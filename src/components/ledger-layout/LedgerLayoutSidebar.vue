@@ -51,6 +51,7 @@ const toggleSidebar = () => {
 <style scoped>
 .sidebar {
   display: flex;
+  flex: 0 0 auto;
   flex-direction: column;
   justify-content: start;
   align-items: stretch;
@@ -67,7 +68,7 @@ const toggleSidebar = () => {
 }
 
 .header {
-  flex: 0 auto;
+  flex: 0 0 auto;
   display: flex;
   flex-direction: row;
   justify-content: start;
@@ -79,7 +80,7 @@ const toggleSidebar = () => {
 }
 
 .header > img {
-  flex: 0 auto;
+  flex: 0 0 auto;
   width: 40px;
   height: 40px;
 }
@@ -123,7 +124,7 @@ const toggleSidebar = () => {
 }
 
 .nav-item {
-  flex: 0 auto;
+  flex: 0 0 auto;
   height: 32px;
   padding: 8px;
   border-radius: 16px;
@@ -161,7 +162,7 @@ const toggleSidebar = () => {
 }
 
 .toggle-sidebar-box {
-  flex: 0 auto;
+  flex: 0 0 auto;
   display: flex;
   flex-direction: row;
   justify-content: center;
