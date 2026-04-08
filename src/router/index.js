@@ -13,8 +13,8 @@ const router = createRouter({
     {
       path: "/auth",
       children: [
-        { path: "login", component: import("@/views/auth/Login.vue") },
-        { path: "signup", component: import("@/views/auth/Signup.vue") },
+        { path: "login", component: () => import("@/views/auth/Login.vue") },
+        { path: "signup", component: () => import("@/views/auth/Signup.vue") },
       ],
     },
     {
@@ -22,14 +22,20 @@ const router = createRouter({
       children: [
         {
           path: "dashboard",
-          component: import("@/views/ledger/Dashboard.vue"),
+          component: () => import("@/views/ledger/Dashboard.vue"),
         },
-        { path: "mypage", component: import("@/views/ledger/MyPage.vue") },
+        {
+          path: "mypage",
+          component: () => import("@/views/ledger/MyPage.vue"),
+        },
         {
           path: "transactions",
-          component: import("@/views/ledger/Transactions.vue"),
+          component: () => import("@/views/ledger/Transactions.vue"),
         },
-        { path: "stat", component: import("@/views/ledger/Statistic.vue") },
+        {
+          path: "stat",
+          component: () => import("@/views/ledger/Statistic.vue"),
+        },
       ],
     },
   ],
