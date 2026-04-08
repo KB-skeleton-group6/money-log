@@ -45,7 +45,7 @@ const userName = ref("홍길동");
 <style scoped>
 .ledger-layout-header {
   display: flex;
-  flex: 0 auto;
+  flex: 0 0 auto;
   flex-direction: row;
   justify-content: start;
   align-items: center;
@@ -73,7 +73,7 @@ const userName = ref("홍길동");
 
 .header-right {
   display: flex;
-  flex: 0 auto;
+  flex: 0 0 auto;
   flex-direction: row;
   justify-content: start;
   align-items: center;
