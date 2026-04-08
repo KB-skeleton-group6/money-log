@@ -37,7 +37,7 @@ import LedgerLayoutSidebar from "@/components/ledger-layout/LedgerLayoutSidebar.
 .body {
   width: 100%;
   height: 100%;
-  overflow: scroll;
+  overflow-y: scroll;
 }
 
 .add-transaction-btn {
