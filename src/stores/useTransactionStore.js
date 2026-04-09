@@ -1,7 +1,8 @@
-import { defineStore } from 'pinia';
-import axios from 'axios';
+import { defineStore } from "pinia";
+import axios from "axios";
+import axiosClient from "@/api/axiosClient";
 
-export const useTransactionStore = defineStore('transaction', {
+export const useTransactionStore = defineStore("transaction", {
   state: () => ({
     transactions: [],
     categories: [],
@@ -49,12 +50,12 @@ export const useTransactionStore = defineStore('transaction', {
 
       const stats = {
         income: {
-          current: calculateTotal(tMonth, 'INCOME'),
-          last: calculateTotal(lMonth, 'INCOME'),
+          current: calculateTotal(tMonth, "INCOME"),
+          last: calculateTotal(lMonth, "INCOME"),
         },
         expense: {
-          current: calculateTotal(tMonth, 'EXPENSE'),
-          last: calculateTotal(lMonth, 'EXPENSE'),
+          current: calculateTotal(tMonth, "EXPENSE"),
+          last: calculateTotal(lMonth, "EXPENSE"),
         },
       };
 
@@ -79,14 +80,14 @@ export const useTransactionStore = defineStore('transaction', {
     async fetchData() {
       this.loading = true;
       try {
-        const [resT, resC] = await Promise.all([
-          axios.get('http://localhost:3000/transactions'),
-          axios.get('http://localhost:3000/categories'),
+        const [transactions, categories] = await Promise.all([
+          axiosClient.transactionApi.getTransactions(),
+          axiosClient.categoryApi.getCategories(),
         ]);
-        this.transactions = resT.data;
-        this.categories = resC.data;
+        this.transactions = transactions;
+        this.categories = categories;
       } catch (error) {
-        console.error('Data Fetch Error:', error);
+        console.error("Data Fetch Error:", error);
       } finally {
         this.loading = false;
       }
@@ -99,10 +100,10 @@ export const useTransactionStore = defineStore('transaction', {
         this.transactions.splice(index, 1);
 
         try {
-          await axios.delete(`http://localhost:3000/transactions/${id}`);
+          await axiosClient.transactionApi.deleteTransaction(id);
         } catch (error) {
           this.transactions.splice(index, 0, backup);
-          alert('삭제에 실패했습니다.');
+          alert("삭제에 실패했습니다.");
         }
       }
     },
