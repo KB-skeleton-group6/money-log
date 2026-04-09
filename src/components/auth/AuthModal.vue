@@ -1,11 +1,14 @@
 <script setup>
 import { ref, computed, watch } from 'vue';
+import { useRouter } from 'vue-router';
 import {
   isEmailValid,
   isNameValid,
   isPasswordValid,
   MemberInfoError as AuthError,
 } from '@/utils/validators/authValidator';
+
+import { useAuthStore } from '@/stores/useAuthStore';
 
 const emit = defineEmits(['close']);
 const isLoginMode = ref(true); // true: 로그인 모드, false: 회원가입 모드
@@ -16,6 +19,8 @@ const email = ref('');
 const name = ref('');
 const password = ref('');
 const errorMessage = ref('');
+
+const router = useRouter();
 
 // 사용자가 다시 타이핑을 시작하면 에러 메시지 숨김
 watch([email, name, password], () => {
@@ -44,9 +49,9 @@ const setMode = (mode) => {
   showPassword.value = false;
 };
 
-// 폼 제출 핸들러
-const handleSubmit = () => {
-  errorMessage.value = ''; // 기존 에러 초기화
+// AuthModal.vue 수정
+const handleSubmit = async () => {
+  errorMessage.value = '';
 
   try {
     isEmailValid(email.value);
@@ -55,18 +60,18 @@ const handleSubmit = () => {
     }
     isPasswordValid(password.value);
 
-    // 유효성 검사 통과 시 처리 로직
+    const authStore = useAuthStore();
+
     if (isLoginMode.value) {
-      console.log('로그인 시도:', {
-        email: email.value,
-        password: password.value,
-      });
+      // 1. 로그인 모드
+      await authStore.login(email.value, password.value);
+      emit('close');
+      router.push('/ledger/dashboard');
     } else {
-      console.log('회원가입 시도:', {
-        email: email.value,
-        name: name.value,
-        password: password.value,
-      });
+      // 2. 회원가입 모드
+      await authStore.signup(email.value, password.value, name.value);
+      alert('회원가입이 완료되었습니다. 로그인해 주세요!');
+      emit('close');
     }
   } catch (error) {
     if (error instanceof AuthError) {
