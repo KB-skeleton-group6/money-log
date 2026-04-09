@@ -45,7 +45,7 @@ const cancelChanges = () => {
   <div class="profile-section">
     <div class="profile-header">
       <div class="profile-image">
-        <img />
+        <span>{{ user.name[0] }}</span>
       </div>
       <div class="profile-summary">
         <div class="name-grade">
@@ -130,15 +130,19 @@ const cancelChanges = () => {
 .profile-image {
   flex: 0 0 auto;
   display: flex;
+  width: 72px;
+  height: 72px;
+  border-radius: 16px;
+  background-color: #00c78b;
   flex-direction: column;
-  justify-content: start;
+  justify-content: center;
   align-items: center;
 }
 
-.profile-image img {
-  width: 64px;
-  height: 64px;
-  border-radius: 50%;
+.profile-image > span {
+  color: white;
+  font-size: 24px;
+  font-weight: bold;
 }
 
 .profile-summary {

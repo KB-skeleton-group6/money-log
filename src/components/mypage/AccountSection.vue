@@ -1,23 +1,68 @@
-<script setup></script>
+<script setup>
+import ChangePasswordModal from "@/components/mypage/ChangePasswordModal.vue";
+import LogoutConfirmModal from "@/components/mypage/LogoutConfirmModal.vue";
+import WithdrawalConfirmModal from "@/components/mypage/WithdrawalConfirmModal.vue";
+
+import { ref } from "vue";
+
+const isChangePasswordModalOpen = ref(false);
+const isLogoutModalOpen = ref(false);
+const isWithdrawalModalOpen = ref(false);
+
+const openChangePasswordModal = () => {
+  isChangePasswordModalOpen.value = true;
+};
+
+const closeChangePasswordModal = () => {
+  isChangePasswordModalOpen.value = false;
+};
+
+const openLogoutModal = () => {
+  isLogoutModalOpen.value = true;
+};
+
+const closeLogoutModal = () => {
+  isLogoutModalOpen.value = false;
+};
+
+const openWithdrawalModal = () => {
+  isWithdrawalModalOpen.value = true;
+};
+
+const closeWithdrawalModal = () => {
+  isWithdrawalModalOpen.value = false;
+};
+</script>
 
 <template>
   <div class="budget-section">
     <h3>계정 관리</h3>
     <div class="buttons">
-      <button class="change-password-btn">
+      <button class="change-password-btn" @click="openChangePasswordModal">
         <i class="fa-solid fa-lock"></i>
         <span>비밀번호 변경</span>
       </button>
-      <button class="logout-btn">
+      <button class="logout-btn" @click="openLogoutModal">
         <i class="fa-solid fa-arrow-right-from-bracket"></i>
         <span>로그아웃</span>
       </button>
       <div class="divider"></div>
-      <button class="withdrawal-btn">
+      <button class="withdrawal-btn" @click="openWithdrawalModal">
         <i class="fa-regular fa-trash-can"></i>
         <span>회원 탈퇴</span>
       </button>
     </div>
+    <Teleport to="body">
+      <ChangePasswordModal
+        v-if="isChangePasswordModalOpen"
+        @close="closeChangePasswordModal"
+      />
+      <LogoutConfirmModal v-if="isLogoutModalOpen" @close="closeLogoutModal" />
+      <WithdrawalConfirmModal
+        v-if="isWithdrawalModalOpen"
+        @close="closeWithdrawalModal"
+      />
+    </Teleport>
   </div>
 </template>
 
@@ -65,6 +110,8 @@
   padding: 8px 16px;
   color: rgb(46, 46, 46);
   background-color: white;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
 }
 
 .buttons > button.withdrawal-btn {
