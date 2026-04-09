@@ -52,6 +52,12 @@ const userName = ref("홍길동");
   padding: 8px 16px;
 }
 
+@media (max-width: 768px) {
+  .ledger-layout-header {
+    display: none;
+  }
+}
+
 .header-left {
   display: flex;
   flex: 1 1 auto;

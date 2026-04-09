@@ -179,4 +179,10 @@ const toggleSidebar = () => {
   border: none;
   padding: 0;
 }
+
+@media (max-width: 768px) {
+  .sidebar {
+    display: none;
+  }
+}
 </style>

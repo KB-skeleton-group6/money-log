@@ -1,6 +1,7 @@
 <script setup>
 import LedgerLayoutHeader from "@/components/ledger-layout/LedgerLayoutHeader.vue";
 import LedgerLayoutSidebar from "@/components/ledger-layout/LedgerLayoutSidebar.vue";
+import LedgerLayoutBottomNav from "@/components/ledger-layout/LedgerLayoutBottomNav.vue";
 
 import TransectionAddModal from "@/components/transection/TransectionAddModal.vue";
 import { useAddTransactionStore } from "@/stores/transactions/useAddTransactionStore";
@@ -20,6 +21,7 @@ import { useAddTransactionStore } from "@/stores/transactions/useAddTransactionS
     </button>
   </div>
 
+  <LedgerLayoutBottomNav />
   <TransectionAddModal />
 </template>
 
@@ -61,5 +63,12 @@ import { useAddTransactionStore } from "@/stores/transactions/useAddTransactionS
     0 6px 20px 0 rgba(0, 0, 0, 0.19);
   transition: background-color 0.3s ease;
   background-color: #00bc7c;
+}
+
+@media (max-width: 768px) {
+  .add-transaction-btn {
+    bottom: 76px;
+    right: 16px;
+  }
 }
 </style>

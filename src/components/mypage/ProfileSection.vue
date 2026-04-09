@@ -62,7 +62,7 @@ const formattedCreatedAt = computed(() => {
   <div class="profile-section">
     <div class="profile-header">
       <div class="profile-image">
-        <span>{{ user?.name[0] ?? "X" }}</span>
+        <span>{{ user && user.name ? user.name[0] : "X" }}</span>
       </div>
       <div class="profile-summary">
         <div class="name-grade">
