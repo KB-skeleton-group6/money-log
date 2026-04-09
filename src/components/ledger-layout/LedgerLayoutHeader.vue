@@ -49,7 +49,7 @@ const userName = ref("홍길동");
   flex-direction: row;
   justify-content: start;
   align-items: center;
-  padding: 8px 16px;
+  padding: 16px;
 }
 
 @media (max-width: 768px) {

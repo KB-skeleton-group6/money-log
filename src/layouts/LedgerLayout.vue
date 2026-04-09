@@ -69,5 +69,9 @@ import { useAddTransactionStore } from "@/stores/transactions/useAddTransactionS
   .add-transaction-btn {
     display: none;
   }
+
+  .body {
+    padding-bottom: 60px;
+  }
 }
 </style>

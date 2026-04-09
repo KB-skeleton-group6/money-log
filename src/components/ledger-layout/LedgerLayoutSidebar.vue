@@ -74,7 +74,7 @@ const toggleSidebar = () => {
   justify-content: start;
   align-items: center;
   gap: 16px;
-  height: 40px;
+  height: 56px;
   padding: 8px;
   color: white;
 }
@@ -125,7 +125,7 @@ const toggleSidebar = () => {
 
 .nav-item {
   flex: 0 0 auto;
-  height: 32px;
+  height: 48px;
   padding: 8px;
   border-radius: 16px;
 }
