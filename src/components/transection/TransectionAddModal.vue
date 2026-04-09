@@ -1,5 +1,6 @@
 <script setup>
 import { ref, computed } from "vue";
+import { useAddTransactionStore } from "@/stores/transactions/useAddTransactionStore";
 
 const categoriesData = {
   expense: [
@@ -31,34 +32,24 @@ const paymentMethodsData = [
   "간편결제",
 ];
 
-let isOpen = ref(false);
-let isIncome = ref(true);
-let date = ref(
-  new Date().toLocaleDateString("ko-KR", {
-    year: "numeric",
-    month: "2-digit",
-    day: "2-digit",
-  }),
-);
-let amount = ref("");
-let category = ref("");
-let detail = ref("");
-let memo = ref("");
-let paymentMethod = ref("신용카드");
+const addTransactionStore = useAddTransactionStore();
+const formData = addTransactionStore.formData;
 
-const memoLength = computed(() => memo.value.length);
+const memoLength = computed(() => formData.memo.length);
 </script>
 
 <template>
-  <button @click="isOpen = true" class="open-btn">테스트 열기</button>
-
   <Teleport to="body">
     <transition name="modal">
-      <div v-if="isOpen" class="modal-overlay" @mousedown.self="isOpen = false">
+      <div
+        v-if="addTransactionStore.isOpen"
+        class="modal-overlay"
+        @mousedown.self="addTransactionStore.isOpen = false"
+      >
         <div class="modal">
           <div class="modal-header">
             <h2 class="modal-title">거래 추가</h2>
-            <button class="close-btn" @click="isOpen = false">
+            <button class="close-btn" @click="addTransactionStore.closeModal">
               <i class="fa-solid fa-xmark"></i>
             </button>
           </div>
@@ -69,15 +60,15 @@ const memoLength = computed(() => memo.value.length);
               <div class="toggle-container">
                 <div
                   class="toggle-item income"
-                  :class="{ selected: isIncome }"
-                  @click="isIncome = true"
+                  :class="{ selected: formData.isIncome }"
+                  @click="formData.isIncome = true"
                 >
                   <i class="fa-solid fa-arrow-up"></i> <span>수입</span>
                 </div>
                 <div
                   class="toggle-item expense"
-                  :class="{ selected: !isIncome }"
-                  @click="isIncome = false"
+                  :class="{ selected: !formData.isIncome }"
+                  @click="formData.isIncome = false"
                 >
                   <i class="fa-solid fa-arrow-down"></i> <span>지출</span>
                 </div>
@@ -88,7 +79,7 @@ const memoLength = computed(() => memo.value.length);
               <label class="form-label">날짜</label>
               <div class="input-box clickable">
                 <i class="fa-regular fa-calendar input-icon"></i>
-                <span class="input-control">{{ date }}</span>
+                <span class="input-control">{{ formData.date }}</span>
                 <i class="fa-solid fa-chevron-down input-icon small"></i>
               </div>
             </div>
@@ -100,7 +91,7 @@ const memoLength = computed(() => memo.value.length);
                 <input
                   type="number"
                   class="input-control text-right bold"
-                  v-model="amount"
+                  v-model="formData.amount"
                   placeholder="0"
                 />
                 <span class="input-suffix">원</span>
@@ -112,15 +103,15 @@ const memoLength = computed(() => memo.value.length);
               <div class="category-grid">
                 <div
                   v-for="value in categoriesData[
-                    isIncome ? 'income' : 'expense'
+                    formData.isIncome ? 'income' : 'expense'
                   ]"
                   :key="value.label"
                   class="category-item"
-                  :class="{ selected: category == value.label }"
+                  :class="{ selected: formData.category == value.label }"
                   @click="
-                    category != value.label
-                      ? (category = value.label)
-                      : (category = '')
+                    formData.category != value.label
+                      ? (formData.category = value.label)
+                      : (formData.category = '')
                   "
                 >
                   <i :class="value.icon"></i>
@@ -136,7 +127,7 @@ const memoLength = computed(() => memo.value.length);
                 <input
                   type="text"
                   class="input-control"
-                  v-model="detail"
+                  v-model="formData.detail"
                   placeholder="예) 아메리카노 구매"
                 />
               </div>
@@ -150,7 +141,7 @@ const memoLength = computed(() => memo.value.length);
               <div class="input-box">
                 <textarea
                   class="input-control textarea"
-                  v-model="memo"
+                  v-model="formData.memo"
                   placeholder="추가 메모를 입력하세요"
                 ></textarea>
               </div>
@@ -163,8 +154,8 @@ const memoLength = computed(() => memo.value.length);
                   v-for="method in paymentMethodsData"
                   :key="method"
                   class="pill-item"
-                  :class="{ selected: paymentMethod == method }"
-                  @click="paymentMethod = method"
+                  :class="{ selected: formData.paymentMethod == method }"
+                  @click="formData.paymentMethod = method"
                 >
                   {{ method }}
                 </div>
