@@ -80,12 +80,8 @@ export const useTransactionStore = defineStore("transaction", {
     async fetchData() {
       this.loading = true;
       try {
-        const [transactions, categories] = await Promise.all([
-          axiosClient.transactionApi.getTransactions(),
-          axiosClient.categoryApi.getCategories(),
-        ]);
+        const transactions = await axiosClient.transactionApi.getTransactions();
         this.transactions = transactions;
-        this.categories = categories;
       } catch (error) {
         console.error("Data Fetch Error:", error);
       } finally {
@@ -110,8 +106,9 @@ export const useTransactionStore = defineStore("transaction", {
     async addTransaction(payload) {
       try {
         // axiosClient에 정의된 createTransaction 호출
-        const newTransaction = await axiosClient.transactionApi.createTransaction(payload);
-        
+        const newTransaction =
+          await axiosClient.transactionApi.createTransaction(payload);
+
         // 서버에서 생성된 객체를 반환받으면 로컬 배열에 추가
         if (newTransaction) {
           this.transactions.push(newTransaction);

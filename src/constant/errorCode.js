@@ -104,6 +104,10 @@ export const ErrorCode = {
     code: 6010,
     msg: '❗️이미 사용 중인 이메일입니다.❗️',
   },
+  SESSION_EXPIRED: {
+    code: 6011,
+    msg: '❗️세션이 만료되었습니다. 다시 로그인해주세요.❗️',
+  },
 
   // 7. 거래 내역 조작 관련 (7000번대)
   TRANSACTION_CREATE_FAILED: {

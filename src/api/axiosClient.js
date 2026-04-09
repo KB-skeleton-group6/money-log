@@ -1,158 +1,163 @@
 import axios from "axios";
-import {
-  FetchFailedError,
-  NetworkOfflineError,
-  SaveFailedError,
-} from "./networkError";
-import { ErrorCode } from "@/constant/errorCode";
+import { NetworkOfflineError, ApiError } from "./networkError";
+import { ApiErrorCode } from "@shared/apiErrorCodes";
+import router from "@/router";
 
 const urlPrefix = "/api";
 
-const isRequestSuccessful = (statusCode) => {
-  return statusCode >= 200 && statusCode < 300;
-};
+const client = axios.create();
 
-const onFetchFailed = () => {
-  throw new FetchFailedError();
-};
-
-const onSaveFailed = () => {
-  throw new SaveFailedError();
-};
-
-const onNetworkOffline = () => {
-  throw new NetworkOfflineError();
-};
-
-const checkRequestFailed = (statusCode, errorCode) => {
-  if (!isRequestSuccessful(statusCode)) {
-    switch (errorCode.code) {
-      case ErrorCode.FETCH_FAILED.code:
-        onFetchFailed();
-        break;
-      case ErrorCode.SAVE_FAILED.code:
-        onSaveFailed();
-        break;
-      default:
-        onNetworkOffline();
-    }
+client.interceptors.request.use((config) => {
+  const stored = localStorage.getItem("auth-storage");
+  const auth = stored ? JSON.parse(stored) : null;
+  if (auth?.accessToken) {
+    config.headers.Authorization = `Bearer ${auth.accessToken}`;
   }
-};
+  return config;
+});
+
+client.interceptors.response.use(
+  (res) => res,
+  (error) => {
+    if (!error.response) {
+      throw new NetworkOfflineError();
+    }
+    const serverErrorCode = error.response.data?.errorCode;
+
+    if (serverErrorCode === ApiErrorCode.AUTH_TOKEN_INVALID) {
+      localStorage.removeItem("auth-storage");
+      window.dispatchEvent(new Event("auth:session-expired"));
+      router.push("/auth/login");
+    }
+
+    throw new ApiError(serverErrorCode);
+  },
+);
+
+async function signup({ email, password, name }) {
+  const res = await client.post(`${urlPrefix}/auth/signup`, {
+    email,
+    password,
+    name,
+  });
+
+  return res.data;
+}
+
+async function login({ email, password }) {
+  const res = await client.post(`${urlPrefix}/auth/login`, {
+    email,
+    password,
+  });
+
+  const authHeader = res.headers.authorization;
+  return authHeader?.startsWith("Bearer ") ? authHeader.slice(7) : authHeader;
+}
+
+async function resetPassword({ currentPassword, newPassword }) {
+  await client.post(`${urlPrefix}/auth/reset-password`, {
+    current_password: currentPassword,
+    new_password: newPassword,
+  });
+}
+
+async function withdraw() {
+  await client.post(`${urlPrefix}/auth/withdraw`, {});
+}
+
+async function getMyProfile() {
+  const res = await client.get(`${urlPrefix}/profiles/me`);
+
+  return res.data;
+}
+
+async function getProfile({ memberId }) {
+  const res = await client.get(`${urlPrefix}/members/${memberId}`);
+
+  return res.data;
+}
+
+async function updateProfile({ memberId, name }) {
+  await client.put(`${urlPrefix}/members/${memberId}`, { name });
+}
 
 async function getMembers() {
-  const res = await axios.get(`${urlPrefix}/members`);
+  const res = await client.get(`${urlPrefix}/members`);
 
-  checkRequestFailed(res.status, ErrorCode.FETCH_FAILED);
-
-  const members = res.data;
-
-  return members;
+  return res.data;
 }
 
 async function getMember(memberId) {
-  const res = await axios.get(`${urlPrefix}/members/${memberId}`);
+  const res = await client.get(`${urlPrefix}/members/${memberId}`);
 
-  checkRequestFailed(res.status, ErrorCode.FETCH_FAILED);
-
-  const member = res.data;
-
-  return member;
+  return res.data;
 }
 
 async function getMemberByEmail(email) {
-  const res = await axios.get(`${urlPrefix}/members?email:eq=${email}`);
+  const res = await client.get(`${urlPrefix}/members?email:eq=${email}`);
 
-  checkRequestFailed(res.status, ErrorCode.FETCH_FAILED);
-
-  const members = res.data;
-
-  return members;
+  return res.data;
 }
 
 async function createMember(member) {
-  const res = await axios.post(`${urlPrefix}/members`, member);
+  const res = await client.post(`${urlPrefix}/members`, member);
 
-  checkRequestFailed(res.status, ErrorCode.FETCH_FAILED);
-
-  const createdMember = res.data;
-
-  return createdMember;
+  return res.data;
 }
 
 async function updateMember(memberId, member) {
-  const res = await axios.put(`${urlPrefix}/members/${memberId}`, member);
+  const res = await client.put(`${urlPrefix}/members/${memberId}`, member);
 
-  checkRequestFailed(res.status, ErrorCode.FETCH_FAILED);
-
-  const updatedMember = res.data;
-
-  return updatedMember;
+  return res.data;
 }
 
 async function deleteMember(memberId) {
-  const res = await axios.delete(`${urlPrefix}/members/${memberId}`);
-
-  checkRequestFailed(res.status, ErrorCode.FETCH_FAILED);
+  await client.delete(`${urlPrefix}/members/${memberId}`);
 }
 
 async function getTransactions() {
-  const res = await axios.get(`${urlPrefix}/transactions`);
+  const res = await client.get(`${urlPrefix}/transactions`);
 
-  checkRequestFailed(res.status, ErrorCode.FETCH_FAILED);
-
-  const transactions = res.data;
-
-  return transactions;
+  return res.data;
 }
 
 async function getTransaction(transactionId) {
-  const res = await axios.get(`${urlPrefix}/transactions/${transactionId}`);
+  const res = await client.get(`${urlPrefix}/transactions/${transactionId}`);
 
-  checkRequestFailed(res.status, ErrorCode.FETCH_FAILED);
-
-  const transaction = res.data;
-
-  return transaction;
+  return res.data;
 }
 
 async function createTransaction(transaction) {
-  const res = await axios.post(`${urlPrefix}/transactions`, transaction);
+  const res = await client.post(`${urlPrefix}/transactions`, transaction);
 
-  checkRequestFailed(res.status, ErrorCode.FETCH_FAILED);
-
-  const createdTransaction = res.data;
-
-  return createdTransaction;
+  return res.data;
 }
 
 async function updateTransaction(transactionId, transaction) {
-  const res = await axios.put(
+  const res = await client.put(
     `${urlPrefix}/transactions/${transactionId}`,
     transaction,
   );
 
-  checkRequestFailed(res.status, ErrorCode.FETCH_FAILED);
-
-  const updatedTransaction = res.data;
-
-  return updatedTransaction;
+  return res.data;
 }
 
 async function deleteTransaction(transactionId) {
-  const res = await axios.delete(`${urlPrefix}/transactions/${transactionId}`);
-
-  checkRequestFailed(res.status, ErrorCode.FETCH_FAILED);
+  await client.delete(`${urlPrefix}/transactions/${transactionId}`);
 }
 
-async function getCategories() {
-  const res = await axios.get(`${urlPrefix}/categories`);
+const authApi = {
+  signup,
+  login,
+  resetPassword,
+  withdraw,
+};
 
-  checkRequestFailed(res.status, ErrorCode.FETCH_FAILED);
-
-  const categories = res.data;
-
-  return categories;
-}
+const profileApi = {
+  getMyProfile,
+  getProfile,
+  updateProfile,
+};
 
 const memberApi = {
   getMembers,
@@ -171,8 +176,4 @@ const transactionApi = {
   deleteTransaction,
 };
 
-const categoryApi = {
-  getCategories,
-};
-
-export default { memberApi, transactionApi, categoryApi };
+export default { authApi, profileApi, memberApi, transactionApi };

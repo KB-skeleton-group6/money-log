@@ -31,3 +31,11 @@ export class ServerTimeoutError extends NetworkError {
     super(ErrorCode.SERVER_TIMEOUT);
   }
 }
+
+export class ApiError extends Error {
+  constructor(serverErrorCode) {
+    super(serverErrorCode);
+    this.name = 'ApiError';
+    this.serverErrorCode = serverErrorCode;
+  }
+}

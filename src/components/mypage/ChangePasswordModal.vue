@@ -88,7 +88,7 @@ const saveChanges = () => {
           <div class="input-wrapper">
             <i class="fa-solid fa-lock"></i>
             <input
-              type="password"
+              :type="showCurrentPassword ? 'text' : 'password'"
               :value="currentPassword"
               @input="changeCurrentPassword"
               placeholder="현재 비밀번호를 입력하세요"
@@ -104,7 +104,7 @@ const saveChanges = () => {
           <div class="input-wrapper">
             <i class="fa-solid fa-lock"></i>
             <input
-              type="password"
+              :type="showNewPassword ? 'text' : 'password'"
               :value="newPassword"
               @input="changeNewPassword"
               placeholder="8자 이상 20자 이하로 입력하세요"
@@ -120,7 +120,7 @@ const saveChanges = () => {
           <div class="input-wrapper">
             <i class="fa-solid fa-lock"></i>
             <input
-              type="password"
+              :type="showConfirmNewPassword ? 'text' : 'password'"
               :value="confirmNewPassword"
               @input="changeConfirmNewPassword"
               placeholder="새 비밀번호를 다시 입력하세요"
