@@ -134,9 +134,9 @@ watch(currentFilter, (newVal) => {
 }
 
 .filter-btn.active {
-  background-color: #20bf6b;
+  background-color: #28c76f;
   color: white;
-  border-color: #20bf6b;
+  border-color: #28c76f;
   font-weight: bold;
 }
 
@@ -162,12 +162,12 @@ watch(currentFilter, (newVal) => {
 }
 
 .toggle-btn.active {
-  background: #ff5252;
+  background: #ea5455;
   color: white;
 }
 
 .toggle-btn:nth-child(2).active {
-  background: #20bf6b;
+  background: #00cfe8;
 }
 
 .bottom-container {

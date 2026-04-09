@@ -68,8 +68,8 @@ const chartData = computed(() => {
         label: '순이익',
         type: 'line',
         data: data.profits,
-        borderColor: '#20bf6b',
-        backgroundColor: '#20bf6b',
+        borderColor: '#28c76f',
+        backgroundColor: '#28c76f',
         tension: 0.4,
         pointRadius: 4,
         fill: false,
@@ -79,7 +79,7 @@ const chartData = computed(() => {
         label: '수입',
         type: 'bar',
         data: data.incomes,
-        backgroundColor: '#00a8ff',
+        backgroundColor: '#00cfe8',
         borderRadius: 6,
         barPercentage: 0.5,
       },
@@ -87,7 +87,7 @@ const chartData = computed(() => {
         label: '지출',
         type: 'bar',
         data: data.expenses,
-        backgroundColor: '#ff4d4d',
+        backgroundColor: '#ea5455',
         borderRadius: 6,
         barPercentage: 0.5,
       },
@@ -220,17 +220,17 @@ h3 {
 }
 
 .data-row.income strong {
-  color: #00a8ff;
+  color: #00cfe8;
 }
 .data-row.expense strong {
-  color: #ff4d4d;
+  color: #ea5455;
 }
 .data-row.profit {
   font-size: 1.1rem;
   margin-top: 16px;
 }
 .data-row.profit strong {
-  color: #20bf6b;
+  color: #28c76f;
 }
 hr {
   border: none;
