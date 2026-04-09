@@ -68,33 +68,41 @@ export const ErrorCode = {
   },
 
   // 6. 로그인 및 회원가입 관련 (6000번대)
-  EMPTY_ID_FIELD: {
+  EMPTY_EMAIL_FIELD: {
     code: 6001,
-    msg: '❗️아이디를 입력해주세요.❗️',
+    msg: '❗️이메일을 입력해주세요.❗️',
   },
   EMPTY_PASSWORD_FIELD: {
     code: 6002,
     msg: '❗️비밀번호를 입력해주세요.❗️',
   },
-  EMPTY_NICKNAME_FIELD: {
+  EMPTY_NAME_FIELD: {
     code: 6003,
-    msg: '❗️닉네임을 입력해주세요.❗️',
+    msg: '❗️이름을 입력해주세요.❗️',
   },
   PASSWORD_MISMATCH: {
     code: 6004,
     msg: '❗️비밀번호가 일치하지 않습니다. 다시 확인해주세요.❗️',
   },
-  INVALID_ID_FORMAT: {
+  INVALID_NAME_FORMAT: {
     code: 6005,
-    msg: '❗️아이디 형식이 올바르지 않습니다. (영문/숫자 조합 4~12자)❗️',
-  },
-  DUPLICATE_ID: {
-    code: 6006,
-    msg: '❗️이미 사용 중인 아이디입니다.❗️',
+    msg: '❗️이름 형식이 올바르지 않습니다. (한글·영문·공백만 허용)❗️',
   },
   LOGIN_FAILED: {
     code: 6007,
-    msg: '❗️아이디 또는 비밀번호가 일치하지 않습니다.❗️',
+    msg: '❗️이메일 또는 비밀번호가 일치하지 않습니다.❗️',
+  },
+  INVALID_PASSWORD_FORMAT: {
+    code: 6008,
+    msg: '❗️비밀번호 형식이 올바르지 않습니다. (영문·숫자·특수문자 포함 8~20자)❗️',
+  },
+  INVALID_EMAIL_FORMAT: {
+    code: 6009,
+    msg: '❗️이메일 형식이 올바르지 않습니다. (예: example@email.com)❗️',
+  },
+  DUPLICATE_EMAIL: {
+    code: 6010,
+    msg: '❗️이미 사용 중인 이메일입니다.❗️',
   },
 
   // 7. 거래 내역 조작 관련 (7000번대)
