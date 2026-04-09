@@ -21,6 +21,7 @@ import {
 } from "../../utils/dataChart";
 import { useTransactionStore } from "@/stores/useTransactionStore";
 import { Categories } from "../../constant/categories";
+import { formatDate } from "@/utils/formatter";
 
 ChartJS.register(
   Title,
@@ -36,12 +37,12 @@ const { transactions } = storeToRefs(transactionStore);
 let recentTransaction = ref([]);
 const allList = Object.values(Categories);
 
-onMounted( async () => {
+onMounted(async () => {
   await transactionStore.fetchData();
 
   recentTransaction.value = [...transactions.value]
-  .sort((a, b) => new Date(b.created_at) - new Date(a.created_at))
-  .slice(0, 7);
+    .sort((a, b) => new Date(b.created_at) - new Date(a.created_at))
+    .slice(0, 6);
 });
 
 const {
@@ -199,17 +200,20 @@ const isToday = (dateStr) => dateStr === dayjs().format("YYYY-MM-DD");
             <div
               class="icon-wrapper"
               :style="{
-                backgroundColor: allList.find((cat) => cat.id === item.category_id).subColor,
+                backgroundColor: allList.find(
+                  (cat) => cat.id === item.category_id,
+                ).subColor,
                 color: allList.find((cat) => cat.id === item.category_id).color,
               }"
             >
-              <i :class="allList.find((cat) => cat.id === item.category_id).icon"></i>
+              <i
+                :class="allList.find((cat) => cat.id === item.category_id).icon"
+              ></i>
             </div>
             <div class="item-info">
               <h4>{{ item.detail }}</h4>
-              <p>
-                {{ item.category }} · {{ formatDateTime(item.transacted_at) }}
-              </p>
+              <p>거래: {{ formatDate(item.transacted_at) }}</p>
+              <p>생성: {{ formatDateTime(item.created_at) }}</p>
             </div>
             <div
               class="item-amount"
