@@ -2,6 +2,7 @@
 import { ref, computed } from "vue";
 import { useAddTransactionStore } from "@/stores/transactions/useAddTransactionStore";
 import { Categories } from "../../constant/categories";
+import { Payments } from "../../constant/paymentMethods";
 
 const addTransactionStore = useAddTransactionStore();
 const formData = addTransactionStore.formData;
@@ -14,6 +15,14 @@ const categorizedList = computed(() => {
     EXPENSE: allList.filter((cat) => cat.label === "EXPENSE"),
   };
 });
+
+const paymentMethods = computed(() => {
+  const allList = Object.values(Payments);
+
+  return {
+    ALL: allList,
+  }
+})
 
 const memoLength = computed(() => formData.memo.length);
 
@@ -136,13 +145,13 @@ const handleSubmit = () => {
               <label class="form-label">결제 수단</label>
               <div class="pills-container">
                 <div
-                  v-for="method in paymentMethodsData"
-                  :key="method"
+                  v-for="method in paymentMethods.ALL"
+                  :key="method.id"
                   class="pill-item"
-                  :class="{ selected: formData.paymentMethod == method }"
-                  @click="formData.paymentMethod = method"
+                  :class="{ selected: method.value == formData.method }"
+                  @click="formData.method = method.value"
                 >
-                  {{ method }}
+                  {{ method.name }}
                 </div>
               </div>
             </div>
