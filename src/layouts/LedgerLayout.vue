@@ -67,8 +67,7 @@ import { useAddTransactionStore } from "@/stores/transactions/useAddTransactionS
 
 @media (max-width: 768px) {
   .add-transaction-btn {
-    bottom: 76px;
-    right: 16px;
+    display: none;
   }
 }
 </style>
