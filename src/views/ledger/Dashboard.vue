@@ -23,6 +23,7 @@ import { useTransactionStore } from "@/stores/useTransactionStore";
 import { Categories } from "../../constant/categories";
 import { formatDate } from "@/utils/formatter";
 
+
 ChartJS.register(
   Title,
   Tooltip,
@@ -34,15 +35,20 @@ ChartJS.register(
 
 const transactionStore = useTransactionStore();
 const { transactions } = storeToRefs(transactionStore);
-let recentTransaction = ref([]);
 const allList = Object.values(Categories);
 
-onMounted(async () => {
-  await transactionStore.fetchData();
+const recentTransaction = computed(() => {
+  if (!transactionStore.transactions || transactionStore.transactions.length === 0) {
+    return [];
+  }
 
-  recentTransaction.value = [...transactions.value]
+  return [...transactionStore.transactions]
     .sort((a, b) => new Date(b.created_at) - new Date(a.created_at))
-    .slice(0, 6);
+    .slice(0, 7);
+});
+
+onMounted(() => {
+  transactionStore.fetchData();
 });
 
 const {
