@@ -3,7 +3,7 @@ import { ref, defineEmits } from "vue";
 import {
   isPasswordValid,
   isPasswordConfirmed,
-} from "@/utils/validators/memberInfoValidator";
+} from "@/utils/validators/authValidator";
 
 const emit = defineEmits(["close", "save"]);
 

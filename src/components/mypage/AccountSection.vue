@@ -35,7 +35,7 @@ const closeWithdrawalModal = () => {
 </script>
 
 <template>
-  <div class="budget-section">
+  <div class="account-section">
     <h3>계정 관리</h3>
     <div class="buttons">
       <button class="change-password-btn" @click="openChangePasswordModal">
@@ -67,7 +67,7 @@ const closeWithdrawalModal = () => {
 </template>
 
 <style scoped>
-.budget-section {
+.account-section {
   display: flex;
   flex-direction: column;
   justify-content: start;
@@ -78,7 +78,7 @@ const closeWithdrawalModal = () => {
   background-color: white;
 }
 
-.budget-section h3 {
+.account-section h3 {
   flex: 0 0 auto;
   margin: 0;
   font-size: 14px;

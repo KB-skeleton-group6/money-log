@@ -24,11 +24,19 @@ const menuItems = [
 const currentComponent = computed(() => {
   return menuItems.find((item) => item.id === menuId.value).component;
 });
+
+const activeIndex = computed(() =>
+  menuItems.findIndex((item) => item.id === menuId.value)
+);
 </script>
 
 <template>
   <div class="container">
     <div class="section-modes">
+      <div
+        class="slider"
+        :style="{ transform: activeIndex === 0 ? 'translateX(0)' : 'translateX(calc(100% + 8px))' }"
+      ></div>
       <div
         v-for="item in menuItems"
         :key="item.id"
@@ -56,13 +64,14 @@ const currentComponent = computed(() => {
   align-items: stretch;
   gap: 32px;
   min-width: 600px;
-  height: 100%;
+  min-height: 100%;
   padding: 32px;
   background-color: rgb(240, 240, 240);
 }
 
 .section-modes {
   flex: 0 0 auto;
+  position: relative;
   display: flex;
   flex-direction: row;
   justify-content: start;
@@ -74,8 +83,21 @@ const currentComponent = computed(() => {
   background-color: white;
 }
 
-.section-modes > div {
+.slider {
+  position: absolute;
+  top: 4px;
+  bottom: 4px;
+  left: 4px;
+  width: calc(50% - 8px);
+  background-color: #00c78b;
+  border-radius: 8px;
+  transition: transform 0.3s ease;
+}
+
+.section-modes > div:not(.slider) {
   flex: 1 1 80px;
+  position: relative;
+  z-index: 1;
   display: flex;
   flex-direction: row;
   justify-content: center;
@@ -84,15 +106,14 @@ const currentComponent = computed(() => {
   padding: 8px;
   border-radius: 8px;
   cursor: pointer;
-  transition: background-color 0.3s ease;
   color: #8ea2b7;
   font-size: 12px;
   font-weight: bold;
+  transition: color 0.3s ease;
 }
 
 .section-modes > div.active {
   color: white;
-  background-color: #00c78b;
 }
 
 .account-section {
