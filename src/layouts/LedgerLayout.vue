@@ -1,6 +1,9 @@
 <script setup>
 import LedgerLayoutHeader from '@/components/ledger-layout/LedgerLayoutHeader.vue';
 import LedgerLayoutSidebar from '@/components/ledger-layout/LedgerLayoutSidebar.vue';
+
+import TransectionAddModal from '@/components/transection/TransectionAddModal.vue';
+import { useAddTransactionStore } from '@/stores/transactions/useAddTransactionStore';
 </script>
 
 <template>
@@ -12,10 +15,15 @@ import LedgerLayoutSidebar from '@/components/ledger-layout/LedgerLayoutSidebar.
         <router-view></router-view>
       </div>
     </div>
-    <button class="add-transaction-btn">
+    <button
+      class="add-transaction-btn"
+      @click="useAddTransactionStore().openModal"
+    >
       <i class="fa-solid fa-plus"></i>
     </button>
   </div>
+
+  <TransectionAddModal />
 </template>
 
 <style scoped>

@@ -39,3 +39,4 @@ __screenshots__/
 *.timestamp-*-*.mjs
 package-lock.json
 .vscode/extensions.json
+db.json

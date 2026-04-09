@@ -1,16 +1,17 @@
 <script setup>
 import { ref, computed, onMounted, watch } from 'vue';
 import { storeToRefs } from 'pinia';
-import { useTransactionStore } from '@/stores/transactions';
+import { useTransactionStore } from '@/stores/useTransactionStore';
 import TransactionList from '@/views/ledger/TransactionList.vue';
+import TransectionAddModal from '@/components/transection/TransectionAddModal.vue';
 
 // Pinia Store 연결
 const transactionStore = useTransactionStore();
 
-// 데이터(ref)는 storeToRefs로 감싸서 꺼내야 화면이 실시간으로 바뀝니다!
+// 데이터(ref)는 storeToRefs로 감싸서 꺼내야 화면이 실시간으로 바뀜
 const { transactions, categories } = storeToRefs(transactionStore);
 
-// 함수(액션)는 그냥 바로 꺼냅니다. (fetchData, deleteTransaction 로직이 다 지워지고 일로 왔어요!)
+// 함수(액션)는 그냥 바로 꺼냅니다.
 const { fetchData, deleteTransaction } = transactionStore;
 
 // 화면 전용 상태 및 로직
@@ -282,6 +283,7 @@ const formatCurrency = (val) => new Intl.NumberFormat('ko-KR').format(val);
         <i class="fas fa-angle-double-right"></i>
       </button>
     </div>
+    <TransectionAddModal />
   </div>
 </template>
 

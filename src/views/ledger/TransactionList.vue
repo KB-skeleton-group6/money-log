@@ -2,10 +2,17 @@
 import { ref, computed } from 'vue';
 import { getCategoryIcon, getLightBackgroundColor } from '@/utils/category';
 import DeleteConfirmModal from '../../components/DeleteConfirmModal.vue';
+import { useAddTransactionStore } from '@/stores/transactions/useAddTransactionStore';
 
 const props = defineProps({
-  transactions: { type: Array, default: () => [] },
-  categories: { type: Array, default: () => [] },
+  transactions: {
+    type: Array,
+    default: () => [],
+  },
+  categories: {
+    type: Array,
+    default: () => [],
+  },
 });
 const emit = defineEmits(['edit', 'delete']);
 
@@ -78,6 +85,11 @@ const handleCloseDeleteModal = () => {
 const executeDelete = () => {
   emit('delete', targetIdToDelete.value); // 부모에게 최종 삭제 요청
   handleCloseDeleteModal();
+};
+
+const addTransactionStore = useAddTransactionStore();
+const handleEditClick = (item) => {
+  addTransactionStore.openEditModal(item);
 };
 </script>
 <template>
@@ -154,7 +166,7 @@ const executeDelete = () => {
         <div class="col-action">
           <button
             class="action-btn"
-            @click="$emit('edit', item.id)"
+            @click="handleEditClick(item)"
             title="수정"
           >
             <i class="far fa-edit"></i>
