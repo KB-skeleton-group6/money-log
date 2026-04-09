@@ -164,4 +164,4 @@ const categoryApi = {
   getCategories,
 };
 
-export { memberApi, transactionApi, categoryApi };
+export default { memberApi, transactionApi, categoryApi };
