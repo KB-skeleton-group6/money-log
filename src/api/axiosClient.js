@@ -59,10 +59,20 @@ async function getMember(memberId) {
   return member;
 }
 
+async function getMemberByEmail(email) {
+  const res = await axios.get(`${urlPrefix}/members?email:eq=${email}`);
+
+  checkRequestFailed(res.status, ErrorCode.FETCH_FAILED);
+
+  const members = res.data;
+
+  return members;
+}
+
 async function createMember(member) {
   const res = await axios.post(`${urlPrefix}/members`, member);
 
-  checkFetchFailed(res.status, ErrorCode.SAVE_FAILED);
+  checkRequestFailed(res.status, ErrorCode.FETCH_FAILED);
 
   const createdMember = res.data;
 
@@ -72,7 +82,7 @@ async function createMember(member) {
 async function updateMember(memberId, member) {
   const res = await axios.put(`${urlPrefix}/members/${memberId}`, member);
 
-  checkFetchFailed(res.status, ErrorCode.SAVE_FAILED);
+  checkRequestFailed(res.status, ErrorCode.FETCH_FAILED);
 
   const updatedMember = res.data;
 
@@ -82,7 +92,7 @@ async function updateMember(memberId, member) {
 async function deleteMember(memberId) {
   const res = await axios.delete(`${urlPrefix}/members/${memberId}`);
 
-  checkFetchFailed(res.status, ErrorCode.SAVE_FAILED);
+  checkRequestFailed(res.status, ErrorCode.FETCH_FAILED);
 }
 
 async function getTransactions() {
@@ -108,7 +118,7 @@ async function getTransaction(transactionId) {
 async function createTransaction(transaction) {
   const res = await axios.post(`${urlPrefix}/transactions`, transaction);
 
-  checkFetchFailed(res.status, ErrorCode.SAVE_FAILED);
+  checkRequestFailed(res.status, ErrorCode.FETCH_FAILED);
 
   const createdTransaction = res.data;
 
@@ -121,7 +131,7 @@ async function updateTransaction(transactionId, transaction) {
     transaction,
   );
 
-  checkFetchFailed(res.status, ErrorCode.SAVE_FAILED);
+  checkRequestFailed(res.status, ErrorCode.FETCH_FAILED);
 
   const updatedTransaction = res.data;
 
@@ -131,7 +141,7 @@ async function updateTransaction(transactionId, transaction) {
 async function deleteTransaction(transactionId) {
   const res = await axios.delete(`${urlPrefix}/transactions/${transactionId}`);
 
-  checkFetchFailed(res.status, ErrorCode.SAVE_FAILED);
+  checkRequestFailed(res.status, ErrorCode.FETCH_FAILED);
 }
 
 async function getCategories() {
@@ -147,6 +157,7 @@ async function getCategories() {
 const memberApi = {
   getMembers,
   getMember,
+  getMemberByEmail,
   createMember,
   updateMember,
   deleteMember,

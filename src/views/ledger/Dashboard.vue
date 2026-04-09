@@ -12,11 +12,17 @@ import {
   LinearScale,
 } from "chart.js";
 
+import { storeToRefs } from "pinia";
+
 import {
   formatCurrency,
   formatDateTime,
   useDashboardCalculations,
 } from "../../utils/dataChart";
+import { useTransactionStore } from "@/stores/useTransactionStore";
+import { Categories } from "../../constant/categories";
+import { formatDate } from "@/utils/formatter";
+
 
 ChartJS.register(
   Title,
@@ -27,7 +33,23 @@ ChartJS.register(
   LinearScale,
 );
 
-const transactions = ref([]);
+const transactionStore = useTransactionStore();
+const { transactions } = storeToRefs(transactionStore);
+const allList = Object.values(Categories);
+
+const recentTransaction = computed(() => {
+  if (!transactionStore.transactions || transactionStore.transactions.length === 0) {
+    return [];
+  }
+
+  return [...transactionStore.transactions]
+    .sort((a, b) => new Date(b.created_at) - new Date(a.created_at))
+    .slice(0, 7);
+});
+
+onMounted(() => {
+  transactionStore.fetchData();
+});
 
 const {
   totalIncome,
@@ -44,109 +66,6 @@ const {
   chartOptionsIncome,
   chartOptionsExpense,
 } = useDashboardCalculations(transactions);
-
-onMounted(() => {
-  setTimeout(() => {
-    transactions.value = [
-      {
-        id: 1,
-        user_id: "user1",
-        category: "급여",
-        amount: 3800000,
-        detail: "월급",
-        type: "INCOME",
-        transacted_at: "2026-04-01 09:00:00",
-        icon: "fa-solid fa-money-check-dollar",
-        iconBg: "#e6f7ef",
-        iconColor: "#28c76f",
-      },
-      {
-        id: 2,
-        user_id: "user1",
-        category: "카페",
-        amount: -6500,
-        detail: "스타벅스",
-        type: "EXPENSE",
-        transacted_at: "2026-03-02 08:30:00",
-        icon: "fa-solid fa-mug-hot",
-        iconBg: "#fef5e5",
-        iconColor: "#ff9f43",
-      },
-      {
-        id: 3,
-        user_id: "user1",
-        category: "식료품",
-        amount: -87400,
-        detail: "마트 장보기",
-        type: "EXPENSE",
-        transacted_at: "2026-02-02 18:20:00",
-        icon: "fa-solid fa-basket-shopping",
-        iconBg: "#fceaea",
-        iconColor: "#ea5455",
-      },
-      {
-        id: 4,
-        user_id: "user1",
-        category: "구독",
-        amount: -17000,
-        detail: "넷플릭스",
-        type: "EXPENSE",
-        transacted_at: "2026-02-05 12:30:00",
-        icon: "fa-solid fa-calendar-check",
-        iconBg: "#fceaea",
-        iconColor: "#ea5455",
-      },
-      {
-        id: 5,
-        user_id: "user1",
-        category: "부업",
-        amount: 450000,
-        detail: "프리랜서 수입",
-        type: "INCOME",
-        transacted_at: "2026-02-05 12:30:00",
-        icon: "fa-solid fa-briefcase",
-        iconBg: "#e0f2fe",
-        iconColor: "#00cfe8",
-      },
-      {
-        id: 6,
-        user_id: "user1",
-        category: "식비",
-        amount: -12000,
-        detail: "점심 식사",
-        type: "EXPENSE",
-        transacted_at: "2026-02-05 12:30:00",
-        icon: "fa-solid fa-utensils",
-        iconBg: "#fef5e5",
-        iconColor: "#ff9f43",
-      },
-      {
-        id: 7,
-        user_id: "user1",
-        category: "교통",
-        amount: -1400,
-        detail: "지하철 교통비",
-        type: "EXPENSE",
-        transacted_at: "2026-03-05 08:10:00",
-        icon: "fa-solid fa-train-subway",
-        iconBg: "#e0f2fe",
-        iconColor: "#00cfe8",
-      },
-      {
-        id: 8,
-        user_id: "user1",
-        category: "교육",
-        amount: -59000,
-        detail: "온라인 강의",
-        type: "EXPENSE",
-        transacted_at: "2026-02-06 20:00:00",
-        icon: "fa-solid fa-book-open",
-        iconBg: "#f3e8ff",
-        iconColor: "#9f7aea",
-      },
-    ];
-  }, 500);
-});
 
 const baseDate = ref(dayjs("2026-04-01"));
 const currentYear = computed(() => baseDate.value.year());
@@ -280,21 +199,27 @@ const isToday = (dateStr) => dateStr === dayjs().format("YYYY-MM-DD");
         </div>
         <ul class="transaction-list">
           <li
-            v-for="item in transactions"
+            v-for="item in recentTransaction"
             :key="item.id"
             class="transaction-item"
           >
             <div
               class="icon-wrapper"
-              :style="{ backgroundColor: item.iconBg, color: item.iconColor }"
+              :style="{
+                backgroundColor: allList.find(
+                  (cat) => cat.id === item.category_id,
+                ).subColor,
+                color: allList.find((cat) => cat.id === item.category_id).color,
+              }"
             >
-              <i :class="item.icon"></i>
+              <i
+                :class="allList.find((cat) => cat.id === item.category_id).icon"
+              ></i>
             </div>
             <div class="item-info">
               <h4>{{ item.detail }}</h4>
-              <p>
-                {{ item.category }} · {{ formatDateTime(item.transacted_at) }}
-              </p>
+              <p>거래: {{ formatDate(item.transacted_at) }}</p>
+              <p>생성: {{ formatDateTime(item.created_at) }}</p>
             </div>
             <div
               class="item-amount"

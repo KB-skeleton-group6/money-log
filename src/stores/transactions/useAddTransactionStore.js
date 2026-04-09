@@ -1,7 +1,8 @@
-import { defineStore } from 'pinia';
-import { ref, reactive } from 'vue';
+import { defineStore } from "pinia";
+import { ref, reactive } from "vue";
+import { useTransactionStore } from "../useTransactionStore";
 
-export const useAddTransactionStore = defineStore('addTransaction', () => {
+export const useAddTransactionStore = defineStore("addTransaction", () => {
   const isOpen = ref(false);
 
   // 수정 모드 구분 변수 추가
@@ -9,13 +10,13 @@ export const useAddTransactionStore = defineStore('addTransaction', () => {
   const editTargetId = ref(null);
 
   const initialFormState = {
-    type: 'EXPENSE',
-    transacted_at: new Date().toISOString().split('T')[0],
-    amount: '',
-    category_id: '',
-    detail: '',
-    memo: '',
-    method: 'CARD',
+    type: "EXPENSE",
+    transacted_at: new Date().toISOString().split("T")[0],
+    amount: "",
+    category_id: "",
+    detail: "",
+    memo: "",
+    method: "CARD",
   };
 
   const formData = reactive({ ...initialFormState });
@@ -28,7 +29,7 @@ export const useAddTransactionStore = defineStore('addTransaction', () => {
   const openEditModal = (transactionData) => {
     const formattedDate = new Date(transactionData.transacted_at)
       .toISOString()
-      .split('T')[0];
+      .split("T")[0];
     // 기존 데이터를 폼에 덮어씌움
     Object.assign(formData, {
       ...transactionData,
@@ -53,44 +54,30 @@ export const useAddTransactionStore = defineStore('addTransaction', () => {
   };
 
   // json-server로 데이터 POST 요청
-  const submitTransaction = async (userId = 'user01') => {
+  const submitTransaction = async (userId = "user01") => {
+    // 1. Transaction 데이터 관리를 담당하는 스토어 호출
+    const transactionStore = useTransactionStore();
+
     try {
       const payload = {
         ...formData,
         amount: Number(formData.amount),
         user_id: userId,
-        transacted_at: new Date(formData.transacted_at).toISOString(), // DB 시간 형식으로 맞춤
-        // created_at: new Date().toISOString(),
+        transacted_at: new Date(formData.transacted_at).toISOString(),
+        created_at: new Date().toISOString(),
       };
-      let url = 'http://localhost:3000/transactions';
-      let method = 'POST';
+      let url = "http://localhost:3000/transactions";
+      let method = "POST";
 
-      if (isEditMode.value) {
-        url = `http://localhost:3000/transactions/${editTargetId.value}`;
-        method = 'PUT'; // 수정은 PUT
-      } else {
-        payload.created_at = new Date().toISOString(); // 생성일은 '추가'할 때만 넣기
-      }
+      // 2. transactionStore의 addTransaction 액션 실행
+      const isSuccess = await transactionStore.addTransaction(payload);
 
-      const response = await fetch(url, {
-        method: method,
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(payload),
-      });
-
-      if (response.ok) {
+      // 3. 성공했을 경우에만 모달 닫기 (실패 처리는 transactionStore에서 alert 등으로 처리됨)
+      if (isSuccess) {
         closeModal();
-      } else {
-        console.error(
-          isEditMode.value
-            ? '거래 수정에 실패했습니다.'
-            : '거래 추가에 실패했습니다.',
-        );
       }
     } catch (error) {
-      console.error('서버 통신 에러:', error);
+      console.error("서버 통신 에러:", error);
     }
     //   const response = await fetch('http://localhost:3000/transactions', {
     //     method: 'POST',

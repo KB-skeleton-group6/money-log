@@ -1,64 +1,139 @@
-import { defineStore } from 'pinia';
-import { ref, computed } from 'vue';
-import api from '@/api/axiosClient';
+import { defineStore } from "pinia";
+import { ref, computed } from "vue";
+import axiosClient from "@/api/axiosClient";
 
-// 'transaction'이라는 고유 ID를 가진 Store 만들기
-export const useTransactionStore = defineStore('transaction', () => {
-  // 1. State (데이터 상태 = 기존의 ref)
+export const useTransactionStore = defineStore("transaction", () => {
+  // state
   const transactions = ref([]);
   const categories = ref([]);
+  const loading = ref(false);
 
-  // 2. Actions (데이터를 조작하는 함수들)
-  const fetchData = async () => {
-    try {
-      const [txData, catData] = await Promise.all([
-        api.transactionApi.getTransactions(),
-        api.categoryApi.getCategories(),
-      ]);
-      transactions.value = txData;
-      categories.value = catData;
-    } catch (error) {
-      console.error('데이터 로드 실패:', error);
-    }
-  };
-
-  const addTransaction = async (formData) => {
-    try {
-      // api.transactionApi.createTransaction 사용
-      await api.transactionApi.createTransaction(formData);
-      await fetchData();
-    } catch (error) {
-      console.error('거래 추가 실패:', error);
-    }
-  };
-
-  const deleteTransaction = async (id) => {
-    try {
-      await api.transactionApi.deleteTransaction(id);
-      // 서버 삭제 성공 후 로컬 상태에서 제거
-      transactions.value = transactions.value.filter(
-        (tx) => String(tx.id) !== String(id),
-      );
-    } catch (error) {
-      console.error('거래 삭제 실패: ', error);
-    }
-  };
-
-  // 3. Getters (계산된 데이터 = 기존의 computed)
-  // 예: 수입 총액만 따로 빼서 보고 싶을 때
-  const totalIncome = computed(() => {
-    return transactions.value
-      .filter((tx) => tx.type === 'INCOME')
-      .reduce((sum, tx) => sum + tx.amount, 0);
+  // getters
+  const getDateInfo = computed(() => {
+    const now = new Date();
+    return {
+      month: now.getMonth(),
+      year: now.getFullYear(),
+    };
   });
 
-  // 밖으로 꺼내줄(공유할) 것들을 return
+  // 이번 달 거래 내역
+  const thisMonthTransactions = computed(() => {
+    const { month, year } = getDateInfo.value;
+    return transactions.value.filter((t) => {
+      const d = new Date(t.transacted_at);
+      return d.getMonth() === month && d.getFullYear() === year;
+    });
+  });
+
+  // 지난달 거래 내역
+  const lastMonthTransactions = computed(() => {
+    const { month, year } = getDateInfo.value;
+    const lastM = month === 0 ? 11 : month - 1;
+    const lastY = month === 0 ? year - 1 : year;
+    return transactions.value.filter((t) => {
+      const d = new Date(t.transacted_at);
+      return d.getMonth() === lastM && d.getFullYear() === lastY;
+    });
+  });
+
+  // 요약 데이터 계산용 헬퍼
+  const summaryStats = computed(() => {
+    const calculateTotal = (list, type) =>
+      list
+        .filter((t) => t.type === type)
+        .reduce((sum, t) => sum + t.amount, 0);
+
+    const tMonth = thisMonthTransactions.value;
+    const lMonth = lastMonthTransactions.value;
+
+    const stats = {
+      income: {
+        current: calculateTotal(tMonth, "INCOME"),
+        last: calculateTotal(lMonth, "INCOME"),
+      },
+      expense: {
+        current: calculateTotal(tMonth, "EXPENSE"),
+        last: calculateTotal(lMonth, "EXPENSE"),
+      },
+    };
+
+    const calculateDiff = (curr, last) =>
+      last === 0 ? 0 : (((curr - last) / last) * 100).toFixed(1);
+
+    return {
+      totalIncome: stats.income.current,
+      incomeDiff: calculateDiff(stats.income.current, stats.income.last),
+      totalExpense: stats.expense.current,
+      expenseDiff: calculateDiff(stats.expense.current, stats.expense.last),
+      totalProfit: stats.income.current - stats.expense.current,
+      profitDiff: calculateDiff(
+        stats.income.current - stats.expense.current,
+        stats.income.last - stats.expense.last,
+      ),
+    };
+  });
+
+  // actions
+  async function fetchData() {
+    loading.value = true;
+    try {
+      const [transactionsData, categoriesData] = await Promise.all([
+        axiosClient.transactionApi.getTransactions(),
+        axiosClient.categoryApi.getCategories(),
+      ]);
+      transactions.value = transactionsData;
+      categories.value = categoriesData;
+    } catch (error) {
+      console.error("Data Fetch Error:", error);
+    } finally {
+      loading.value = false;
+    }
+  }
+
+  async function deleteTransaction(id) {
+    const index = transactions.value.findIndex((t) => t.id === id);
+    if (index !== -1) {
+      const backup = transactions.value[index];
+      transactions.value.splice(index, 1);
+
+      try {
+        await axiosClient.transactionApi.deleteTransaction(id);
+      } catch (error) {
+        transactions.value.splice(index, 0, backup);
+        alert("삭제에 실패했습니다.");
+      }
+    }
+  }
+
+  async function addTransaction(payload) {
+    try {
+      const newTransaction =
+        await axiosClient.transactionApi.createTransaction(payload);
+
+      if (newTransaction) {
+        transactions.value.push(newTransaction);
+      } else {
+        await fetchData();
+      }
+      return true;
+    } catch (error) {
+      console.error("거래 추가 실패:", error);
+      alert("거래 내역을 추가하는데 실패했습니다.");
+      return false;
+    }
+  }
+
   return {
     transactions,
     categories,
+    loading,
+    getDateInfo,
+    thisMonthTransactions,
+    lastMonthTransactions,
+    summaryStats,
     fetchData,
-    addTransaction,
     deleteTransaction,
-    totalIncome,
+    addTransaction,
   };
 });

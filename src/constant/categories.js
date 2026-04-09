@@ -114,10 +114,10 @@ export const Categories = {
     subColor: "#F0FFF0", // 보조: 허니듀
     icon: "fa-solid fa-piggy-bank",
   },
-  ETC_EXPENSE: {
+  ETC_INCOME: {
     id: "cat99",
     name: "기타",
-    label: "EXPENSE",
+    label: "INCOME",
     color: "#808080", // 이미지에서 추출한 회색
     subColor: "#D3D3D3", // 보조: 라이트 그레이
     icon: "fa-solid fa-ellipsis-h",
