@@ -1,10 +1,10 @@
-import { defineStore } from 'pinia';
-import { ref } from 'vue';
-import axiosClient from '@/api/axiosClient';
-import { ErrorCode } from '@/constant/errorCode';
-import { MemberInfoError } from '@/utils/validators/authValidator';
+import { defineStore } from "pinia";
+import { ref } from "vue";
+import axiosClient from "@/api/axiosClient";
+import { ErrorCode } from "@/constant/errorCode";
+import { MemberInfoError } from "@/utils/validators/authValidator";
 
-export const useAuthStore = defineStore('auth', () => {
+export const useAuthStore = defineStore("auth", () => {
   const isLoggedIn = ref(false);
   const user = ref(null);
 
@@ -17,13 +17,15 @@ export const useAuthStore = defineStore('auth', () => {
   const login = async (email, password) => {
     try {
       // 서버(json-server)에 이메일과 비밀번호가 일치하는 데이터만 요청
-      const members = await axiosClient.memberApi.getMembers({
-        email,
-        password,
-      });
+      const members = await axiosClient.memberApi.getMemberByEmail(email);
+
       const foundUser = members.length > 0 ? members[0] : null;
 
       if (foundUser) {
+        if (foundUser.password !== password) {
+          throw new MemberInfoError(ErrorCode.LOGIN_FAILED);
+        }
+
         isLoggedIn.value = true;
         // 비밀번호를 제외한 정보만 저장
         user.value = {
@@ -31,7 +33,7 @@ export const useAuthStore = defineStore('auth', () => {
           email: foundUser.email,
           name: foundUser.name,
         };
-        console.log('로그인 성공:', user.value);
+        console.log("로그인 성공:", user.value);
       } else {
         isLoggedIn.value = false;
         user.value = null;
@@ -39,7 +41,7 @@ export const useAuthStore = defineStore('auth', () => {
       }
     } catch (error) {
       if (error instanceof MemberInfoError) throw error;
-      console.error('로그인 API 에러:', error);
+      console.error("로그인 API 에러:", error);
       throw new MemberInfoError(ErrorCode.FETCH_FAILED);
     }
   };
@@ -52,7 +54,7 @@ export const useAuthStore = defineStore('auth', () => {
    */
   const signup = async (email, password, name) => {
     try {
-      const members = await axiosClient.memberApi.getMembers({ email });
+      const members = await axiosClient.memberApi.getMemberByEmail(email);
       if (members.length > 0) {
         throw new MemberInfoError(ErrorCode.DUPLICATE_EMAIL);
       }
@@ -67,10 +69,10 @@ export const useAuthStore = defineStore('auth', () => {
 
       await axiosClient.memberApi.createMember(newUser);
 
-      console.log('회원가입 성공');
+      console.log("회원가입 성공");
     } catch (error) {
       if (error instanceof MemberInfoError) throw error;
-      console.error('회원가입 API 에러:', error);
+      console.error("회원가입 API 에러:", error);
       throw new MemberInfoError(ErrorCode.SAVE_FAILED);
     }
   };

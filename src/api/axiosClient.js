@@ -1,12 +1,12 @@
-import axios from 'axios';
+import axios from "axios";
 import {
   FetchFailedError,
   NetworkOfflineError,
   SaveFailedError,
-} from './networkError';
-import { ErrorCode } from '@/constant/errorCode';
+} from "./networkError";
+import { ErrorCode } from "@/constant/errorCode";
 
-const urlPrefix = '/api';
+const urlPrefix = "/api";
 
 const isRequestSuccessful = (statusCode) => {
   return statusCode >= 200 && statusCode < 300;
@@ -57,6 +57,16 @@ async function getMember(memberId) {
   const member = res.data;
 
   return member;
+}
+
+async function getMemberByEmail(email) {
+  const res = await axios.get(`${urlPrefix}/members?email:eq=${email}`);
+
+  checkRequestFailed(res.status, ErrorCode.FETCH_FAILED);
+
+  const members = res.data;
+
+  return members;
 }
 
 async function createMember(member) {
@@ -147,6 +157,7 @@ async function getCategories() {
 const memberApi = {
   getMembers,
   getMember,
+  getMemberByEmail,
   createMember,
   updateMember,
   deleteMember,
