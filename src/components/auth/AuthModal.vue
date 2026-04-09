@@ -5,7 +5,7 @@ import {
   isNameValid,
   isPasswordValid,
   MemberInfoError as AuthError,
-} from '@/utils/validators/memberInfoValidator';
+} from '@/utils/validators/authValidator';
 
 const emit = defineEmits(['close']);
 const isLoginMode = ref(true); // true: 로그인 모드, false: 회원가입 모드
