@@ -19,6 +19,8 @@ const router = createRouter({
     },
     {
       path: "/ledger",
+      component: () => import("@/layouts/LedgerLayout.vue"),
+      redirect: "/ledger/dashboard",
       children: [
         {
           path: "dashboard",
