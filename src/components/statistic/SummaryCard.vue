@@ -33,9 +33,9 @@ const diffClass = computed(() => (props.diff >= 0 ? 'up' : 'down'));
   <div class="summary-card">
     <div class="card-header">
       <span class="icon-wrapper" :class="type">
-        <i v-if="type === 'income'">💰</i>
-        <i v-else-if="type === 'expense'">💸</i>
-        <i v-else>📊</i>
+        <i v-if="type === 'income'" class="fa-solid fa-arrow-down"></i>
+        <i v-else-if="type === 'expense'" class="fa-solid fa-arrow-up"></i>
+        <i v-else class="fa-solid fa-arrow-right-arrow-left"></i>
       </span>
       <span class="title">{{ title }}</span>
     </div>
@@ -81,13 +81,16 @@ const diffClass = computed(() => (props.diff >= 0 ? 'up' : 'down'));
   font-size: 1.2rem;
 }
 .icon-wrapper.income {
-  background: #e3f2fd;
+  background: #e0f2fe;
+  color: #00cfe8;
 }
 .icon-wrapper.expense {
-  background: #ffebee;
+  background: #fceaea;
+  color: #ea5455;
 }
 .icon-wrapper.profit {
-  background: #e8f5e9;
+  background: #e6f7ef;
+  color: #28c76f;
 }
 
 .title {
@@ -103,13 +106,13 @@ const diffClass = computed(() => (props.diff >= 0 ? 'up' : 'down'));
 }
 
 .text-blue {
-  color: #2d98da;
+  color: #00cfe8;
 }
 .text-red {
-  color: #eb4d4b;
+  color: #ea5455;
 }
 .text-green {
-  color: #20bf6b;
+  color: #28c76f;
 }
 
 .comparison {
@@ -119,11 +122,11 @@ const diffClass = computed(() => (props.diff >= 0 ? 'up' : 'down'));
 }
 
 .up {
-  color: #eb4d4b;
+  color: #ea5455;
   font-weight: 600;
 }
 .down {
-  color: #2d98da;
+  color: #00cfe8;
   font-weight: 600;
 }
 </style>
