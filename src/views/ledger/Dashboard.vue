@@ -21,6 +21,8 @@ import {
 } from "../../utils/dataChart";
 import { useTransactionStore } from "@/stores/useTransactionStore";
 import { Categories } from "../../constant/categories";
+import { formatDate } from "@/utils/formatter";
+
 
 ChartJS.register(
   Title,
@@ -35,7 +37,7 @@ const transactionStore = useTransactionStore();
 const { transactions } = storeToRefs(transactionStore);
 const allList = Object.values(Categories);
 
-const recentTransactions = computed(() => {
+const recentTransaction = computed(() => {
   if (!transactionStore.transactions || transactionStore.transactions.length === 0) {
     return [];
   }
@@ -197,7 +199,7 @@ const isToday = (dateStr) => dateStr === dayjs().format("YYYY-MM-DD");
         </div>
         <ul class="transaction-list">
           <li
-            v-for="item in recentTransactions"
+            v-for="item in recentTransaction"
             :key="item.id"
             class="transaction-item"
           >
@@ -216,9 +218,8 @@ const isToday = (dateStr) => dateStr === dayjs().format("YYYY-MM-DD");
             </div>
             <div class="item-info">
               <h4>{{ item.detail }}</h4>
-              <p>
-                {{ item.category }} · {{ formatDateTime(item.transacted_at) }}
-              </p>
+              <p>거래: {{ formatDate(item.transacted_at) }}</p>
+              <p>생성: {{ formatDateTime(item.created_at) }}</p>
             </div>
             <div
               class="item-amount"
