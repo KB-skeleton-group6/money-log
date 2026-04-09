@@ -1,5 +1,5 @@
 <script setup>
-import { ref, computed } from "vue";
+import { ref, computed, onMounted } from "vue";
 import dayjs from "dayjs";
 import { Bar } from "vue-chartjs";
 import {
@@ -12,7 +12,12 @@ import {
   LinearScale,
 } from "chart.js";
 
-// ChartJS 등록
+import {
+  formatCurrency,
+  formatDateTime,
+  useDashboardCalculations,
+} from "../../utils/dataChart";
+
 ChartJS.register(
   Title,
   Tooltip,
@@ -22,160 +27,131 @@ ChartJS.register(
   LinearScale,
 );
 
-// --- 1. 임시 데이터 (json-server에서 가져올 데이터 모델링) ---
-const transactions = ref([
-  {
-    id: 1,
-    user_id: "user1",
-    category: "급여",
-    amount: 3800000,
-    detail: "월급",
-    type: "INCOME",
-    transacted_at: "2026-04-01 09:00:00",
-    icon: "fa-solid fa-money-check-dollar",
-    iconBg: "#e6f7ef",
-    iconColor: "#28c76f",
-  },
-  {
-    id: 2,
-    user_id: "user1",
-    category: "카페",
-    amount: -6500,
-    detail: "스타벅스",
-    type: "EXPENSE",
-    transacted_at: "2026-04-02 08:30:00",
-    icon: "fa-solid fa-mug-hot",
-    iconBg: "#fef5e5",
-    iconColor: "#ff9f43",
-  },
-  {
-    id: 3,
-    user_id: "user1",
-    category: "식료품",
-    amount: -87400,
-    detail: "마트 장보기",
-    type: "EXPENSE",
-    transacted_at: "2026-04-02 18:20:00",
-    icon: "fa-solid fa-basket-shopping",
-    iconBg: "#fceaea",
-    iconColor: "#ea5455",
-  },
-  {
-    id: 4,
-    user_id: "user1",
-    category: "구독",
-    amount: -17000,
-    detail: "넷플릭스",
-    type: "EXPENSE",
-    transacted_at: "2026-04-03 00:00:00",
-    icon: "fa-solid fa-calendar-check",
-    iconBg: "#fceaea",
-    iconColor: "#ea5455",
-  },
-  {
-    id: 5,
-    user_id: "user1",
-    category: "부업",
-    amount: 450000,
-    detail: "프리랜서 수입",
-    type: "INCOME",
-    transacted_at: "2026-04-04 14:00:00",
-    icon: "fa-solid fa-briefcase",
-    iconBg: "#e0f2fe",
-    iconColor: "#00cfe8",
-  },
-  {
-    id: 6,
-    user_id: "user1",
-    category: "식비",
-    amount: -12000,
-    detail: "점심 식사",
-    type: "EXPENSE",
-    transacted_at: "2026-04-05 12:30:00",
-    icon: "fa-solid fa-utensils",
-    iconBg: "#fef5e5",
-    iconColor: "#ff9f43",
-  },
-  {
-    id: 7,
-    user_id: "user1",
-    category: "교통",
-    amount: -1400,
-    detail: "지하철 교통비",
-    type: "EXPENSE",
-    transacted_at: "2026-04-05 08:10:00",
-    icon: "fa-solid fa-train-subway",
-    iconBg: "#e0f2fe",
-    iconColor: "#00cfe8",
-  },
-  {
-    id: 8,
-    user_id: "user1",
-    category: "교육",
-    amount: -59000,
-    detail: "온라인 강의",
-    type: "EXPENSE",
-    transacted_at: "2026-04-06 20:00:00",
-    icon: "fa-solid fa-book-open",
-    iconBg: "#f3e8ff",
-    iconColor: "#9f7aea",
-  },
-]);
+const transactions = ref([]);
 
-// --- 2. 상단 카드 계산 및 차트 데이터 ---
-const totalIncome = computed(() =>
-  transactions.value
-    .filter((t) => t.type === "INCOME")
-    .reduce((sum, t) => sum + t.amount, 0),
-);
-const totalExpense = computed(() =>
-  transactions.value
-    .filter((t) => t.type === "EXPENSE")
-    .reduce((sum, t) => sum + t.amount, 0),
-);
-const netIncome = computed(() => totalIncome.value + totalExpense.value);
+const {
+  totalIncome,
+  totalExpense,
+  netIncome,
+  chartDataNet,
+  chartDataIncome,
+  chartDataExpense,
+  netRate,
+  incomeRate,
+  expenseRate,
+  tooltipState,
+  chartOptionsNet,
+  chartOptionsIncome,
+  chartOptionsExpense,
+} = useDashboardCalculations(transactions);
 
-const formatCurrency = (val) => new Intl.NumberFormat("ko-KR").format(val);
-const formatDateTime = (dateStr) => {
-  const d = new Date(dateStr);
-  return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")} ${String(d.getHours()).padStart(2, "0")}:${String(d.getMinutes()).padStart(2, "0")}`;
-};
-
-// 미니 차트 공통 옵션 (축 숨김, 툴팁 숨김 등)
-const chartOptions = {
-  responsive: true,
-  maintainAspectRatio: false,
-  scales: { x: { display: false }, y: { display: false } },
-  plugins: { legend: { display: false }, tooltip: { enabled: false } },
-  layout: { padding: 0 },
-};
-
-// 시각적 효과를 위한 더미 차트 데이터 세팅
-const createChartData = (color) => ({
-  labels: ["1", "2", "3", "4", "5", "6", "7"],
-  datasets: [
-    {
-      data: [10, 15, 8, 20, 25, 22, 30],
-      backgroundColor: color,
-      borderRadius: 4,
-    },
-  ],
+onMounted(() => {
+  setTimeout(() => {
+    transactions.value = [
+      {
+        id: 1,
+        user_id: "user1",
+        category: "급여",
+        amount: 3800000,
+        detail: "월급",
+        type: "INCOME",
+        transacted_at: "2026-04-01 09:00:00",
+        icon: "fa-solid fa-money-check-dollar",
+        iconBg: "#e6f7ef",
+        iconColor: "#28c76f",
+      },
+      {
+        id: 2,
+        user_id: "user1",
+        category: "카페",
+        amount: -6500,
+        detail: "스타벅스",
+        type: "EXPENSE",
+        transacted_at: "2026-03-02 08:30:00",
+        icon: "fa-solid fa-mug-hot",
+        iconBg: "#fef5e5",
+        iconColor: "#ff9f43",
+      },
+      {
+        id: 3,
+        user_id: "user1",
+        category: "식료품",
+        amount: -87400,
+        detail: "마트 장보기",
+        type: "EXPENSE",
+        transacted_at: "2026-02-02 18:20:00",
+        icon: "fa-solid fa-basket-shopping",
+        iconBg: "#fceaea",
+        iconColor: "#ea5455",
+      },
+      {
+        id: 4,
+        user_id: "user1",
+        category: "구독",
+        amount: -17000,
+        detail: "넷플릭스",
+        type: "EXPENSE",
+        transacted_at: "2026-02-05 12:30:00",
+        icon: "fa-solid fa-calendar-check",
+        iconBg: "#fceaea",
+        iconColor: "#ea5455",
+      },
+      {
+        id: 5,
+        user_id: "user1",
+        category: "부업",
+        amount: 450000,
+        detail: "프리랜서 수입",
+        type: "INCOME",
+        transacted_at: "2026-02-05 12:30:00",
+        icon: "fa-solid fa-briefcase",
+        iconBg: "#e0f2fe",
+        iconColor: "#00cfe8",
+      },
+      {
+        id: 6,
+        user_id: "user1",
+        category: "식비",
+        amount: -12000,
+        detail: "점심 식사",
+        type: "EXPENSE",
+        transacted_at: "2026-02-05 12:30:00",
+        icon: "fa-solid fa-utensils",
+        iconBg: "#fef5e5",
+        iconColor: "#ff9f43",
+      },
+      {
+        id: 7,
+        user_id: "user1",
+        category: "교통",
+        amount: -1400,
+        detail: "지하철 교통비",
+        type: "EXPENSE",
+        transacted_at: "2026-03-05 08:10:00",
+        icon: "fa-solid fa-train-subway",
+        iconBg: "#e0f2fe",
+        iconColor: "#00cfe8",
+      },
+      {
+        id: 8,
+        user_id: "user1",
+        category: "교육",
+        amount: -59000,
+        detail: "온라인 강의",
+        type: "EXPENSE",
+        transacted_at: "2026-02-06 20:00:00",
+        icon: "fa-solid fa-book-open",
+        iconBg: "#f3e8ff",
+        iconColor: "#9f7aea",
+      },
+    ];
+  }, 500);
 });
 
-const chartDataNet = createChartData("#48c774");
-const chartDataIncome = createChartData("#3e8ed0");
-const chartDataExpense = createChartData("#f14668");
-
-// --- 3. 달력 로직 ---
-
-// 기준이 되는 날짜 (초기값: 2026년 4월 1일)
 const baseDate = ref(dayjs("2026-04-01"));
-
-// 템플릿에서 그대로 사용할 수 있도록 연, 월을 분리
 const currentYear = computed(() => baseDate.value.year());
 const currentMonth = computed(() => baseDate.value.month() + 1);
 
-// 이전/다음 달 이동 (dayjs 내장 함수로 연도 변경까지 자동 처리)
 const prevMonth = () => {
   baseDate.value = baseDate.value.subtract(1, "month");
 };
@@ -184,33 +160,25 @@ const nextMonth = () => {
 };
 
 const calendarDays = computed(() => {
-  // 이번 달 1일을 기준으로 그 주 일요일(달력 맨 첫 칸)의 날짜를 가져옵니다.
   const startDate = baseDate.value.startOf("month").startOf("week");
-
-  // 달력은 총 6주 * 7일 = 무조건 42칸을 생성합니다.
   return Array.from({ length: 42 }).map((_, index) => {
-    // 첫 칸(일요일)부터 1일씩 더해가며 42개의 날짜 객체를 만듭니다.
     const targetDate = startDate.add(index, "day");
     const dateStr = targetDate.format("YYYY-MM-DD");
-
-    // 해당 날짜의 거래내역 필터링
     const dayTx = transactions.value.filter((t) =>
       t.transacted_at.startsWith(dateStr),
     );
-
     return {
       date: dateStr,
-      dayNumber: targetDate.date(), // 일(Day) 표기용
-      isCurrentMonth: targetDate.month() === baseDate.value.month(), // 이번 달 여부 (투명도 조절용)
-      hasIncome: dayTx.some((t) => t.type === "INCOME"), // 파란 점 표시 여부
-      hasExpense: dayTx.some((t) => t.type === "EXPENSE"), // 빨간 점 표시 여부
-      transactions: dayTx, // 툴팁에 표시할 데이터
+      dayNumber: targetDate.date(),
+      isCurrentMonth: targetDate.month() === baseDate.value.month(),
+      hasIncome: dayTx.some((t) => t.type === "INCOME"),
+      hasExpense: dayTx.some((t) => t.type === "EXPENSE"),
+      transactions: dayTx,
     };
   });
 });
 
-// 2026년 4월 7일을 '오늘'로 가정 (이미지 상 민트색 원 적용)
-const isToday = (dateStr) => dateStr === "2026-04-07";
+const isToday = (dateStr) => dateStr === dayjs().format("YYYY-MM-DD");
 </script>
 
 <template>
@@ -222,13 +190,26 @@ const isToday = (dateStr) => dateStr === "2026-04-07";
           <i class="fa-solid fa-arrow-right-arrow-left icon-bg text-green"></i>
         </div>
         <div class="card-body">
-          <h2 class="text-green">+{{ formatCurrency(netIncome) }}원</h2>
+          <h2 class="text-green">
+            {{ netIncome > 0 ? "+" : "" }}{{ formatCurrency(netIncome) }}원
+          </h2>
           <p class="change-rate text-green">
-            <i class="fa-solid fa-caret-up"></i> 12.5% 전월 대비
+            <i class="fa-solid" :class="netRate.icon"></i>{{ netRate.text }}
           </p>
         </div>
         <div class="chart-container">
-          <Bar :data="chartDataNet" :options="chartOptions" />
+          <Bar :data="chartDataNet" :options="chartOptionsNet" />
+          <div
+            v-if="tooltipState.show && tooltipState.activeId === 'net'"
+            class="custom-tooltip"
+            :style="{ left: tooltipState.x + 'px', top: tooltipState.y + 'px' }"
+          >
+            <div class="tooltip-month">{{ tooltipState.month }}</div>
+            <div class="tooltip-data">
+              거래 {{ tooltipState.count }}건 :
+              {{ formatCurrency(tooltipState.value) }}원
+            </div>
+          </div>
         </div>
       </div>
 
@@ -240,11 +221,23 @@ const isToday = (dateStr) => dateStr === "2026-04-07";
         <div class="card-body">
           <h2 class="text-blue">+{{ formatCurrency(totalIncome) }}원</h2>
           <p class="change-rate text-blue">
-            <i class="fa-solid fa-caret-up"></i> 8.3% 전월 대비
+            <i class="fa-solid" :class="incomeRate.icon"></i
+            >{{ incomeRate.text }}
           </p>
         </div>
         <div class="chart-container">
-          <Bar :data="chartDataIncome" :options="chartOptions" />
+          <Bar :data="chartDataIncome" :options="chartOptionsIncome" />
+          <div
+            v-if="tooltipState.show && tooltipState.activeId === 'income'"
+            class="custom-tooltip"
+            :style="{ left: tooltipState.x + 'px', top: tooltipState.y + 'px' }"
+          >
+            <div class="tooltip-month">{{ tooltipState.month }}</div>
+            <div class="tooltip-data">
+              거래 {{ tooltipState.count }}건 :
+              {{ formatCurrency(tooltipState.value) }}원
+            </div>
+          </div>
         </div>
       </div>
 
@@ -256,11 +249,23 @@ const isToday = (dateStr) => dateStr === "2026-04-07";
         <div class="card-body">
           <h2 class="text-red">{{ formatCurrency(totalExpense) }}원</h2>
           <p class="change-rate text-red">
-            <i class="fa-solid fa-caret-down"></i> 5.2% 전월 대비
+            <i class="fa-solid" :class="expenseRate.icon"></i
+            >{{ expenseRate.text }}
           </p>
         </div>
         <div class="chart-container">
-          <Bar :data="chartDataExpense" :options="chartOptions" />
+          <Bar :data="chartDataExpense" :options="chartOptionsExpense" />
+          <div
+            v-if="tooltipState.show && tooltipState.activeId === 'expense'"
+            class="custom-tooltip"
+            :style="{ left: tooltipState.x + 'px', top: tooltipState.y + 'px' }"
+          >
+            <div class="tooltip-month">{{ tooltipState.month }}</div>
+            <div class="tooltip-data">
+              거래 {{ tooltipState.count }}건 :
+              {{ formatCurrency(tooltipState.value) }}원
+            </div>
+          </div>
         </div>
       </div>
     </div>
@@ -269,7 +274,9 @@ const isToday = (dateStr) => dateStr === "2026-04-07";
       <div class="card transaction-list-card">
         <div class="card-header border-bottom">
           <h3>최근 거래내역</h3>
-          <a href="#" class="view-all">전체보기 ></a>
+          <RouterLink to="/ledger/transactions">
+            <a class="view-all">전체보기 ></a>
+          </RouterLink>
         </div>
         <ul class="transaction-list">
           <li
@@ -310,7 +317,6 @@ const isToday = (dateStr) => dateStr === "2026-04-07";
             <i class="fa-solid fa-chevron-right"></i>
           </button>
         </div>
-
         <div class="calendar-grid">
           <div class="weekday text-red">일</div>
           <div class="weekday">월</div>
@@ -319,7 +325,6 @@ const isToday = (dateStr) => dateStr === "2026-04-07";
           <div class="weekday">목</div>
           <div class="weekday">금</div>
           <div class="weekday text-blue">토</div>
-
           <div
             v-for="(day, index) in calendarDays"
             :key="index"
@@ -334,7 +339,6 @@ const isToday = (dateStr) => dateStr === "2026-04-07";
               <span v-if="day.hasIncome" class="dot dot-blue"></span>
               <span v-if="day.hasExpense" class="dot dot-red"></span>
             </div>
-
             <div v-if="day.transactions.length > 0" class="day-tooltip">
               <div
                 v-for="tx in day.transactions"
@@ -350,7 +354,6 @@ const isToday = (dateStr) => dateStr === "2026-04-07";
             </div>
           </div>
         </div>
-
         <div class="calendar-legend">
           <span class="legend-item"
             ><span class="dot dot-blue"></span> 수입</span
@@ -373,8 +376,6 @@ const isToday = (dateStr) => dateStr === "2026-04-07";
   background-color: #f8f9fa;
   color: #333;
 }
-
-/* 유틸리티 컬러 */
 .text-green {
   color: #28c76f;
 }
@@ -392,8 +393,6 @@ const isToday = (dateStr) => dateStr === "2026-04-07";
   padding: 20px;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.03);
 }
-
-/* 상단 요약 카드 */
 .summary-cards {
   display: grid;
   grid-template-columns: repeat(3, minmax(0, 1fr));
@@ -430,10 +429,33 @@ const isToday = (dateStr) => dateStr === "2026-04-07";
   font-size: 0.85rem;
   margin: 0;
 }
+
 .chart-container {
+  position: relative; /* 툴팁이 이 박스를 기준으로 뜨도록 설정 */
   height: 40px;
   margin-top: auto;
   padding-top: 15px;
+}
+
+.custom-tooltip {
+  position: absolute;
+  background-color: #333333;
+  color: #fff;
+  padding: 8px 12px;
+  border-radius: 6px;
+  pointer-events: none;
+  transform: translate(-50%, -100%);
+  z-index: 100;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  white-space: nowrap;
+}
+.tooltip-month {
+  font-size: 12px;
+  margin-bottom: 2px;
+}
+.tooltip-data {
+  font-size: 13px;
+  font-weight: bold;
 }
 
 /* 하단 영역 그리드 */
@@ -442,18 +464,32 @@ const isToday = (dateStr) => dateStr === "2026-04-07";
   grid-template-columns: 1fr 1fr;
   gap: 20px;
 }
-
-/* 최근 거래내역 리스트 */
 .border-bottom {
   border-bottom: 1px solid #eee;
   padding-bottom: 15px;
   margin-bottom: 15px;
 }
-.view-all {
-  color: #28c76f;
-  text-decoration: none;
+
+/* 강제 밑줄 제거용 철벽 CSS */
+a.view-all {
+  text-decoration: none !important;
+  border-bottom: none !important;
+  box-shadow: none !important;
+  color: #666 !important;
   font-size: 0.9rem;
 }
+a.view-all:visited,
+a.view-all:active {
+  text-decoration: none !important;
+  border-bottom: none !important;
+  color: #666 !important;
+}
+a.view-all:hover {
+  text-decoration: none !important;
+  color: #28c76f !important;
+}
+
+/* 리스트 아이템 */
 .transaction-list {
   list-style: none;
   padding: 0;
@@ -491,7 +527,7 @@ const isToday = (dateStr) => dateStr === "2026-04-07";
   font-weight: 600;
 }
 
-/* 달력 */
+/* 달력 디자인 */
 .calendar-header {
   display: flex;
   justify-content: space-between;
@@ -534,7 +570,7 @@ const isToday = (dateStr) => dateStr === "2026-04-07";
   opacity: 0.3;
 }
 .is-today .day-number {
-  background-color: #e6f7ef; /* 민트 배경 */
+  background-color: #e6f7ef;
   color: #28c76f;
   border-radius: 50%;
   width: 28px;
@@ -562,7 +598,7 @@ const isToday = (dateStr) => dateStr === "2026-04-07";
   background-color: #ea5455;
 }
 
-/* 달력 툴팁 (마우스 호버 시) */
+/* 달력 툴팁 */
 .day-tooltip {
   display: none;
   position: absolute;
@@ -591,8 +627,6 @@ const isToday = (dateStr) => dateStr === "2026-04-07";
 .tooltip-tx:last-child {
   margin-bottom: 0;
 }
-
-/* 범례 */
 .calendar-legend {
   display: flex;
   justify-content: center;
