@@ -10,14 +10,15 @@ export class MemberInfoError extends Error {
 
 // 정규식 정의
 const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-const PASSWORD_REGEX = /^(?=.*[a-zA-Z])(?=.*\d)(?=.*[!@#$%^&*()_+\-=[\]{};':"\\|,.<>/?]).{8,20}$/;
-const NAME_REGEX = /^[가-힣a-zA-Z\s]+$/;
+const PASSWORD_REGEX =
+  /^(?=.*[a-zA-Z])(?=.*\d)(?=.*[!@#$%^&*()_+~`|}{[\]:;?><,./-]).{8,20}$/; // 영문, 숫자, 특수문자 포함 8~20자
+const NAME_REGEX = /^[가-힣a-zA-Z\s]+$/; // 한글, 영문, 공백만 허용
 
 /**
  * 이메일 유효성 검사
  */
 export function isEmailValid(email) {
-  if (!email) {
+  if (!email || email.trim() === '') {
     throw new MemberInfoError(ErrorCode.EMPTY_EMAIL_FIELD);
   }
   if (!EMAIL_REGEX.test(email)) {
@@ -30,7 +31,7 @@ export function isEmailValid(email) {
  * 비밀번호 유효성 검사
  */
 export function isPasswordValid(password) {
-  if (!password) {
+  if (!password || password.trim() === '') {
     throw new MemberInfoError(ErrorCode.EMPTY_PASSWORD_FIELD);
   }
   if (!PASSWORD_REGEX.test(password)) {
@@ -53,7 +54,7 @@ export function isPasswordConfirmed(password, confirmPassword) {
  * 이름 유효성 검사
  */
 export function isNameValid(name) {
-  if (!name) {
+  if (!name || name.trim() === '') {
     throw new MemberInfoError(ErrorCode.EMPTY_NAME_FIELD);
   }
   if (!NAME_REGEX.test(name)) {

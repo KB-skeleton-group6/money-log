@@ -1,4 +1,4 @@
-import { ErrorCode } from '@/constants/errorCode';
+import { ErrorCode } from '@/constant/errorCode';
 
 // 가계부 전용 커스텀 에러 클래스
 export class TransactionError extends Error {
