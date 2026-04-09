@@ -72,15 +72,18 @@ const withdraw = async () => {
       <button class="change-password-btn" @click="openChangePasswordModal">
         <i class="fa-solid fa-lock"></i>
         <span>비밀번호 변경</span>
+        <i class="fa-solid fa-chevron-right chevron"></i>
       </button>
       <button class="logout-btn" @click="openLogoutModal">
         <i class="fa-solid fa-arrow-right-from-bracket"></i>
         <span>로그아웃</span>
+        <i class="fa-solid fa-chevron-right chevron"></i>
       </button>
       <div class="divider"></div>
       <button class="withdrawal-btn" @click="openWithdrawalModal">
         <i class="fa-regular fa-trash-can"></i>
         <span>회원 탈퇴</span>
+        <i class="fa-solid fa-chevron-right chevron"></i>
       </button>
     </div>
     <Teleport to="body">
@@ -142,10 +145,10 @@ const withdraw = async () => {
   justify-content: start;
   align-items: center;
   gap: 8px;
-  border: 1px solid rgb(240, 240, 240);
+  border: 1px solid #e8e8ed;
   border-radius: 8px;
   padding: 8px 16px;
-  color: rgb(46, 46, 46);
+  color: #1c1c1e;
   background-color: white;
   cursor: pointer;
   transition: background-color 0.3s ease;
@@ -154,5 +157,45 @@ const withdraw = async () => {
 .buttons > button.withdrawal-btn {
   border: 1px solid red;
   color: red;
+}
+
+.chevron {
+  display: none;
+}
+
+@media (max-width: 768px) {
+  .buttons {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .buttons > .divider {
+    flex: 0 0 auto;
+    height: 1px;
+    background-color: #d1d1d6;
+  }
+
+  .buttons > button,
+  .buttons > button.withdrawal-btn {
+    width: 100%;
+    justify-content: start;
+    border: none;
+    border-radius: 0;
+    padding: 14px 8px;
+  }
+
+  .chevron {
+    display: block;
+  }
+
+  .buttons > button .chevron {
+    margin-left: auto;
+    font-size: 11px;
+    color: #aeaeb2;
+  }
+
+  .buttons > button.withdrawal-btn .chevron {
+    color: rgb(255, 150, 150);
+  }
 }
 </style>

@@ -31,6 +31,7 @@ const activeIndex = computed(() =>
 </script>
 
 <template>
+  <div class="page-wrapper">
   <div class="container">
     <div class="section-modes">
       <div
@@ -54,19 +55,27 @@ const activeIndex = computed(() =>
       <AuthSettingSection />
     </div>
   </div>
+  </div>
 </template>
 
 <style scoped>
+.page-wrapper {
+  min-height: 100%;
+  background-color: #f2f2f7;
+}
+
 .container {
   display: flex;
   flex-direction: column;
   justify-content: start;
   align-items: stretch;
   gap: 32px;
-  min-width: 600px;
+  min-width: 0;
+  max-width: 768px;
+  width: 100%;
   min-height: 100%;
+  margin: 0 auto;
   padding: 32px;
-  background-color: rgb(240, 240, 240);
 }
 
 .section-modes {
@@ -118,5 +127,12 @@ const activeIndex = computed(() =>
 
 .account-section {
   flex: 0 0 auto;
+}
+
+@media (max-width: 768px) {
+  .container {
+    gap: 16px;
+    padding: 16px;
+  }
 }
 </style>
