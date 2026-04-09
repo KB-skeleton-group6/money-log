@@ -40,3 +40,4 @@ __screenshots__/
 package-lock.json
 .vscode/extensions.json
 db.json
+server/data.sqlite
