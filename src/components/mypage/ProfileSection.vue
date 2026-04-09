@@ -1,51 +1,68 @@
 <script setup>
-import { reactive, ref } from "vue";
+import { useAuthStore } from "@/stores/auth/useAuthStore";
+import { isNameValid } from "@/utils/validators/authValidator";
+import dayjs from "dayjs";
+import { computed, ref } from "vue";
 
-const createdAt = new Date().toLocaleDateString("ko-KR", {
-  year: "numeric",
-  month: "long",
-  day: "numeric",
-});
+const authStore = useAuthStore();
 
-const user = reactive({
-  name: "홍길동",
-  email: "gdhong@gmail.com",
-  createdAt: `${createdAt} 가입`,
-  grade: "일반 회원",
+const user = computed(() => {
+  return (
+    authStore.user ?? {
+      name: "",
+      email: "",
+      grade: "",
+      createdAt: "",
+    }
+  );
 });
 
 const isEditMode = ref(false);
+const editErrorMessage = ref("");
 
 const changedName = ref("");
 
 const clickEditButton = () => {
   isEditMode.value = true;
-  changedName.value = user.name;
+  changedName.value = user.value.name;
 };
 
 const inputName = (event) => {
   changedName.value = event.target.value;
 };
 
-const saveChanges = () => {
-  if (changedName.value.trim() === "") {
-    alert("이름을 입력해주세요.");
-    return;
+const saveChanges = async () => {
+  try {
+    isNameValid(changedName.value);
+    await authStore.updateProfile({ name: changedName.value });
+    isEditMode.value = false;
+    editErrorMessage.value = "";
+  } catch (error) {
+    if (error.name === "MemberInfoError") {
+      editErrorMessage.value = error.message;
+    } else {
+      console.log(error);
+      editErrorMessage.value = "알 수 없는 오류입니다.";
+    }
   }
-  user.name = changedName.value;
-  isEditMode.value = false;
 };
 
 const cancelChanges = () => {
   isEditMode.value = false;
+  editErrorMessage.value = "";
 };
+
+const formattedCreatedAt = computed(() => {
+  if (!user.value.createdAt) return "";
+  return dayjs(user.value.createdAt).format("YYYY년 MM월 DD일");
+});
 </script>
 
 <template>
   <div class="profile-section">
     <div class="profile-header">
       <div class="profile-image">
-        <span>{{ user.name[0] }}</span>
+        <span>{{ user?.name[0] ?? "X" }}</span>
       </div>
       <div class="profile-summary">
         <div class="name-grade">
@@ -53,12 +70,14 @@ const cancelChanges = () => {
           ><span class="grade">{{ user.grade }}</span>
         </div>
         <div class="email">{{ user.email }}</div>
-        <div class="created-at">{{ user.createdAt }}</div>
+        <div class="created-at">{{ formattedCreatedAt }}</div>
       </div>
-      <button class="edit-btn" v-if="!isEditMode" @click="clickEditButton">
-        <i class="fa-solid fa-pencil"></i>
-        <span>정보 수정</span>
-      </button>
+      <div class="edit-profile-box">
+        <button class="edit-btn" v-if="!isEditMode" @click="clickEditButton">
+          <i class="fa-solid fa-pencil"></i>
+          <span>정보 수정</span>
+        </button>
+      </div>
     </div>
     <div class="profile-detail" v-if="!isEditMode">
       <div class="profile-detail-item">
@@ -85,7 +104,7 @@ const cancelChanges = () => {
         </div>
         <div class="profile-detail-item-content">
           <div class="label">가입일</div>
-          <div class="value">{{ createdAt }}</div>
+          <div class="value">{{ formattedCreatedAt }}</div>
         </div>
       </div>
     </div>
@@ -97,6 +116,9 @@ const cancelChanges = () => {
         :value="changedName"
         @input="inputName"
       />
+      <div class="error-message" v-if="editErrorMessage">
+        {{ editErrorMessage }}
+      </div>
       <div class="buttons">
         <button class="cancel-btn" @click="cancelChanges">취소</button>
         <button class="save-btn" @click="saveChanges">저장하기</button>
@@ -122,7 +144,7 @@ const cancelChanges = () => {
   display: flex;
   flex-direction: row;
   justify-content: start;
-  align-items: start;
+  align-items: center;
   gap: 16px;
   padding: 16px;
 }
@@ -190,6 +212,16 @@ const cancelChanges = () => {
   margin: 0;
   font-size: 10px;
   color: rgb(195, 195, 195);
+}
+
+.edit-profile-box {
+  flex: 0 0 auto;
+  display: flex;
+  flex-direction: column;
+  justify-content: start;
+  align-items: center;
+  height: 100%;
+  align-self: flex-start;
 }
 
 .edit-btn {

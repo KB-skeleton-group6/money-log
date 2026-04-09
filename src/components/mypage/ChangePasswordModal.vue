@@ -41,11 +41,12 @@ const saveChanges = () => {
     isPasswordValid(newPassword.value);
     isPasswordConfirmed(newPassword.value, confirmNewPassword.value);
     emit("save", {
+      currentPassword: currentPassword.value,
       newPassword: newPassword.value,
     });
   } catch (err) {
     let message = "알 수 없는 오류입니다.";
-    if (err.name === "AuthError") {
+    if (err.name === "MemberInfoError") {
       switch (err.code) {
         case 6002:
           message = "비밀번호를 입력해주세요";
@@ -76,7 +77,7 @@ const saveChanges = () => {
           <div class="desc">안전한 비밀번호를 비밀번호로 변경하세요</div>
         </div>
         <div class="close-btn-box">
-          <button class="close-btn">
+          <button class="close-btn" @click="emit('close')">
             <i class="fa-solid fa-xmark"></i>
           </button>
         </div>

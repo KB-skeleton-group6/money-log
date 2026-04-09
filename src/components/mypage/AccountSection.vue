@@ -2,8 +2,13 @@
 import ChangePasswordModal from "@/components/mypage/ChangePasswordModal.vue";
 import LogoutConfirmModal from "@/components/mypage/LogoutConfirmModal.vue";
 import WithdrawalConfirmModal from "@/components/mypage/WithdrawalConfirmModal.vue";
+import { useAuthStore } from "@/stores/auth/useAuthStore";
 
 import { ref } from "vue";
+import { useRouter } from "vue-router";
+
+const authStore = useAuthStore();
+const router = useRouter();
 
 const isChangePasswordModalOpen = ref(false);
 const isLogoutModalOpen = ref(false);
@@ -32,6 +37,32 @@ const openWithdrawalModal = () => {
 const closeWithdrawalModal = () => {
   isWithdrawalModalOpen.value = false;
 };
+
+const changePassword = async ({ currentPassword, newPassword }) => {
+  try {
+    await authStore.changePassword({
+      currentPassword,
+      newPassword,
+    });
+    closeChangePasswordModal();
+  } catch (error) {
+    if (error.name === "MemberInfoError") {
+    } else {
+    }
+  }
+};
+
+const logout = async () => {
+  authStore.logout();
+  router.push("/");
+  closeLogoutModal();
+};
+
+const withdraw = async () => {
+  authStore.withdraw();
+  router.push("/");
+  closeWithdrawalModal();
+};
 </script>
 
 <template>
@@ -55,11 +86,17 @@ const closeWithdrawalModal = () => {
     <Teleport to="body">
       <ChangePasswordModal
         v-if="isChangePasswordModalOpen"
+        @save="changePassword"
         @close="closeChangePasswordModal"
       />
-      <LogoutConfirmModal v-if="isLogoutModalOpen" @close="closeLogoutModal" />
+      <LogoutConfirmModal
+        v-if="isLogoutModalOpen"
+        @confirm="logout"
+        @close="closeLogoutModal"
+      />
       <WithdrawalConfirmModal
         v-if="isWithdrawalModalOpen"
+        @confirm="withdraw"
         @close="closeWithdrawalModal"
       />
     </Teleport>
