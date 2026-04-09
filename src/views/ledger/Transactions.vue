@@ -93,12 +93,7 @@ const pageNumbers = computed(() => {
   }
   return nums;
 });
-// // 3. 총 페이지 수 계산
-// const totalPages = computed(() => {
-//   return Math.ceil(allFilteredTransactions.value.length / itemsPerPage.value);
-// });
 
-// 필터가 바뀌면 페이지를 다시 1페이지로 리셋합니다.
 watch(
   filters,
   () => {

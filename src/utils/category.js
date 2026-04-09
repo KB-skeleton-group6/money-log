@@ -1,4 +1,4 @@
-// 💡 카테고리 이름에 맞춰 폰트어썸 아이콘 반환
+// 카테고리 이름에 맞춰 폰트어썸 아이콘 반환
 export const getCategoryIcon = (categoryName) => {
   const iconMap = {
     식비: 'fas fa-utensils',
@@ -18,7 +18,7 @@ export const getCategoryIcon = (categoryName) => {
   return iconMap[categoryName] || 'fas fa-check-circle';
 };
 
-// 💡 DB 헥스코드를 연한 파스텔톤 배경색으로 변환 (투명도 12% 적용)
+// DB 헥스코드를 연한 파스텔톤 배경색으로 변환 (투명도 12% 적용)
 export const getLightBackgroundColor = (hexColor) => {
   if (!hexColor) return '#f5f5f5';
   return hexColor + '20';

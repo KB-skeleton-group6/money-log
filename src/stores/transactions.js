@@ -1,7 +1,8 @@
 import { defineStore } from 'pinia';
 import { ref, computed } from 'vue';
+import api from '@/api/axiosClient';
 
-// 'transaction'이라는 고유 ID를 가진 Store를 만듭니다.
+// 'transaction'이라는 고유 ID를 가진 Store 만들기
 export const useTransactionStore = defineStore('transaction', () => {
   // 1. State (데이터 상태 = 기존의 ref)
   const transactions = ref([]);
@@ -10,32 +11,35 @@ export const useTransactionStore = defineStore('transaction', () => {
   // 2. Actions (데이터를 조작하는 함수들)
   const fetchData = async () => {
     try {
-      const [txRes, catRes] = await Promise.all([
-        fetch('http://localhost:3000/transactions'),
-        fetch('http://localhost:3000/categories'),
+      const [txData, catData] = await Promise.all([
+        api.transactionApi.getTransactions(),
+        api.categoryApi.getCategories(),
       ]);
-      transactions.value = await txRes.json();
-      categories.value = await catRes.json();
+      transactions.value = txData;
+      categories.value = catData;
     } catch (error) {
       console.error('데이터 로드 실패:', error);
     }
   };
 
   const addTransaction = async (formData) => {
-    await fetch('http://localhost:3000/transactions', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(formData),
-    });
-    fetchData(); // 추가 후 데이터 새로고침
+    try {
+      // api.transactionApi.createTransaction 사용
+      await api.transactionApi.createTransaction(formData);
+      await fetchData(); // 추가 후 목록 새로고침
+    } catch (error) {
+      console.error('거래 추가 실패:', error);
+    }
   };
 
   const deleteTransaction = async (id) => {
-    await fetch(`http://localhost:3000/transactions/${id}`, {
-      method: 'DELETE',
-    });
-    // 서버 삭제 후, 로컬 데이터에서도 즉시 제거
-    transactions.value = transactions.value.filter((tx) => tx.id !== id);
+    try {
+      await api.transactionApi.deleteTransaction(id);
+      // 서버 삭제 성공 후 로컬 상태에서 제거
+      transactions.value = transactions.value.fill((tx) => tx.id !== id);
+    } catch (error) {
+      console.error('거래 삭제 실패: ', error);
+    }
   };
 
   // 3. Getters (계산된 데이터 = 기존의 computed)
@@ -46,7 +50,7 @@ export const useTransactionStore = defineStore('transaction', () => {
       .reduce((sum, tx) => sum + tx.amount, 0);
   });
 
-  // ✨ 이 은행에서 밖으로 꺼내줄(공유할) 것들을 return 해줍니다.
+  // 밖으로 꺼내줄(공유할) 것들을 return
   return {
     transactions,
     categories,

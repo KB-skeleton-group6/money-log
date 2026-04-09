@@ -25,7 +25,7 @@ const groupedTransactions = computed(() => {
     // YYYY-MM-DD 형식
     const dateKey = `${dateObj.getFullYear()}-${String(dateObj.getMonth() + 1).padStart(2, '0')}-${String(dateObj.getDate()).padStart(2, '0')}`;
 
-    // 24시간 형식 표기 (getHours는 0~23을 반환합니다)
+    // 24시간 형식 표기 (getHours는 0~23을 반환)
     const timeStr = `${String(dateObj.getHours()).padStart(2, '0')}:${String(dateObj.getMinutes()).padStart(2, '0')}`;
 
     if (!groups[dateKey])
@@ -41,7 +41,7 @@ const groupedTransactions = computed(() => {
     (a, b) => new Date(b.date) - new Date(a.date),
   );
 
-  // 2. 각 날짜 그룹 내부의 아이템들을 시간 최신순으로 정렬g
+  // 2. 각 날짜 그룹 내부의 아이템들을 시간 최신순으로 정렬
   sortedGroups.forEach((group) => {
     group.items.sort(
       (a, b) => new Date(b.transacted_at) - new Date(a.transacted_at),
