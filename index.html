@@ -22,10 +22,17 @@
               return s.replace(/~and~/g, '&');
             })
             .join('?');
+
+          // 저장소 이름(/money-log)을 유지한 채 뒤에 실제 경로를 붙임
           window.history.replaceState(
             null,
             null,
-            l.pathname.slice(0, l.pathname.length - 1) + decoded + l.hash,
+            l.pathname.slice(
+              0,
+              l.pathname.length - (l.pathname.endsWith('/') ? 1 : 0),
+            ) +
+              decoded +
+              l.hash,
           );
         }
       })(window.location);
