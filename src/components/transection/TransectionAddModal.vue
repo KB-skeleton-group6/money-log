@@ -1,41 +1,30 @@
 <script setup>
 import { ref, computed } from "vue";
 import { useAddTransactionStore } from "@/stores/transactions/useAddTransactionStore";
-
-const categoriesData = {
-  expense: [
-    { name: "식비", label: "Food", icon: "fa-solid fa-utensils" },
-    { name: "카페", label: "Cafe", icon: "fa-solid fa-mug-hot" },
-    { name: "교통", label: "Transportation", icon: "fa-solid fa-bus" },
-    { name: "쇼핑", label: "Shopping", icon: "fa-solid fa-bag-shopping" },
-    { name: "식료품", label: "Groceries", icon: "fa-solid fa-basket-shopping" },
-    { name: "구독", label: "Subscription", icon: "fa-solid fa-tv" },
-    { name: "건강", label: "Health", icon: "fa-solid fa-heartbeat" },
-    { name: "교육", label: "Education", icon: "fa-solid fa-graduation-cap" },
-    { name: "여가", label: "Leisure", icon: "fa-solid fa-gamepad" },
-    { name: "기타", label: "Other", icon: "fa-solid fa-ellipsis-h" },
-  ],
-  income: [
-    { name: "급여", label: "Salary", icon: "fa-solid fa-money-check-dollar" },
-    { name: "부업", label: "Side Job", icon: "fa-solid fa-briefcase" },
-    { name: "투자", label: "Investment", icon: "fa-solid fa-chart-line" },
-    { name: "용돈", label: "Allowance", icon: "fa-solid fa-piggy-bank" },
-    { name: "기타", label: "Other", icon: "fa-solid fa-ellipsis-h" },
-  ],
-};
-
-const paymentMethodsData = [
-  "신용카드",
-  "체크카드",
-  "현금",
-  "계좌이체",
-  "간편결제",
-];
+import { Categories } from "../../constant/categories";
 
 const addTransactionStore = useAddTransactionStore();
 const formData = addTransactionStore.formData;
 
+const categorizedList = computed(() => {
+  const allList = Object.values(Categories);
+
+  return {
+    INCOME: allList.filter((cat) => cat.label === "INCOME"),
+    EXPENSE: allList.filter((cat) => cat.label === "EXPENSE"),
+  };
+});
+
 const memoLength = computed(() => formData.memo.length);
+
+const handleSubmit = () => {
+  if (!formData.category_id || !formData.amount) {
+    alert("금액과 카테고리는 필수입니다.");
+    return;
+  }
+  // 스토어의 제출 함수 호출
+  addTransactionStore.submitTransaction();
+};
 </script>
 
 <template>
@@ -44,7 +33,7 @@ const memoLength = computed(() => formData.memo.length);
       <div
         v-if="addTransactionStore.isOpen"
         class="modal-overlay"
-        @mousedown.self="addTransactionStore.isOpen = false"
+        @mousedown.self="addTransactionStore.closeModal"
       >
         <div class="modal">
           <div class="modal-header">
@@ -54,21 +43,21 @@ const memoLength = computed(() => formData.memo.length);
             </button>
           </div>
 
-          <form class="form-container" @submit.prevent>
+          <form class="form-container" @submit.prevent="handleSubmit">
             <div class="form-group">
               <label class="form-label">거래 유형</label>
               <div class="toggle-container">
                 <div
                   class="toggle-item income"
-                  :class="{ selected: formData.isIncome }"
-                  @click="formData.isIncome = true"
+                  :class="{ selected: formData.type === 'INCOME' }"
+                  @click="formData.type = 'INCOME'"
                 >
                   <i class="fa-solid fa-arrow-up"></i> <span>수입</span>
                 </div>
                 <div
                   class="toggle-item expense"
-                  :class="{ selected: !formData.isIncome }"
-                  @click="formData.isIncome = false"
+                  :class="{ selected: formData.type === 'EXPENSE' }"
+                  @click="formData.type = 'EXPENSE'"
                 >
                   <i class="fa-solid fa-arrow-down"></i> <span>지출</span>
                 </div>
@@ -78,9 +67,11 @@ const memoLength = computed(() => formData.memo.length);
             <div class="form-group">
               <label class="form-label">날짜</label>
               <div class="input-box clickable">
-                <i class="fa-regular fa-calendar input-icon"></i>
-                <span class="input-control">{{ formData.date }}</span>
-                <i class="fa-solid fa-chevron-down input-icon small"></i>
+                <input
+                  type="date"
+                  v-model="formData.transacted_at"
+                  class="input-control no-border"
+                />
               </div>
             </div>
 
@@ -102,20 +93,14 @@ const memoLength = computed(() => formData.memo.length);
               <label class="form-label">카테고리</label>
               <div class="category-grid">
                 <div
-                  v-for="value in categoriesData[
-                    formData.isIncome ? 'income' : 'expense'
-                  ]"
-                  :key="value.label"
+                  v-for="cat in categorizedList[formData.type]"
+                  :key="cat.id"
                   class="category-item"
-                  :class="{ selected: formData.category == value.label }"
-                  @click="
-                    formData.category != value.label
-                      ? (formData.category = value.label)
-                      : (formData.category = '')
-                  "
+                  :class="{ selected: formData.category_id === cat.id }"
+                  @click="formData.category_id = cat.id"
                 >
-                  <i :class="value.icon"></i>
-                  <span>{{ value.name }}</span>
+                  <i :class="cat.icon"></i>
+                  <span>{{ cat.name }}</span>
                 </div>
               </div>
             </div>
@@ -171,6 +156,13 @@ const memoLength = computed(() => formData.memo.length);
 </template>
 
 <style scoped>
+/* 기존 스타일 유지 */
+.input-control.no-border {
+  border: none;
+  outline: none;
+  background: transparent;
+  width: 100%;
+}
 .modal {
   --color-primary: #00bc7d;
   --color-primary-bg: #e8fff5;
