@@ -33,15 +33,20 @@ ChartJS.register(
 
 const transactionStore = useTransactionStore();
 const { transactions } = storeToRefs(transactionStore);
-let recentTransaction = ref([]);
 const allList = Object.values(Categories);
 
-onMounted( async () => {
-  await transactionStore.fetchData();
+const recentTransactions = computed(() => {
+  if (!transactionStore.transactions || transactionStore.transactions.length === 0) {
+    return [];
+  }
 
-  recentTransaction.value = [...transactions.value]
-  .sort((a, b) => new Date(b.created_at) - new Date(a.created_at))
-  .slice(0, 7);
+  return [...transactionStore.transactions]
+    .sort((a, b) => new Date(b.created_at) - new Date(a.created_at))
+    .slice(0, 7);
+});
+
+onMounted(() => {
+  transactionStore.fetchData();
 });
 
 const {
@@ -192,18 +197,22 @@ const isToday = (dateStr) => dateStr === dayjs().format("YYYY-MM-DD");
         </div>
         <ul class="transaction-list">
           <li
-            v-for="item in recentTransaction"
+            v-for="item in recentTransactions"
             :key="item.id"
             class="transaction-item"
           >
             <div
               class="icon-wrapper"
               :style="{
-                backgroundColor: allList.find((cat) => cat.id === item.category_id).subColor,
+                backgroundColor: allList.find(
+                  (cat) => cat.id === item.category_id,
+                ).subColor,
                 color: allList.find((cat) => cat.id === item.category_id).color,
               }"
             >
-              <i :class="allList.find((cat) => cat.id === item.category_id).icon"></i>
+              <i
+                :class="allList.find((cat) => cat.id === item.category_id).icon"
+              ></i>
             </div>
             <div class="item-info">
               <h4>{{ item.detail }}</h4>

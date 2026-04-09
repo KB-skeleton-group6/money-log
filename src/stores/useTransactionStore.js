@@ -107,5 +107,24 @@ export const useTransactionStore = defineStore("transaction", {
         }
       }
     },
+    async addTransaction(payload) {
+      try {
+        // axiosClient에 정의된 createTransaction 호출
+        const newTransaction = await axiosClient.transactionApi.createTransaction(payload);
+        
+        // 서버에서 생성된 객체를 반환받으면 로컬 배열에 추가
+        if (newTransaction) {
+          this.transactions.push(newTransaction);
+        } else {
+          // 만약 응답값이 없다면 전체를 다시 불러옴
+          await this.fetchData();
+        }
+        return true; // 성공
+      } catch (error) {
+        console.error("거래 추가 실패:", error);
+        alert("거래 내역을 추가하는데 실패했습니다.");
+        return false; // 실패
+      }
+    },
   },
 });
