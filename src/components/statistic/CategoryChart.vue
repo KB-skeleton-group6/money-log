@@ -10,27 +10,8 @@ const props = defineProps({
   activeType: String,
 });
 
-const { aggregatedStats } = useCategoryStats(() => props.activeType);
-
-const processedData = computed(() => {
-  if (aggregatedStats.value.length === 0) {
-    return { labels: [], values: [], colors: [], count: 0 };
-  }
-
-  const totalSum = aggregatedStats.value.reduce(
-    (sum, item) => sum + item.amount,
-    0,
-  );
-
-  return {
-    labels: aggregatedStats.value.map((r) => r.name),
-    values: aggregatedStats.value.map((r) =>
-      totalSum > 0 ? ((r.amount / totalSum) * 100).toFixed(1) : 0,
-    ),
-    colors: aggregatedStats.value.map((r) => r.color),
-    count: aggregatedStats.value.length,
-  };
-});
+// 데이터 가공 로직을 훅 내부로 이동시켜 컴포넌트 단순화
+const { processedData } = useCategoryStats(() => props.activeType);
 
 const chartData = computed(() => ({
   labels: processedData.value.labels,
