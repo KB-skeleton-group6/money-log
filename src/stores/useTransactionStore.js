@@ -1,8 +1,9 @@
-import { defineStore } from 'pinia';
-import { ref, computed } from 'vue';
-import axiosClient from '@/api/axiosClient';
+import { defineStore } from "pinia";
+import { ref, computed } from "vue";
+import axiosClient from "@/api/axiosClient";
+import { useAuthStore } from "./auth/useAuthStore";
 
-export const useTransactionStore = defineStore('transaction', () => {
+export const useTransactionStore = defineStore("transaction", () => {
   // state
   const transactions = ref([]);
   const categories = ref([]);
@@ -47,12 +48,12 @@ export const useTransactionStore = defineStore('transaction', () => {
 
     const stats = {
       income: {
-        current: calculateTotal(tMonth, 'INCOME'),
-        last: calculateTotal(lMonth, 'INCOME'),
+        current: calculateTotal(tMonth, "INCOME"),
+        last: calculateTotal(lMonth, "INCOME"),
       },
       expense: {
-        current: calculateTotal(tMonth, 'EXPENSE'),
-        last: calculateTotal(lMonth, 'EXPENSE'),
+        current: calculateTotal(tMonth, "EXPENSE"),
+        last: calculateTotal(lMonth, "EXPENSE"),
       },
     };
 
@@ -76,14 +77,20 @@ export const useTransactionStore = defineStore('transaction', () => {
   async function fetchData() {
     loading.value = true;
     try {
-      const [transactionsData, categoriesData] = await Promise.all([
-        axiosClient.transactionApi.getTransactions(),
-        axiosClient.categoryApi.getCategories(),
-      ]);
+      const authStore = useAuthStore();
+      if (!authStore.isLoggedIn) {
+        transactions.value = [];
+        return;
+      }
+      const userId = authStore.user.id;
+
+      const transactionsData =
+        await axiosClient.transactionApi.getTransactionsByUserId(userId);
+      console.log(transactionsData);
+
       transactions.value = transactionsData;
-      categories.value = categoriesData;
     } catch (error) {
-      console.error('Data Fetch Error:', error);
+      console.error("Data Fetch Error:", error);
     } finally {
       loading.value = false;
     }
@@ -99,7 +106,7 @@ export const useTransactionStore = defineStore('transaction', () => {
         await axiosClient.transactionApi.deleteTransaction(id);
       } catch (error) {
         transactions.value.splice(index, 0, backup);
-        alert('삭제에 실패했습니다.');
+        alert("삭제에 실패했습니다.");
       }
     }
   }
@@ -116,8 +123,8 @@ export const useTransactionStore = defineStore('transaction', () => {
       }
       return true;
     } catch (error) {
-      console.error('거래 추가 실패:', error);
-      alert('거래 내역을 추가하는데 실패했습니다.');
+      console.error("거래 추가 실패:", error);
+      alert("거래 내역을 추가하는데 실패했습니다.");
       return false;
     }
   }

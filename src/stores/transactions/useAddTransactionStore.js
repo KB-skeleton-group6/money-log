@@ -1,6 +1,7 @@
 import { defineStore } from "pinia";
 import { ref, reactive } from "vue";
 import { useTransactionStore } from "../useTransactionStore";
+import { useAuthStore } from "../auth/useAuthStore";
 
 export const useAddTransactionStore = defineStore("addTransaction", () => {
   const isOpen = ref(false);
@@ -54,9 +55,11 @@ export const useAddTransactionStore = defineStore("addTransaction", () => {
   };
 
   // json-server로 데이터 POST 요청
-  const submitTransaction = async (userId = "user01") => {
+  const submitTransaction = async () => {
     // 1. Transaction 데이터 관리를 담당하는 스토어 호출
     const transactionStore = useTransactionStore();
+    const authStore = useAuthStore();
+    const userId = authStore.user.id;
 
     try {
       const payload = {
