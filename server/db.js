@@ -19,6 +19,14 @@ db.exec(`
     type TEXT NOT NULL
   );
 
+  CREATE TABLE IF NOT EXISTS budgets (
+    id          INTEGER PRIMARY KEY AUTOINCREMENT,
+    user_id     INTEGER NOT NULL,
+    category_id INTEGER NOT NULL,
+    amount      INTEGER NOT NULL DEFAULT 0,
+    UNIQUE(user_id, category_id)
+  );
+
   CREATE TABLE IF NOT EXISTS transactions (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     user_id TEXT NOT NULL,

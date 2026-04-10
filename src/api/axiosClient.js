@@ -115,6 +115,16 @@ async function deleteMember(memberId) {
   await client.delete(`${urlPrefix}/members/${memberId}`);
 }
 
+async function getBudgets() {
+  const res = await client.get(`${urlPrefix}/budgets`);
+  return res.data;
+}
+
+async function saveBudgets(items) {
+  const res = await client.put(`${urlPrefix}/budgets`, items);
+  return res.data;
+}
+
 async function getCategories() {
   const res = await client.get(`${urlPrefix}/categories`);
   return res.data;
@@ -173,6 +183,11 @@ const memberApi = {
   deleteMember,
 };
 
+const budgetApi = {
+  getBudgets,
+  saveBudgets,
+};
+
 const categoryApi = {
   getCategories,
 };
@@ -185,4 +200,4 @@ const transactionApi = {
   deleteTransaction,
 };
 
-export default { authApi, profileApi, memberApi, categoryApi, transactionApi };
+export default { authApi, profileApi, memberApi, budgetApi, categoryApi, transactionApi };
