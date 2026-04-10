@@ -1,130 +1,138 @@
-import { defineStore } from "pinia";
-import axios from "axios";
-import axiosClient from "@/api/axiosClient";
+import { defineStore } from 'pinia';
+import { ref, computed } from 'vue';
+import axiosClient from '@/api/axiosClient';
 
-export const useTransactionStore = defineStore("transaction", {
-  state: () => ({
-    transactions: [],
-    categories: [],
-    loading: false,
-  }),
+export const useTransactionStore = defineStore('transaction', () => {
+  // state
+  const transactions = ref([]);
+  const categories = ref([]);
+  const loading = ref(false);
 
-  getters: {
-    getDateInfo: () => {
-      const now = new Date();
-      return {
-        month: now.getMonth(),
-        year: now.getFullYear(),
-      };
-    },
+  // getters
+  const getDateInfo = computed(() => {
+    const now = new Date();
+    return {
+      month: now.getMonth(),
+      year: now.getFullYear(),
+    };
+  });
 
-    // 이번 달 거래 내역
-    thisMonthTransactions: (state) => {
-      const { month, year } = state.getDateInfo;
-      return state.transactions.filter((t) => {
-        const d = new Date(t.transacted_at);
-        return d.getMonth() === month && d.getFullYear() === year;
-      });
-    },
+  // 이번 달 거래 내역
+  const thisMonthTransactions = computed(() => {
+    const { month, year } = getDateInfo.value;
+    return transactions.value.filter((t) => {
+      const d = new Date(t.transacted_at);
+      return d.getMonth() === month && d.getFullYear() === year;
+    });
+  });
 
-    // 지난달 거래 내역
-    lastMonthTransactions: (state) => {
-      const { month, year } = state.getDateInfo;
-      const lastM = month === 0 ? 11 : month - 1;
-      const lastY = month === 0 ? year - 1 : year;
-      return state.transactions.filter((t) => {
-        const d = new Date(t.transacted_at);
-        return d.getMonth() === lastM && d.getFullYear() === lastY;
-      });
-    },
+  // 지난달 거래 내역
+  const lastMonthTransactions = computed(() => {
+    const { month, year } = getDateInfo.value;
+    const lastM = month === 0 ? 11 : month - 1;
+    const lastY = month === 0 ? year - 1 : year;
+    return transactions.value.filter((t) => {
+      const d = new Date(t.transacted_at);
+      return d.getMonth() === lastM && d.getFullYear() === lastY;
+    });
+  });
 
-    // 요약 데이터 계산용 헬퍼
-    summaryStats: (state) => {
-      const calculateTotal = (list, type) =>
-        list
-          .filter((t) => t.type === type)
-          .reduce((sum, t) => sum + t.amount, 0);
+  // 요약 데이터 계산용 헬퍼
+  const summaryStats = computed(() => {
+    const calculateTotal = (list, type) =>
+      list.filter((t) => t.type === type).reduce((sum, t) => sum + t.amount, 0);
 
-      const tMonth = state.thisMonthTransactions;
-      const lMonth = state.lastMonthTransactions;
+    const tMonth = thisMonthTransactions.value;
+    const lMonth = lastMonthTransactions.value;
 
-      const stats = {
-        income: {
-          current: calculateTotal(tMonth, "INCOME"),
-          last: calculateTotal(lMonth, "INCOME"),
-        },
-        expense: {
-          current: calculateTotal(tMonth, "EXPENSE"),
-          last: calculateTotal(lMonth, "EXPENSE"),
-        },
-      };
+    const stats = {
+      income: {
+        current: calculateTotal(tMonth, 'INCOME'),
+        last: calculateTotal(lMonth, 'INCOME'),
+      },
+      expense: {
+        current: calculateTotal(tMonth, 'EXPENSE'),
+        last: calculateTotal(lMonth, 'EXPENSE'),
+      },
+    };
 
-      const calculateDiff = (curr, last) =>
-        last === 0 ? 0 : (((curr - last) / last) * 100).toFixed(1);
+    const calculateDiff = (curr, last) =>
+      last === 0 ? 0 : (((curr - last) / last) * 100).toFixed(1);
 
-      return {
-        totalIncome: stats.income.current,
-        incomeDiff: calculateDiff(stats.income.current, stats.income.last),
-        totalExpense: stats.expense.current,
-        expenseDiff: calculateDiff(stats.expense.current, stats.expense.last),
-        totalProfit: stats.income.current - stats.expense.current,
-        profitDiff: calculateDiff(
-          stats.income.current - stats.expense.current,
-          stats.income.last - stats.expense.last,
-        ),
-      };
-    },
-  },
+    return {
+      totalIncome: stats.income.current,
+      incomeDiff: calculateDiff(stats.income.current, stats.income.last),
+      totalExpense: stats.expense.current,
+      expenseDiff: calculateDiff(stats.expense.current, stats.expense.last),
+      totalProfit: stats.income.current - stats.expense.current,
+      profitDiff: calculateDiff(
+        stats.income.current - stats.expense.current,
+        stats.income.last - stats.expense.last,
+      ),
+    };
+  });
 
-  actions: {
-    async fetchData() {
-      this.loading = true;
+  // actions
+  async function fetchData() {
+    loading.value = true;
+    try {
+      const [transactionsData, categoriesData] = await Promise.all([
+        axiosClient.transactionApi.getTransactions(),
+        axiosClient.categoryApi.getCategories(),
+      ]);
+      transactions.value = transactionsData;
+      categories.value = categoriesData;
+    } catch (error) {
+      console.error('Data Fetch Error:', error);
+    } finally {
+      loading.value = false;
+    }
+  }
+
+  async function deleteTransaction(id) {
+    const index = transactions.value.findIndex((t) => t.id === id);
+    if (index !== -1) {
+      const backup = transactions.value[index];
+      transactions.value.splice(index, 1);
+
       try {
-        const [transactions, categories] = await Promise.all([
-          axiosClient.transactionApi.getTransactions(),
-          axiosClient.categoryApi.getCategories(),
-        ]);
-        this.transactions = transactions;
-        this.categories = categories;
+        await axiosClient.transactionApi.deleteTransaction(id);
       } catch (error) {
-        console.error("Data Fetch Error:", error);
-      } finally {
-        this.loading = false;
+        transactions.value.splice(index, 0, backup);
+        alert('삭제에 실패했습니다.');
       }
-    },
+    }
+  }
 
-    async deleteTransaction(id) {
-      const index = this.transactions.findIndex((t) => t.id === id);
-      if (index !== -1) {
-        const backup = this.transactions[index];
-        this.transactions.splice(index, 1);
+  async function addTransaction(payload) {
+    try {
+      const newTransaction =
+        await axiosClient.transactionApi.createTransaction(payload);
 
-        try {
-          await axiosClient.transactionApi.deleteTransaction(id);
-        } catch (error) {
-          this.transactions.splice(index, 0, backup);
-          alert("삭제에 실패했습니다.");
-        }
+      if (newTransaction) {
+        transactions.value.push(newTransaction);
+      } else {
+        await fetchData();
       }
-    },
-    async addTransaction(payload) {
-      try {
-        // axiosClient에 정의된 createTransaction 호출
-        const newTransaction = await axiosClient.transactionApi.createTransaction(payload);
-        
-        // 서버에서 생성된 객체를 반환받으면 로컬 배열에 추가
-        if (newTransaction) {
-          this.transactions.push(newTransaction);
-        } else {
-          // 만약 응답값이 없다면 전체를 다시 불러옴
-          await this.fetchData();
-        }
-        return true; // 성공
-      } catch (error) {
-        console.error("거래 추가 실패:", error);
-        alert("거래 내역을 추가하는데 실패했습니다.");
-        return false; // 실패
-      }
-    },
-  },
+      return true;
+    } catch (error) {
+      console.error('거래 추가 실패:', error);
+      alert('거래 내역을 추가하는데 실패했습니다.');
+      return false;
+    }
+  }
+  async function editTransaction() {}
+
+  return {
+    transactions,
+    categories,
+    loading,
+    getDateInfo,
+    thisMonthTransactions,
+    lastMonthTransactions,
+    summaryStats,
+    fetchData,
+    deleteTransaction,
+    addTransaction,
+  };
 });

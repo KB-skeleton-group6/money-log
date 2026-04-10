@@ -1,8 +1,8 @@
 <script setup>
-import { ref, computed } from "vue";
-import { useAddTransactionStore } from "@/stores/transactions/useAddTransactionStore";
-import { Categories } from "../../constant/categories";
-import { Payments } from "../../constant/paymentMethods";
+import { ref, computed } from 'vue';
+import { useAddTransactionStore } from '@/stores/transactions/useAddTransactionStore';
+import { Categories } from '../../constant/categories';
+import { Payments } from '../../constant/paymentMethods';
 
 const addTransactionStore = useAddTransactionStore();
 const formData = addTransactionStore.formData;
@@ -11,8 +11,8 @@ const categorizedList = computed(() => {
   const allList = Object.values(Categories);
 
   return {
-    INCOME: allList.filter((cat) => cat.label === "INCOME"),
-    EXPENSE: allList.filter((cat) => cat.label === "EXPENSE"),
+    INCOME: allList.filter((cat) => cat.label === 'INCOME'),
+    EXPENSE: allList.filter((cat) => cat.label === 'EXPENSE'),
   };
 });
 
@@ -21,14 +21,14 @@ const paymentMethods = computed(() => {
 
   return {
     ALL: allList,
-  }
-})
+  };
+});
 
 const memoLength = computed(() => formData.memo.length);
 
 const handleSubmit = () => {
   if (!formData.category_id || !formData.amount) {
-    alert("금액과 카테고리는 필수입니다.");
+    alert('금액과 카테고리는 필수입니다.');
     return;
   }
   // 스토어의 제출 함수 호출
@@ -46,7 +46,10 @@ const handleSubmit = () => {
       >
         <div class="modal">
           <div class="modal-header">
-            <h2 class="modal-title">거래 추가</h2>
+            <!-- <h2 class="modal-title">거래 추가</h2> -->
+            <h2 class="modal-title">
+              {{ addTransactionStore.isEditMode ? '거래 수정' : '거래 추가' }}
+            </h2>
             <button class="close-btn" @click="addTransactionStore.closeModal">
               <i class="fa-solid fa-xmark"></i>
             </button>
@@ -156,7 +159,10 @@ const handleSubmit = () => {
               </div>
             </div>
 
-            <button class="add-btn" type="submit">추가하기</button>
+            <!-- <button class="add-btn" type="submit">추가하기</button> -->
+            <button class="add-btn" type="submit">
+              {{ addTransactionStore.isEditMode ? '수정하기' : '추가하기' }}
+            </button>
           </form>
         </div>
       </div>
@@ -338,12 +344,12 @@ const handleSubmit = () => {
   font-weight: bold;
   font-size: 1.1rem;
 }
-.input-control[type="number"]::-webkit-outer-spin-button,
-.input-control[type="number"]::-webkit-inner-spin-button {
+.input-control[type='number']::-webkit-outer-spin-button,
+.input-control[type='number']::-webkit-inner-spin-button {
   -webkit-appearance: none;
   margin: 0;
 }
-.input-control[type="number"] {
+.input-control[type='number'] {
   -moz-appearance: textfield;
 }
 
