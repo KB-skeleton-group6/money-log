@@ -84,7 +84,7 @@ export const useAuthStore = defineStore("auth", () => {
     try {
       // 1. 유효성 검사
       isNameValid(name);
-      isEmailValid(name);
+      isEmailValid(email);
       isPasswordValid(password);
 
       const members = await axiosClient.memberApi.getMemberByEmail(email);
