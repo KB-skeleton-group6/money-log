@@ -1,6 +1,7 @@
 import { defineStore } from 'pinia';
 import { ref, computed } from 'vue';
 import axiosClient from '@/api/axiosClient';
+import { useAuthStore } from './auth/useAuthStore';
 
 export const useTransactionStore = defineStore('transaction', () => {
   // state
@@ -76,12 +77,18 @@ export const useTransactionStore = defineStore('transaction', () => {
   async function fetchData(userId = 'user01') {
     loading.value = true;
     try {
-      const [transactionsData, categoriesData] = await Promise.all([
-        axiosClient.transactionApi.getTransactions(`?user_id=${userId}`),
-        axiosClient.categoryApi.getCategories(),
-      ]);
+      const authStore = useAuthStore();
+      if (!authStore.isLoggedIn) {
+        transactions.value = [];
+        return;
+      }
+      const userId = authStore.user.id;
+
+      const transactionsData =
+        await axiosClient.transactionApi.getTransactionsByUserId(userId);
+      console.log(transactionsData);
+
       transactions.value = transactionsData;
-      categories.value = categoriesData;
     } catch (error) {
       console.error('Data Fetch Error:', error);
     } finally {

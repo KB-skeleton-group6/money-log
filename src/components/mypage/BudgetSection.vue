@@ -73,13 +73,24 @@ const hexToRgba = (hex, alpha) => {
           <span class="title">월별 예산 설정</span>
           <span class="subtitle">카테고리별 월 지출 한도를 설정하세요</span>
         </div>
+        <button
+          v-if="!isEditMode"
+          class="edit-btn edit-btn--mobile"
+          @click="enterEditMode"
+        >
+          <i class="fa-solid fa-pencil"></i>
+        </button>
       </div>
       <div class="header-right">
         <div class="total-budget">
           <span class="total-label">총 예산</span>
           <span class="total-amount">{{ formatAmountShort(totalBudget) }}</span>
         </div>
-        <button v-if="!isEditMode" class="edit-btn" @click="enterEditMode">
+        <button
+          v-if="!isEditMode"
+          class="edit-btn edit-btn--desktop"
+          @click="enterEditMode"
+        >
           <i class="fa-solid fa-pencil"></i>
           <span>수정</span>
         </button>
@@ -184,12 +195,12 @@ const hexToRgba = (hex, alpha) => {
 .header-titles .title {
   font-size: 14px;
   font-weight: bold;
-  color: rgb(50, 50, 50);
+  color: #1c1c1e;
 }
 
 .header-titles .subtitle {
   font-size: 11px;
-  color: rgb(153, 153, 153);
+  color: #8a8a8e;
 }
 
 .header-right {
@@ -208,7 +219,7 @@ const hexToRgba = (hex, alpha) => {
 
 .total-budget .total-label {
   font-size: 11px;
-  color: rgb(153, 153, 153);
+  color: #8a8a8e;
 }
 
 .total-budget .total-amount {
@@ -223,14 +234,21 @@ const hexToRgba = (hex, alpha) => {
   justify-content: center;
   align-items: center;
   gap: 8px;
-  border: 1px solid rgb(240, 240, 240);
+  border: 1px solid #e8e8ed;
   border-radius: 8px;
   padding: 8px;
   background: none;
-  color: rgb(50, 50, 50);
+  color: #1c1c1e;
   cursor: pointer;
   font-size: 12px;
   transition: background-color 0.3s ease;
+}
+
+.edit-btn--mobile {
+  display: none;
+  margin-left: auto;
+  border: none;
+  padding: 4px;
 }
 
 .edit-btn > i {
@@ -238,7 +256,7 @@ const hexToRgba = (hex, alpha) => {
 }
 
 .edit-btn:hover {
-  background-color: rgb(240, 240, 240);
+  background-color: #f5f5f7;
 }
 
 /* Grid */
@@ -256,7 +274,7 @@ const hexToRgba = (hex, alpha) => {
   padding: 14px;
   border-radius: 12px;
   background-color: white;
-  border: 1px solid rgb(240, 240, 240);
+  border: 1px solid #e8e8ed;
 }
 
 .card-top {
@@ -287,20 +305,20 @@ const hexToRgba = (hex, alpha) => {
 .cat-name {
   font-size: 13px;
   font-weight: bold;
-  color: rgb(50, 50, 50);
+  color: #1c1c1e;
 }
 
 .cat-amount {
   font-size: 14px;
   font-weight: bold;
-  color: rgb(30, 30, 30);
+  color: #1c1c1e;
 }
 
 .progress-bar-track {
   width: 100%;
   height: 6px;
   border-radius: 999px;
-  background-color: rgb(230, 230, 230);
+  background-color: #e8e8ed;
   overflow: hidden;
 }
 
@@ -312,7 +330,7 @@ const hexToRgba = (hex, alpha) => {
 
 .cat-percent {
   font-size: 11px;
-  color: rgb(153, 153, 153);
+  color: #8a8a8e;
 }
 
 .budget-input-wrapper {
@@ -320,10 +338,10 @@ const hexToRgba = (hex, alpha) => {
   flex-direction: row;
   align-items: center;
   gap: 2px;
-  border: 1px solid rgb(220, 220, 220);
+  border: 1px solid #d1d1d6;
   border-radius: 8px;
-  padding: 4px 8px;
-  background-color: rgb(249, 249, 249);
+  padding: 8px;
+  background-color: white;
 }
 
 .budget-input-wrapper:focus-within {
@@ -337,7 +355,7 @@ const hexToRgba = (hex, alpha) => {
   outline: none;
   font-size: 13px;
   font-weight: bold;
-  color: rgb(30, 30, 30);
+  color: #1c1c1e;
   background: transparent;
   text-align: right;
 }
@@ -345,7 +363,7 @@ const hexToRgba = (hex, alpha) => {
 .unit {
   font-size: 13px;
   font-weight: normal;
-  color: rgb(80, 80, 80);
+  color: #48484a;
   flex: 0 0 auto;
 }
 
@@ -361,7 +379,7 @@ const hexToRgba = (hex, alpha) => {
   display: flex;
   justify-content: center;
   align-items: center;
-  border: 1px solid rgb(240, 240, 240);
+  border: 1px solid #e8e8ed;
   border-radius: 10px;
   padding: 10px;
   font-size: 13px;
@@ -371,11 +389,11 @@ const hexToRgba = (hex, alpha) => {
 
 .cancel-btn {
   background-color: white;
-  color: rgb(79, 79, 79);
+  color: #48484a;
 }
 
 .cancel-btn:hover {
-  background-color: rgb(240, 240, 240);
+  background-color: #f5f5f7;
 }
 
 .save-btn {
@@ -386,5 +404,42 @@ const hexToRgba = (hex, alpha) => {
 
 .save-btn:hover {
   background-color: #00a572;
+}
+
+@media (max-width: 768px) {
+  .budget-header {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 12px;
+    padding: 12px;
+  }
+
+  .edit-btn > span {
+    display: none;
+  }
+
+  .edit-btn {
+    border: none;
+    padding: 4px;
+    background: none;
+  }
+
+  .total-budget {
+    flex-direction: row;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .total-budget .total-label {
+    font-size: 12px;
+  }
+
+  .category-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .cat-amount {
+    text-align: right;
+  }
 }
 </style>

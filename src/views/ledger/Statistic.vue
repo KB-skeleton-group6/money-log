@@ -190,4 +190,26 @@ watch(currentFilter, (newVal) => {
   flex-direction: column;
   box-sizing: border-box;
 }
+
+/* 반응형 최적화 (태블릿 & 모바일) */
+@media (max-width: 992px) {
+  .bottom-container {
+    flex-direction: column;
+  }
+}
+
+@media (max-width: 768px) {
+  .statistics-page {
+    padding: 12px;
+  }
+
+  .summary-container {
+    flex-direction: column;
+    gap: 12px;
+  }
+
+  .filter-container {
+    flex-wrap: wrap;
+  }
+}
 </style>
