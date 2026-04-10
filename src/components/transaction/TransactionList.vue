@@ -177,6 +177,12 @@ const handleEditClick = (item) => {
       </div>
     </div>
 
+    <!-- 데이터가 없을 때 표시할 UI -->
+    <div v-if="groupedTransactions.length === 0" class="empty-msg">
+      <i class="fa-regular fa-folder-open"></i>
+      <p>데이터가 없습니다.</p>
+    </div>
+
     <DeleteConfirmModal
       :isOpen="isDeleteModalOpen"
       @cancel="handleCloseDeleteModal"
@@ -327,6 +333,25 @@ const handleEditClick = (item) => {
 }
 .text-red {
   color: #ff5252;
+}
+
+/* 빈 데이터 안내 메시지 스타일 (Statistic과 동일한 느낌) */
+.empty-msg {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  gap: 12px;
+  color: #999;
+  padding: 80px 0;
+}
+.empty-msg i {
+  font-size: 3rem;
+  color: #ddd;
+}
+.empty-msg p {
+  margin: 0;
+  font-size: 1rem;
 }
 
 .mobile-only {
