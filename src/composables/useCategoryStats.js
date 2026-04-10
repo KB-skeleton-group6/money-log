@@ -1,7 +1,8 @@
 import { computed, toValue } from 'vue';
 import { useTransactionStore } from '@/stores/transactions/useTransactionStore';
 import { storeToRefs } from 'pinia';
-import { Categories } from '@/constant/categories';
+import { getCategoryById } from '@/constant/categories';
+import { calculatePercent } from '@/utils/formatter';
 
 export function useCategoryStats(activeTypeRef) {
   const store = useTransactionStore();
@@ -13,38 +14,52 @@ export function useCategoryStats(activeTypeRef) {
     }
 
     const typeKey = toValue(activeTypeRef).toUpperCase();
-    const categoryMap = {};
 
-    thisMonthTransactions.value.forEach((t) => {
-      if (t.type === typeKey) {
-        if (!categoryMap[t.category_id]) {
-          categoryMap[t.category_id] = { amount: 0, count: 0 };
+    const categoryMap = thisMonthTransactions.value
+      .filter((t) => t.type === typeKey)
+      .reduce((acc, t) => {
+        if (!acc[t.category_id]) {
+          acc[t.category_id] = { amount: 0, count: 0 };
         }
-        categoryMap[t.category_id].amount += t.amount;
-        categoryMap[t.category_id].count += 1;
-      }
-    });
+        acc[t.category_id].amount += t.amount;
+        acc[t.category_id].count += 1;
+        return acc;
+      }, {});
 
-    const result = Object.keys(categoryMap).map((catId) => {
-      const category = categories.value.find(
-        (c) => String(c.id) === String(catId),
-      );
+    return Object.entries(categoryMap)
+      .map(([catId, stats]) => {
+        const category = categories.value.find(
+          (c) => String(c.id) === String(catId),
+        );
 
-      const staticCategory = Object.values(Categories).find(
-        (c) => String(c.id) === String(catId),
-      );
+        const staticCategory = getCategoryById(catId);
 
-      return {
-        name: category ? category.name : '기타',
-        amount: categoryMap[catId].amount,
-        count: categoryMap[catId].count,
-        color: category?.color || '#ccc',
-        icon: staticCategory?.icon || 'fa-solid fa-tag',
-      };
-    });
-
-    return result.sort((a, b) => b.amount - a.amount);
+        return {
+          name: category ? category.name : '기타',
+          amount: stats.amount,
+          count: stats.count,
+          color: category?.color || '#ccc',
+          icon: staticCategory?.icon || 'fa-solid fa-tag',
+        };
+      })
+      .sort((a, b) => b.amount - a.amount);
   });
 
-  return { aggregatedStats };
+  const processedData = computed(() => {
+    const stats = aggregatedStats.value;
+    if (stats.length === 0) {
+      return { labels: [], values: [], colors: [], count: 0 };
+    }
+
+    const totalSum = stats.reduce((sum, item) => sum + item.amount, 0);
+
+    return {
+      labels: stats.map((r) => r.name),
+      values: stats.map((r) => calculatePercent(r.amount, totalSum)),
+      colors: stats.map((r) => r.color),
+      count: stats.length,
+    };
+  });
+
+  return { aggregatedStats, processedData };
 }
