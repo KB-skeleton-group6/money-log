@@ -1,12 +1,13 @@
 import { defineStore } from 'pinia';
 import { ref, computed } from 'vue';
 import axiosClient from '@/api/axiosClient';
-import { useAuthStore } from '../auth/useAuthStore';
+import { useAuthStore } from '@/stores/auth/useAuthStore';
+import { Categories } from '@/constant/categories';
 
 export const useTransactionStore = defineStore('transaction', () => {
   // state
   const transactions = ref([]);
-  const categories = ref([]);
+  const categories = ref(Object.values(Categories));
   const loading = ref(false);
 
   // getters
@@ -76,7 +77,7 @@ export const useTransactionStore = defineStore('transaction', () => {
   });
 
   // actions
-  async function fetchData(userId = 'user01') {
+  async function fetchData() {
     loading.value = true;
     try {
       const authStore = useAuthStore();
@@ -88,13 +89,10 @@ export const useTransactionStore = defineStore('transaction', () => {
       const userId = authStore.user.id;
 
       // Promise.all을 사용하여 트랜잭션과 카테고리 데이터를 병렬로 가져옴
-      const [transactionsData, categoriesData] = await Promise.all([
-        axiosClient.transactionApi.getTransactionsByUserId(userId),
-        axiosClient.categoryApi.getCategories(),
-      ]);
-
+      const transactionsData =
+        await axiosClient.transactionApi.getTransactionsByUserId(userId);
       transactions.value = transactionsData;
-      categories.value = categoriesData;
+      categories.value = Object.values(Categories);
     } catch (error) {
       console.error('Data Fetch Error:', error);
     } finally {
