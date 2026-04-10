@@ -205,7 +205,7 @@ const isToday = (dateStr) => dateStr === dayjs().format("YYYY-MM-DD");
         </div>
         <ul class="transaction-list">
           <li
-            v-for="item in recentTransactions"
+            v-for="item in recentTransaction"
             :key="item.id"
             class="transaction-item"
           >
