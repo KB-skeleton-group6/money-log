@@ -185,4 +185,10 @@ const emit = defineEmits(["close", "confirm"]);
   color: white;
   border-color: #00c78b;
 }
+
+@media (max-width: 768px) {
+  .logout-modal {
+    width: calc(100% - 32px);
+  }
+}
 </style>

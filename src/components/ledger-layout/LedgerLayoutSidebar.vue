@@ -22,10 +22,12 @@ const toggleSidebar = () => {
 
 <template>
   <div class="sidebar" :class="sidebarClass">
-    <div class="header">
-      <img alt="" />
-      <span class="sidebar-label">Moneylog</span>
-    </div>
+    <router-link to="/" class="header">
+      <div class="logo">
+        <i class="fa-solid fa-wallet"></i>
+      </div>
+      <span class="sidebar-label">머니로그</span>
+    </router-link>
     <div class="nav-bar">
       <div
         class="nav-item"
@@ -55,7 +57,6 @@ const toggleSidebar = () => {
   flex-direction: column;
   justify-content: start;
   align-items: stretch;
-  gap: 4px;
   width: 240px;
   border-right: 1px solid lightgray;
   background-color: #141e2b;
@@ -68,26 +69,33 @@ const toggleSidebar = () => {
 }
 
 .header {
+  text-decoration: none;
   flex: 0 0 auto;
   display: flex;
   flex-direction: row;
   justify-content: start;
   align-items: center;
-  gap: 16px;
-  height: 40px;
+  line-height: 1;
+  gap: 4px;
+  height: 56px;
   padding: 8px;
   color: white;
 }
 
-.header > img {
+.header > .logo {
   flex: 0 0 auto;
+  display: flex;
+  justify-content: center;
+  align-items: center;
   width: 40px;
   height: 40px;
+  font-size: 20px;
 }
 
 .header > span {
   font-size: 20px;
   font-weight: bold;
+  color: white;
 }
 
 .sidebar.open .header,
@@ -125,7 +133,7 @@ const toggleSidebar = () => {
 
 .nav-item {
   flex: 0 0 auto;
-  height: 32px;
+  height: 48px;
   padding: 8px;
   border-radius: 16px;
 }
@@ -168,6 +176,9 @@ const toggleSidebar = () => {
   justify-content: center;
   align-items: center;
   height: 60px;
+  padding: 8px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
 }
 
 .toggle-sidebar-box * {
@@ -178,5 +189,11 @@ const toggleSidebar = () => {
   background: none;
   border: none;
   padding: 0;
+}
+
+@media (max-width: 768px) {
+  .sidebar {
+    display: none;
+  }
 }
 </style>

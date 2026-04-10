@@ -3,13 +3,14 @@ import { ref, computed } from "vue";
 import { useAddTransactionStore } from "@/stores/transactions/useAddTransactionStore";
 import { Categories } from "../../constant/categories";
 import { Payments } from "../../constant/paymentMethods";
+import { DatePicker } from "v-calendar";
+import "v-calendar/style.css";
 
 const addTransactionStore = useAddTransactionStore();
 const formData = addTransactionStore.formData;
+const allList = Object.values(Categories);
 
 const categorizedList = computed(() => {
-  const allList = Object.values(Categories);
-
   return {
     INCOME: allList.filter((cat) => cat.label === "INCOME"),
     EXPENSE: allList.filter((cat) => cat.label === "EXPENSE"),
@@ -21,17 +22,29 @@ const paymentMethods = computed(() => {
 
   return {
     ALL: allList,
-  }
-})
+  };
+});
+
+const filterNumber = (event) => {
+  const filteredValue = event.target.value.replace(/[^0-9]/g, "");
+
+  formData.amount = filteredValue;
+};
 
 const memoLength = computed(() => formData.memo.length);
 
 const handleSubmit = () => {
-  if (!formData.category_id || !formData.amount) {
-    alert("금액과 카테고리는 필수입니다.");
-    return;
+  if (!formData.category_id) {
+    formData.category_id = formData.type === "INCOME" ? "cat99" : "cat98";
   }
-  // 스토어의 제출 함수 호출
+  if (!formData.amount) {
+    formData.amount = 0;
+  }
+  if (!formData.detail) {
+    formData.detail = allList.find(
+      (cat) => cat.id === formData.category_id,
+    ).name;
+  }
   addTransactionStore.submitTransaction();
 };
 </script>
@@ -44,9 +57,18 @@ const handleSubmit = () => {
         class="modal-overlay"
         @mousedown.self="addTransactionStore.closeModal"
       >
-        <div class="modal">
+        <div
+          class="modal"
+          :class="{
+            income: formData.type === 'INCOME',
+            expense: formData.type === 'EXPENSE',
+          }"
+        >
           <div class="modal-header">
-            <h2 class="modal-title">거래 추가</h2>
+            <!-- <h2 class="modal-title">거래 추가</h2> -->
+            <h2 class="modal-title">
+              {{ addTransactionStore.isEditMode ? "거래 수정" : "거래 추가" }}
+            </h2>
             <button class="close-btn" @click="addTransactionStore.closeModal">
               <i class="fa-solid fa-xmark"></i>
             </button>
@@ -72,16 +94,26 @@ const handleSubmit = () => {
                 </div>
               </div>
             </div>
-
             <div class="form-group">
               <label class="form-label">날짜</label>
-              <div class="input-box clickable">
-                <input
-                  type="date"
-                  v-model="formData.transacted_at"
-                  class="input-control no-border"
-                />
-              </div>
+              <DatePicker
+                v-model="formData.transacted_at"
+                mode="date"
+                :masks="{ title: 'YYYY년 MMM', modelValue: 'YYYY-MM-DD' }"
+                @dayclick="(day, event) => event.target.blur()"
+              >
+                <template #default="{ inputValue, inputEvents }">
+                  <div class="input-box clickable" v-on="inputEvents">
+                    <i class="fa-solid fa-calendar input-icon"></i>
+                    <input
+                      class="input-control no-border bold"
+                      :value="inputValue"
+                      readonly
+                      placeholder="날짜 선택"
+                    />
+                  </div>
+                </template>
+              </DatePicker>
             </div>
 
             <div class="form-group">
@@ -93,6 +125,7 @@ const handleSubmit = () => {
                   class="input-control text-right bold"
                   v-model="formData.amount"
                   placeholder="0"
+                  @input="filterNumber"
                 />
                 <span class="input-suffix">원</span>
               </div>
@@ -156,7 +189,10 @@ const handleSubmit = () => {
               </div>
             </div>
 
-            <button class="add-btn" type="submit">추가하기</button>
+            <!-- <button class="add-btn" type="submit">추가하기</button> -->
+            <button class="add-btn" type="submit">
+              {{ addTransactionStore.isEditMode ? "수정하기" : "추가하기" }}
+            </button>
           </form>
         </div>
       </div>
@@ -194,6 +230,7 @@ const handleSubmit = () => {
 
   padding: 36px;
   background-color: var(--color-bg-white);
+  border: 2px solid var(--color-border);
   border-radius: 16px;
   box-shadow: 0px 8px 32px rgba(0, 0, 0, 0.08);
   z-index: 999;
@@ -210,6 +247,12 @@ const handleSubmit = () => {
   background: var(--color-border);
   border-radius: 10px;
 }
+/* .modal.income {
+  border: 2px solid var(--color-income);
+}
+.modal.expense {
+  border: 2px solid var(--color-expense);
+} */
 
 .modal-overlay {
   position: fixed;
@@ -217,19 +260,31 @@ const handleSubmit = () => {
   left: 0;
   width: 100vw;
   height: 100vh;
-  background-color: rgba(0, 0, 0, 0.5);
+  background-color: #888e9c99;
   z-index: 998;
   display: flex;
   justify-content: center;
   align-items: center;
 }
+
 .modal-enter-active,
 .modal-leave-active {
   transition: opacity 0.2s ease;
 }
+
+.modal-enter-active .modal,
+.modal-leave-active .modal {
+  transition: transform 0.2s ease-out;
+}
+
 .modal-enter-from,
 .modal-leave-to {
   opacity: 0;
+}
+
+.modal-enter-from .modal,
+.modal-leave-to .modal {
+  transform: scale(0.9);
 }
 
 .modal-header {
@@ -370,10 +425,18 @@ const handleSubmit = () => {
   transition: 0.3s;
 }
 .toggle-item.expense.selected {
-  color: var(--color-expense);
+  color: var(--color-bg-light);
+  background-color: var(--color-expense);
+
+  /* color: var(--color-expense); */
+  /* border: 1px solid var(--color-expense); */
 }
 .toggle-item.income.selected {
-  color: var(--color-income);
+  color: var(--color-bg-light);
+  background-color: var(--color-income);
+
+  /* color: var(--color-income); */
+  /* border: 1px solid var(--color-income); */
 }
 
 .category-grid {

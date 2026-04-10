@@ -203,7 +203,7 @@ const saveChanges = () => {
   justify-content: start;
   align-items: start;
   gap: 4px;
-  min-width: 300px;
+  min-width: 0;
 }
 
 .header > .title-box > .title {
@@ -335,5 +335,11 @@ const saveChanges = () => {
 .buttons > .save-btn {
   background-color: #00c78b;
   color: white;
+}
+
+@media (max-width: 768px) {
+  .change-password-modal {
+    width: calc(100% - 32px);
+  }
 }
 </style>

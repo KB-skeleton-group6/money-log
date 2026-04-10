@@ -50,7 +50,8 @@ export const useAuthStore = defineStore("auth", () => {
       saveLocalAuth();
     } catch (error) {
       if (error instanceof MemberInfoError) throw error;
-      if (error instanceof ApiError) throw new MemberInfoError(resolveApiError(error.serverErrorCode));
+      if (error instanceof ApiError)
+        throw new MemberInfoError(resolveApiError(error.serverErrorCode));
       console.error("로그인 API 에러:", error);
       throw new MemberInfoError(ErrorCode.LOGIN_FAILED);
     }
@@ -61,7 +62,8 @@ export const useAuthStore = defineStore("auth", () => {
       await axiosClient.authApi.signup({ email, password, name });
     } catch (error) {
       if (error instanceof MemberInfoError) throw error;
-      if (error instanceof ApiError) throw new MemberInfoError(resolveApiError(error.serverErrorCode));
+      if (error instanceof ApiError)
+        throw new MemberInfoError(resolveApiError(error.serverErrorCode));
       console.error("회원가입 API 에러:", error);
       throw new MemberInfoError(ErrorCode.SAVE_FAILED);
     }
@@ -71,6 +73,7 @@ export const useAuthStore = defineStore("auth", () => {
     user.value = null;
     accessToken.value = null;
     removeLocalAuth();
+    console.log("로그아웃 성공");
   };
 
   const withdraw = async () => {
@@ -79,7 +82,8 @@ export const useAuthStore = defineStore("auth", () => {
       logout();
     } catch (error) {
       if (error instanceof MemberInfoError) throw error;
-      if (error instanceof ApiError) throw new MemberInfoError(resolveApiError(error.serverErrorCode));
+      if (error instanceof ApiError)
+        throw new MemberInfoError(resolveApiError(error.serverErrorCode));
       console.error("회원탈퇴 API 에러:", error);
       throw new MemberInfoError(ErrorCode.SAVE_FAILED);
     }
@@ -94,7 +98,8 @@ export const useAuthStore = defineStore("auth", () => {
       user.value = { ...user.value, name };
       saveLocalAuth();
     } catch (error) {
-      if (error instanceof ApiError) throw new MemberInfoError(resolveApiError(error.serverErrorCode));
+      if (error instanceof ApiError)
+        throw new MemberInfoError(resolveApiError(error.serverErrorCode));
       console.error("프로필 업데이트 API 에러:", error);
       throw new MemberInfoError(ErrorCode.SAVE_FAILED);
     }
@@ -104,7 +109,8 @@ export const useAuthStore = defineStore("auth", () => {
     try {
       await axiosClient.authApi.resetPassword({ currentPassword, newPassword });
     } catch (error) {
-      if (error instanceof ApiError) throw new MemberInfoError(resolveApiError(error.serverErrorCode));
+      if (error instanceof ApiError)
+        throw new MemberInfoError(resolveApiError(error.serverErrorCode));
       console.error("비밀번호 변경 에러:", error);
       throw new MemberInfoError(ErrorCode.SAVE_FAILED);
     }

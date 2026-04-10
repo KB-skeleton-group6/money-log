@@ -12,7 +12,7 @@ export class MemberInfoError extends Error {
 const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 const PASSWORD_REGEX =
   /^(?=.*[a-zA-Z])(?=.*\d)(?=.*[!@#$%^&*()_+~`|}{[\]:;?><,./-]).{8,20}$/; // 영문, 숫자, 특수문자 포함 8~20자
-const NAME_REGEX = /^[가-힣a-zA-Z\s]+$/; // 한글, 영문, 공백만 허용
+const NAME_REGEX = /^[가-힣a-zA-Z\s]{1,12}$/; // 한글, 영문, 공백만 허용, 12자 이하
 
 /**
  * 이메일 유효성 검사
