@@ -1,7 +1,7 @@
 import { defineStore } from 'pinia';
 import { ref, computed } from 'vue';
 import axiosClient from '@/api/axiosClient';
-import { useAuthStore } from './auth/useAuthStore';
+import { useAuthStore } from '../auth/useAuthStore';
 
 export const useTransactionStore = defineStore('transaction', () => {
   // state
