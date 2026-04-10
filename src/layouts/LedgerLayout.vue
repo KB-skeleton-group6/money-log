@@ -55,6 +55,9 @@ import { useAddTransactionStore } from '@/stores/transactions/useAddTransactionS
 
 .add-transaction-btn {
   position: fixed;
+  display: flex;
+  justify-content: center;
+  align-items: center;
   width: 64px;
   height: 64px;
   bottom: 32px;
@@ -66,6 +69,9 @@ import { useAddTransactionStore } from '@/stores/transactions/useAddTransactionS
     0 6px 20px 0 rgba(0, 0, 0, 0.19);
   transition: background-color 0.3s ease;
   background-color: #00bc7c;
+  color: white;
+  cursor: pointer;
+  font-size: 24px;
 }
 
 @media (max-width: 768px) {
