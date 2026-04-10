@@ -1,5 +1,5 @@
 <script setup>
-import { ref, onMounted, watch } from 'vue';
+import { ref, onMounted, computed, watch } from 'vue';
 import { useTransactionStore } from '@/stores/transactions/useTransactionStore';
 import { storeToRefs } from 'pinia';
 
@@ -85,10 +85,8 @@ watch(currentFilter, (newVal) => {
       </div>
 
       <section class="bottom-container">
-        <template v-if="categories.length > 0 && transactions.length > 0">
-          <CategoryChart :active-type="currentType" />
-          <TopCategoryList :active-type="currentType" />
-        </template>
+        <CategoryChart :active-type="currentType" />
+        <TopCategoryList :active-type="currentType" />
       </section>
     </div>
   </div>
