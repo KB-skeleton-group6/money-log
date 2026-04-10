@@ -129,4 +129,30 @@ const diffClass = computed(() => (props.diff >= 0 ? 'up' : 'down'));
   color: #00cfe8;
   font-weight: 600;
 }
+
+/* 모바일 화면 최적화 */
+@media (max-width: 768px) {
+  .summary-card {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 16px;
+    min-width: auto;
+  }
+  .card-header {
+    margin-bottom: 0;
+  }
+  .card-content {
+    text-align: right;
+    display: flex;
+    flex-direction: column-reverse;
+  }
+  .card-content h2 {
+    font-size: 1.25rem;
+  }
+  .comparison {
+    margin-top: 0;
+    margin-bottom: 4px;
+  }
+}
 </style>

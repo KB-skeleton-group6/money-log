@@ -145,4 +145,15 @@ const chartOptions = {
   padding: 40px 0;
   color: #999;
 }
+
+/* 모바일 화면 최적화 */
+@media (max-width: 768px) {
+  .chart-content {
+    flex-direction: column; /* 가로 배치를 세로 배치로 변경 */
+    gap: 24px; /* 모바일 화면에 맞게 간격 조절 */
+  }
+  .legend-list {
+    width: 100%; /* 범례 영역이 화면을 꽉 채우도록 설정 */
+  }
+}
 </style>
