@@ -11,7 +11,7 @@ const transactionStore = useTransactionStore();
 const authStore = useAuthStore();
 
 // 데이터(ref)는 storeToRefs로 감싸서 꺼내야 화면이 실시간으로 바뀜
-const { transactions, categories } = storeToRefs(transactionStore);
+const { transactions, categories, loading } = storeToRefs(transactionStore);
 
 // 함수(액션)는 그냥 바로 꺼냅니다.
 const { fetchData, deleteTransaction, updateTransaction } = transactionStore;
@@ -41,6 +41,8 @@ onMounted(() => {
 
 // 1. 필터링된 "전체" 데이터 (기존과 동일)
 const allFilteredTransactions = computed(() => {
+  if (!transactions.value) return []; // 데이터가 없을 때 에러가 나지 않도록 방어
+
   const filtered = transactions.value.filter((tx) => {
     // 1. 날짜 필터 (한국 시간으로 변환 후 비교)
     const dateObj = new Date(tx.transacted_at);
@@ -122,6 +124,8 @@ watch(user, (newUser) => {
 const summary = computed(() => {
   let income = 0;
   let expense = 0;
+
+  if (!transactions.value) return { income: 0, expense: 0, net: 0, count: 0 }; // 방어 코드
 
   transactions.value.forEach((tx) => {
     const dateObj = new Date(tx.transacted_at);
@@ -250,59 +254,68 @@ const formatCurrency = (val) => new Intl.NumberFormat('ko-KR').format(val);
       </div>
     </section>
 
-    <TransactionList
-      :transactions="pagedTransactions"
-      :categories="categories"
-      @delete="deleteTransaction"
-      @edit="updateTransaction"
-    />
-
-    <div class="pagination" v-if="totalPages > 0">
-      <button
-        :disabled="currentPage === 1"
-        @click="currentPage = 1"
-        class="page-btn"
-        title="처음으로"
-      >
-        <i class="fas fa-angle-double-left"></i>
-      </button>
-
-      <button
-        :disabled="currentPage === 1"
-        @click="currentPage--"
-        class="page-btn"
-        title="이전"
-      >
-        <i class="fas fa-angle-left"></i>
-      </button>
-
-      <button
-        v-for="page in pageNumbers"
-        :key="page"
-        @click="currentPage = page"
-        :class="['page-btn', { active: currentPage === page }]"
-      >
-        {{ page }}
-      </button>
-
-      <button
-        :disabled="currentPage === totalPages"
-        @click="currentPage++"
-        class="page-btn"
-        title="다음"
-      >
-        <i class="fas fa-angle-right"></i>
-      </button>
-
-      <button
-        :disabled="currentPage === totalPages"
-        @click="currentPage = totalPages"
-        class="page-btn"
-        title="끝으로"
-      >
-        <i class="fas fa-angle-double-right"></i>
-      </button>
+    <!-- 로딩 중일 때 표시할 리스트 영역 -->
+    <div v-if="loading" class="loading-overlay">
+      데이터를 불러오는 중입니다...
     </div>
+
+    <!-- 로딩이 완료되면 보여줄 리스트 및 페이지네이션 -->
+    <template v-else>
+      <TransactionList
+        :transactions="pagedTransactions"
+        :categories="categories"
+        @delete="deleteTransaction"
+        @edit="updateTransaction"
+      />
+
+      <div class="pagination" v-if="totalPages > 0">
+        <button
+          :disabled="currentPage === 1"
+          @click="currentPage = 1"
+          class="page-btn"
+          title="처음으로"
+        >
+          <i class="fas fa-angle-double-left"></i>
+        </button>
+
+        <button
+          :disabled="currentPage === 1"
+          @click="currentPage--"
+          class="page-btn"
+          title="이전"
+        >
+          <i class="fas fa-angle-left"></i>
+        </button>
+
+        <button
+          v-for="page in pageNumbers"
+          :key="page"
+          @click="currentPage = page"
+          :class="['page-btn', { active: currentPage === page }]"
+        >
+          {{ page }}
+        </button>
+
+        <button
+          :disabled="currentPage === totalPages"
+          @click="currentPage++"
+          class="page-btn"
+          title="다음"
+        >
+          <i class="fas fa-angle-right"></i>
+        </button>
+
+        <button
+          :disabled="currentPage === totalPages"
+          @click="currentPage = totalPages"
+          class="page-btn"
+          title="끝으로"
+        >
+          <i class="fas fa-angle-double-right"></i>
+        </button>
+      </div>
+    </template>
+
     <TransactionAddModal />
   </div>
 </template>
@@ -324,6 +337,17 @@ const formatCurrency = (val) => new Intl.NumberFormat('ko-KR').format(val);
   color: #64748b;
   font-size: 14px;
   margin: 0;
+}
+
+/* 로딩 화면 스타일 */
+.loading-overlay {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 40vh; /* 상단에 필터와 카드가 있으므로 높이를 살짝 줄임 */
+  font-size: 18px;
+  font-weight: 700;
+  color: #64748b;
 }
 
 /* 1. 필터 섹션 스타일 */
@@ -468,8 +492,8 @@ const formatCurrency = (val) => new Intl.NumberFormat('ko-KR').format(val);
 .page-btn {
   min-width: 34px;
   height: 34px;
-  border: 1px solid #e2e8f0;
-  background-color: #fff;
+  border: none;
+  background-color: transparent;
   color: #718096;
   font-size: 13px;
   cursor: pointer;
@@ -480,15 +504,14 @@ const formatCurrency = (val) => new Intl.NumberFormat('ko-KR').format(val);
 }
 
 .page-btn:hover:not(:disabled) {
-  background-color: #f7fafc;
-  border-color: #cbd5e0;
+  background-color: transparent;
+  color: #1a202c; /* 마우스 오버 시 배경 대신 아이콘/글자 색상을 진하게 강조 */
 }
 
 .page-btn.active {
   color: #1a202c;
   font-weight: 800;
   border-bottom: 3px solid #1a202c; /* 강조 밑줄 */
-  border-top: 1px solid #e2e8f0;
 }
 
 .page-btn:disabled {
