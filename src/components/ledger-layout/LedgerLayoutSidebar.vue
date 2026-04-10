@@ -23,7 +23,9 @@ const toggleSidebar = () => {
 <template>
   <div class="sidebar" :class="sidebarClass">
     <router-link to="/" class="header">
-      <img alt="" />
+      <div class="logo">
+        <i class="fa-solid fa-wallet"></i>
+      </div>
       <span class="sidebar-label">머니로그</span>
     </router-link>
     <div class="nav-bar">
@@ -74,17 +76,20 @@ const toggleSidebar = () => {
   justify-content: start;
   align-items: center;
   line-height: 1;
-  gap: 16px;
+  gap: 4px;
   height: 56px;
   padding: 8px;
   color: white;
 }
 
-.header > img {
+.header > .logo {
   flex: 0 0 auto;
-  display: block;
+  display: flex;
+  justify-content: center;
+  align-items: center;
   width: 40px;
   height: 40px;
+  font-size: 20px;
 }
 
 .header > span {
