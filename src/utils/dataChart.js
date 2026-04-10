@@ -1,5 +1,6 @@
 import { computed, ref } from "vue";
 import dayjs from "dayjs";
+import { formatAmountShort } from "./formatter";
 
 // --- 1. 포맷팅 유틸 함수 ---
 export const formatCurrency = (val) =>
@@ -37,12 +38,13 @@ export function useDashboardCalculations(transactionsRef) {
         if (t.type === "INCOME") {
           incomes[index] += t.amount;
           incomeCounts[index]++;
+          monthlyNets[index] += t.amount;
         }
         if (t.type === "EXPENSE") {
-          expenses[index] += Math.abs(t.amount);
+          expenses[index] += t.amount;
           expenseCounts[index]++;
+          monthlyNets[index] -= t.amount;
         }
-        monthlyNets[index] += t.amount;
         totalCounts[index]++;
       } else if (monthDiff > 6) {
         olderNet += t.amount;
@@ -75,6 +77,14 @@ export function useDashboardCalculations(transactionsRef) {
   const totalIncome = computed(() => stats.value.incomes[6]);
   const totalExpense = computed(() => stats.value.expenses[6]);
   const netIncome = computed(() => stats.value.cumulativeNets[6]);
+
+  const formatTotalIncome = computed(() =>
+    formatAmountShort(totalIncome.value),
+  );
+  const formatTotalExpense = computed(() =>
+    formatAmountShort(totalExpense.value),
+  );
+  const formatNetIncome = computed(() => formatAmountShort(netIncome.value));
 
   const calculateRateInfo = (current, previous, previousCount) => {
     if (previousCount === 0) {
@@ -114,7 +124,6 @@ export function useDashboardCalculations(transactionsRef) {
     ),
   );
 
-  // ✨ [NEW] Vue Native 툴팁 상태 관리
   const tooltipState = ref({
     show: false,
     activeId: null,
@@ -230,5 +239,8 @@ export function useDashboardCalculations(transactionsRef) {
     chartOptionsNet,
     chartOptionsIncome,
     chartOptionsExpense,
+    formatTotalIncome,
+    formatTotalExpense,
+    formatNetIncome,
   };
 }
