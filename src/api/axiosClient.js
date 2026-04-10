@@ -115,6 +115,14 @@ async function getTransaction(transactionId) {
   return transaction;
 }
 
+async function getTransactionsByUserId(userId) {
+  const res = await axios.get(`${urlPrefix}/transactions?user_id:eq=${userId}`);
+
+  const transactions = res.data;
+
+  return transactions;
+}
+
 async function createTransaction(transaction) {
   const res = await axios.post(`${urlPrefix}/transactions`, transaction);
 
@@ -165,6 +173,7 @@ const memberApi = {
 
 const transactionApi = {
   getTransactions,
+  getTransactionsByUserId,
   getTransaction,
   createTransaction,
   updateTransaction,
