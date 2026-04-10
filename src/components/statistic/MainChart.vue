@@ -1,5 +1,5 @@
 <script setup>
-import { computed } from 'vue';
+import { computed, ref, onMounted, onUnmounted } from 'vue';
 import { Bar } from 'vue-chartjs';
 import { useTransactionStore } from '@/stores/useTransactionStore';
 import { storeToRefs } from 'pinia';
@@ -41,6 +41,22 @@ const props = defineProps({
 const store = useTransactionStore();
 const { transactions } = storeToRefs(store);
 
+// 모바일 화면 여부 감지 상태
+const isMobile = ref(false);
+
+const handleResize = () => {
+  isMobile.value = window.innerWidth <= 768;
+};
+
+onMounted(() => {
+  handleResize();
+  window.addEventListener('resize', handleResize);
+});
+
+onUnmounted(() => {
+  window.removeEventListener('resize', handleResize);
+});
+
 const chartTitle = computed(() => {
   const titleMap = {
     weekly: '주간별',
@@ -48,7 +64,7 @@ const chartTitle = computed(() => {
     quarterly: '분기별',
     yearly: '연도별',
   };
-  return `${titleMap[props.filterType] || '기간별'} 수입 · 지출 · 순이익`;
+  return `${titleMap[props.filterType] || '기간별'} 거래 차트`;
 });
 
 const processedChartData = computed(() => {
@@ -100,7 +116,7 @@ const chartData = computed(() => {
   };
 });
 
-const chartOptions = {
+const chartOptions = computed(() => ({
   responsive: true,
   maintainAspectRatio: false,
   interaction: {
@@ -130,12 +146,14 @@ const chartOptions = {
       position: 'left',
       beginAtZero: true,
       title: {
-        display: true,
+        display: !isMobile.value, // 모바일에서는 공간 확보를 위해 타이틀 숨김
         text: '수입 · 지출',
         color: '#888',
         font: { size: 12, weight: 'bold' },
       },
       ticks: {
+        maxTicksLimit: isMobile.value ? 5 : 8, // 모바일에서는 눈금 수를 줄여 깔끔하게
+        font: { size: isMobile.value ? 10 : 12 }, // 모바일 폰트 사이즈 축소
         callback: (value) => {
           const realValue = Math.round(
             Math.sign(value) * Math.pow(Math.abs(value), 2),
@@ -150,12 +168,14 @@ const chartOptions = {
       display: true,
       position: 'right',
       title: {
-        display: true,
+        display: !isMobile.value, // 모바일에서는 공간 확보를 위해 타이틀 숨김
         text: '순이익',
         color: '#28c76f',
         font: { size: 12, weight: 'bold' },
       },
       ticks: {
+        maxTicksLimit: isMobile.value ? 5 : 8,
+        font: { size: isMobile.value ? 10 : 12 },
         callback: (value) => {
           const realValue = Math.round(
             Math.sign(value) * Math.pow(Math.abs(value), 2),
@@ -169,9 +189,12 @@ const chartOptions = {
     },
     x: {
       grid: { display: false },
+      ticks: {
+        font: { size: isMobile.value ? 10 : 12 }, // 모바일 환경에서 X축 라벨 폰트 크기 축소
+      },
     },
   },
-};
+}));
 </script>
 
 <template>
@@ -196,8 +219,9 @@ const chartOptions = {
   padding: 20px;
 }
 .canvas-wrapper {
-  height: 300px;
+  height: 260px;
   position: relative;
+  width: 100%;
 }
 .loading-placeholder {
   display: flex;
@@ -289,6 +313,16 @@ hr {
   to {
     opacity: 1;
     transform: translateY(0);
+  }
+}
+
+/* 반응형 최적화 (태블릿 & 모바일) */
+@media (max-width: 768px) {
+  .chart-container {
+    padding: 16px;
+  }
+  .canvas-wrapper {
+    height: 220px;
   }
 }
 </style>
