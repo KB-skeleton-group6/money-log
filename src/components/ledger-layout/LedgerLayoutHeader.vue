@@ -50,7 +50,7 @@ async function logout() {
 <template>
   <div class="ledger-layout-header">
     <div class="mobile-logo">
-      <img src="" alt="logo" />
+      <i class="fa-solid fa-wallet"></i>
     </div>
     <div class="header-left">
       <div class="title">{{ title }}</div>
@@ -209,7 +209,8 @@ async function logout() {
     display: flex;
     align-items: center;
     flex: 0 0 auto;
-    margin-right: 12px;
+    margin-right: 8px;
+    font-size: 18px;
   }
 
   .mobile-logo img {
