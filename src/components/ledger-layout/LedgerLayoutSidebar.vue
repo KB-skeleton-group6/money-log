@@ -22,10 +22,10 @@ const toggleSidebar = () => {
 
 <template>
   <div class="sidebar" :class="sidebarClass">
-    <div class="header">
+    <router-link to="/" class="header">
       <img alt="" />
-      <span class="sidebar-label">Moneylog</span>
-    </div>
+      <span class="sidebar-label">머니로그</span>
+    </router-link>
     <div class="nav-bar">
       <div
         class="nav-item"
@@ -55,7 +55,6 @@ const toggleSidebar = () => {
   flex-direction: column;
   justify-content: start;
   align-items: stretch;
-  gap: 4px;
   width: 240px;
   border-right: 1px solid lightgray;
   background-color: #141e2b;
@@ -68,11 +67,13 @@ const toggleSidebar = () => {
 }
 
 .header {
+  text-decoration: none;
   flex: 0 0 auto;
   display: flex;
   flex-direction: row;
   justify-content: start;
   align-items: center;
+  line-height: 1;
   gap: 16px;
   height: 56px;
   padding: 8px;
@@ -81,6 +82,7 @@ const toggleSidebar = () => {
 
 .header > img {
   flex: 0 0 auto;
+  display: block;
   width: 40px;
   height: 40px;
 }
@@ -88,6 +90,7 @@ const toggleSidebar = () => {
 .header > span {
   font-size: 20px;
   font-weight: bold;
+  color: white;
 }
 
 .sidebar.open .header,
@@ -168,6 +171,9 @@ const toggleSidebar = () => {
   justify-content: center;
   align-items: center;
   height: 60px;
+  padding: 8px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
 }
 
 .toggle-sidebar-box * {

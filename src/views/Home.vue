@@ -1,11 +1,17 @@
 <script setup>
-import { ref, onMounted, onUnmounted } from 'vue';
-import AuthModal from '@/components/auth/AuthModal.vue';
+import { ref, onMounted, onUnmounted } from "vue";
+import { useRouter } from "vue-router";
+import AuthModal from "@/components/auth/AuthModal.vue";
+import { useAuthStore } from "@/stores/auth/useAuthStore";
+
+const router = useRouter();
+const authStore = useAuthStore();
+const { isLoggedIn } = authStore;
 
 const scrollToSection = (sectionId) => {
   const element = document.getElementById(sectionId);
   if (element) {
-    element.scrollIntoView({ behavior: 'smooth' });
+    element.scrollIntoView({ behavior: "smooth" });
   }
 };
 
@@ -17,10 +23,10 @@ const handleScroll = () => {
 };
 
 onMounted(() => {
-  window.addEventListener('scroll', handleScroll);
+  window.addEventListener("scroll", handleScroll);
 });
 onUnmounted(() => {
-  window.removeEventListener('scroll', handleScroll);
+  window.removeEventListener("scroll", handleScroll);
 });
 </script>
 
@@ -28,7 +34,7 @@ onUnmounted(() => {
   <div class="landing-page">
     <!-- 네비게이션 바 -->
     <header class="navbar">
-      <div class="logo"><i class="fa-solid fa-wallet"></i> Money Log</div>
+      <div class="logo"><i class="fa-solid fa-wallet"></i>머니로그</div>
 
       <nav class="nav-menu">
         <button @click="scrollToSection('intro')">소개</button>
@@ -36,7 +42,20 @@ onUnmounted(() => {
         <button @click="scrollToSection('preview')">실제 화면</button>
       </nav>
 
-      <button class="login-btn" @click="showAuthModal = true">로그인</button>
+      <button
+        v-if="!isLoggedIn"
+        class="login-btn"
+        @click="showAuthModal = true"
+      >
+        로그인
+      </button>
+      <button
+        v-else
+        class="login-btn"
+        @click="router.push('/ledger/dashboard')"
+      >
+        대시보드
+      </button>
     </header>
 
     <!-- 메인 히어로 섹션 -->
@@ -48,8 +67,19 @@ onUnmounted(() => {
           직관적인 통계로 소비 패턴을 분석하세요.<br />
           Money Log와 함께 현명한 금융 생활을 시작해 보세요.
         </p>
-        <button class="cta-btn" @click="showAuthModal = true">
+        <button
+          v-if="!isLoggedIn"
+          class="cta-btn"
+          @click="showAuthModal = true"
+        >
           지금 바로 시작하기
+        </button>
+        <button
+          v-else
+          class="cta-btn"
+          @click="router.push('/ledger/dashboard')"
+        >
+          대시보드로 이동하기
         </button>
       </div>
       <div class="hero-image">

@@ -2,7 +2,12 @@ import { defineStore } from "pinia";
 import { computed, ref } from "vue";
 import axiosClient from "@/api/axiosClient";
 import { ErrorCode } from "@/constant/errorCode";
-import { MemberInfoError } from "@/utils/validators/authValidator";
+import {
+  isEmailValid,
+  isNameValid,
+  isPasswordValid,
+  MemberInfoError,
+} from "@/utils/validators/authValidator";
 
 const getProfileFromUser = (user) => {
   return {
@@ -77,6 +82,11 @@ export const useAuthStore = defineStore("auth", () => {
    */
   const signup = async (email, password, name) => {
     try {
+      // 1. 유효성 검사
+      isNameValid(name);
+      isEmailValid(name);
+      isPasswordValid(password);
+
       const members = await axiosClient.memberApi.getMemberByEmail(email);
       if (members.length > 0) {
         throw new MemberInfoError(ErrorCode.DUPLICATE_EMAIL);
@@ -120,6 +130,8 @@ export const useAuthStore = defineStore("auth", () => {
 
   const updateProfile = async ({ name }) => {
     try {
+      isNameValid(name);
+
       const members = await axiosClient.memberApi.getMemberByEmail(
         user.value.email,
       );

@@ -36,6 +36,7 @@ const transactionStore = useTransactionStore();
 const { transactions } = storeToRefs(transactionStore);
 const allList = Object.values(Categories);
 
+
 const recentTransaction = computed(() => {
   if (
     !transactionStore.transactions ||

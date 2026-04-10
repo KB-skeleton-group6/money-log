@@ -1,9 +1,9 @@
-import { defineStore } from 'pinia';
-import { ref, reactive } from 'vue';
-import { useTransactionStore } from './useTransactionStore';
-import { useAuthStore } from '../auth/useAuthStore';
+import { defineStore } from "pinia";
+import { ref, reactive } from "vue";
+import { useTransactionStore } from "./useTransactionStore";
+import { useAuthStore } from "../auth/useAuthStore";
 
-export const useAddTransactionStore = defineStore('addTransaction', () => {
+export const useAddTransactionStore = defineStore("addTransaction", () => {
   const isOpen = ref(false);
 
   // 수정 모드 구분 변수 추가
@@ -11,13 +11,13 @@ export const useAddTransactionStore = defineStore('addTransaction', () => {
   const editTargetId = ref(null);
 
   const initialFormState = {
-    type: 'EXPENSE',
-    transacted_at: new Date().toISOString().split('T')[0],
-    amount: '',
-    category_id: '',
-    detail: '',
-    memo: '',
-    method: 'CARD',
+    type: "EXPENSE",
+    transacted_at: new Date().toISOString().split("T")[0],
+    amount: "",
+    category_id: "",
+    detail: "",
+    memo: "",
+    method: "CARD",
   };
 
   const formData = reactive({ ...initialFormState });
@@ -30,7 +30,7 @@ export const useAddTransactionStore = defineStore('addTransaction', () => {
   const openEditModal = (transactionData) => {
     const formattedDate = new Date(transactionData.transacted_at)
       .toISOString()
-      .split('T')[0];
+      .split("T")[0];
     // 기존 데이터를 폼에 덮어씌움
     Object.assign(formData, {
       ...transactionData,
@@ -67,7 +67,7 @@ export const useAddTransactionStore = defineStore('addTransaction', () => {
         amount: Number(formData.amount),
         user_id: userId,
         transacted_at: new Date(formData.transacted_at).toISOString(),
-        // created_at은 수정 시에는 보통 건드리지 않거나 별도 처리
+        created_at: new Date(),
       };
 
       let isSuccess = false;
@@ -87,7 +87,7 @@ export const useAddTransactionStore = defineStore('addTransaction', () => {
         closeModal();
       }
     } catch (error) {
-      console.error('서버 통신 에러:', error);
+      console.error("서버 통신 에러:", error);
     }
   };
 
