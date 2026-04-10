@@ -89,7 +89,7 @@ const executeDelete = () => {
 
 const addTransactionStore = useAddTransactionStore();
 const handleEditClick = (item) => {
-  addTransactionStore.openEditModal(item);
+  editTransaction.openEditModal(item);
 };
 </script>
 <template>

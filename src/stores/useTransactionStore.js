@@ -1,8 +1,8 @@
-import { defineStore } from "pinia";
-import { ref, computed } from "vue";
-import axiosClient from "@/api/axiosClient";
+import { defineStore } from 'pinia';
+import { ref, computed } from 'vue';
+import axiosClient from '@/api/axiosClient';
 
-export const useTransactionStore = defineStore("transaction", () => {
+export const useTransactionStore = defineStore('transaction', () => {
   // state
   const transactions = ref([]);
   const categories = ref([]);
@@ -40,21 +40,19 @@ export const useTransactionStore = defineStore("transaction", () => {
   // 요약 데이터 계산용 헬퍼
   const summaryStats = computed(() => {
     const calculateTotal = (list, type) =>
-      list
-        .filter((t) => t.type === type)
-        .reduce((sum, t) => sum + t.amount, 0);
+      list.filter((t) => t.type === type).reduce((sum, t) => sum + t.amount, 0);
 
     const tMonth = thisMonthTransactions.value;
     const lMonth = lastMonthTransactions.value;
 
     const stats = {
       income: {
-        current: calculateTotal(tMonth, "INCOME"),
-        last: calculateTotal(lMonth, "INCOME"),
+        current: calculateTotal(tMonth, 'INCOME'),
+        last: calculateTotal(lMonth, 'INCOME'),
       },
       expense: {
-        current: calculateTotal(tMonth, "EXPENSE"),
-        last: calculateTotal(lMonth, "EXPENSE"),
+        current: calculateTotal(tMonth, 'EXPENSE'),
+        last: calculateTotal(lMonth, 'EXPENSE'),
       },
     };
 
@@ -85,7 +83,7 @@ export const useTransactionStore = defineStore("transaction", () => {
       transactions.value = transactionsData;
       categories.value = categoriesData;
     } catch (error) {
-      console.error("Data Fetch Error:", error);
+      console.error('Data Fetch Error:', error);
     } finally {
       loading.value = false;
     }
@@ -101,7 +99,7 @@ export const useTransactionStore = defineStore("transaction", () => {
         await axiosClient.transactionApi.deleteTransaction(id);
       } catch (error) {
         transactions.value.splice(index, 0, backup);
-        alert("삭제에 실패했습니다.");
+        alert('삭제에 실패했습니다.');
       }
     }
   }
@@ -118,11 +116,12 @@ export const useTransactionStore = defineStore("transaction", () => {
       }
       return true;
     } catch (error) {
-      console.error("거래 추가 실패:", error);
-      alert("거래 내역을 추가하는데 실패했습니다.");
+      console.error('거래 추가 실패:', error);
+      alert('거래 내역을 추가하는데 실패했습니다.');
       return false;
     }
   }
+  async function editTransaction() {}
 
   return {
     transactions,
