@@ -132,7 +132,6 @@ const handleEditClick = (item) => {
           <div class="item-info">
             <div class="item-title">{{ item.detail }}</div>
             <div class="item-memo" v-if="item.memo">{{ item.memo }}</div>
-            <div class="mobile-only mobile-date">{{ item.displayTime }}</div>
           </div>
         </div>
 
@@ -149,7 +148,7 @@ const handleEditClick = (item) => {
         </div>
 
         <div class="col-date time-text pc-only">
-          <i class="far fa-clock"></i> {{ item.displayTime }}
+          <i class="far fa-clock"></i> {{ group.date }}
         </div>
 
         <div
@@ -330,9 +329,6 @@ const handleEditClick = (item) => {
   color: #ff5252;
 }
 
-/* --- 기존 스타일 아래에 추가하세요 --- */
-
-/* 모바일/PC 요소 제어용 클래스 */
 .mobile-only {
   display: none;
 }
@@ -352,12 +348,10 @@ const handleEditClick = (item) => {
   /* 1. 리스트 아이템을 카드 형태로 변경 */
   .transaction-item {
     display: grid;
-    grid-template-areas:
-      'detail detail amount'
-      'category action action'; /* 구역을 나눠서 배치 */
-    grid-template-columns: 1fr 1fr auto;
-    gap: 12px;
-    padding: 20px 0;
+    grid-template-areas: 'detail amount action'; /* 완벽한 1줄 배치로 변경 */
+    grid-template-columns: 1fr auto auto;
+    gap: 8px;
+    padding: 12px 0;
     align-items: center;
   }
 
@@ -374,13 +368,22 @@ const handleEditClick = (item) => {
   }
 
   .col-category {
-    grid-area: category;
-    text-align: left;
+    display: none; /* 모바일 화면에서는 카테고리 숨김 */
   }
 
   .col-action {
     grid-area: action;
     justify-content: flex-end;
+  }
+
+  /* 상세 내용(디테일)과 메모를 양옆으로 나란히 배치 */
+  .item-info {
+    flex-direction: row;
+    align-items: center;
+    gap: 4px;
+  }
+  .item-memo {
+    display: none; /* 모바일에서 메모 숨김 */
   }
 
   /* 3. 모바일 전용 폰트 스타일 */
@@ -391,7 +394,8 @@ const handleEditClick = (item) => {
   }
 
   .item-title {
-    font-size: 14px;
+    font-size: 16px; /* 상세내용 글씨 크기 확대 */
+    font-weight: 700; /* 조금 더 또렷하게 보이도록 굵기 추가 (선택사항) */
   }
 
   .category-tag {
@@ -400,10 +404,12 @@ const handleEditClick = (item) => {
   }
 
   .date-header {
-    font-size: 13px;
-    position: sticky; /* 날짜 헤더 고정 (선택 사항) */
+    font-size: 14px; /* 글자 크기 살짝 키움 */
+    padding: 16px 4px; /* 위아래 여백을 대폭 늘려 칸을 넓힘 */
+    margin-bottom: 8px;
+    background-color: #fff;
+    position: sticky;
     top: 0;
-    background: white;
     z-index: 10;
   }
 }
