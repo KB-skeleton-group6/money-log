@@ -1,12 +1,12 @@
-import axios from "axios";
+import axios from 'axios';
 import {
   FetchFailedError,
   NetworkOfflineError,
   SaveFailedError,
-} from "./networkError";
-import { ErrorCode } from "@/constant/errorCode";
+} from './networkError';
+import { ErrorCode } from '@/constant/errorCode';
 
-const urlPrefix = "/api";
+const urlPrefix = '/api';
 
 const isRequestSuccessful = (statusCode) => {
   return statusCode >= 200 && statusCode < 300;
@@ -44,9 +44,7 @@ async function getMembers() {
 
   checkRequestFailed(res.status, ErrorCode.FETCH_FAILED);
 
-  const members = res.data;
-
-  return members;
+  return res.data;
 }
 
 async function getMember(memberId) {
@@ -54,9 +52,7 @@ async function getMember(memberId) {
 
   checkRequestFailed(res.status, ErrorCode.FETCH_FAILED);
 
-  const member = res.data;
-
-  return member;
+  return res.data;
 }
 
 async function getMemberByEmail(email) {
@@ -64,9 +60,7 @@ async function getMemberByEmail(email) {
 
   checkRequestFailed(res.status, ErrorCode.FETCH_FAILED);
 
-  const members = res.data;
-
-  return members;
+  return res.data;
 }
 
 async function createMember(member) {
@@ -74,9 +68,7 @@ async function createMember(member) {
 
   checkRequestFailed(res.status, ErrorCode.FETCH_FAILED);
 
-  const createdMember = res.data;
-
-  return createdMember;
+  return res.data;
 }
 
 async function updateMember(memberId, member) {
@@ -84,9 +76,7 @@ async function updateMember(memberId, member) {
 
   checkRequestFailed(res.status, ErrorCode.FETCH_FAILED);
 
-  const updatedMember = res.data;
-
-  return updatedMember;
+  return res.data;
 }
 
 async function deleteMember(memberId) {
@@ -100,9 +90,7 @@ async function getTransactions() {
 
   checkRequestFailed(res.status, ErrorCode.FETCH_FAILED);
 
-  const transactions = res.data;
-
-  return transactions;
+  return res.data;
 }
 
 async function getTransaction(transactionId) {
@@ -110,17 +98,13 @@ async function getTransaction(transactionId) {
 
   checkRequestFailed(res.status, ErrorCode.FETCH_FAILED);
 
-  const transaction = res.data;
-
-  return transaction;
+  return res.data;
 }
 
 async function getTransactionsByUserId(userId) {
   const res = await axios.get(`${urlPrefix}/transactions?user_id:eq=${userId}`);
 
-  const transactions = res.data;
-
-  return transactions;
+  return res.data;
 }
 
 async function createTransaction(transaction) {
@@ -128,9 +112,7 @@ async function createTransaction(transaction) {
 
   checkRequestFailed(res.status, ErrorCode.FETCH_FAILED);
 
-  const createdTransaction = res.data;
-
-  return createdTransaction;
+  return res.data;
 }
 
 async function updateTransaction(transactionId, transaction) {
@@ -141,9 +123,7 @@ async function updateTransaction(transactionId, transaction) {
 
   checkRequestFailed(res.status, ErrorCode.FETCH_FAILED);
 
-  const updatedTransaction = res.data;
-
-  return updatedTransaction;
+  return res.data;
 }
 
 async function deleteTransaction(transactionId) {
@@ -157,9 +137,7 @@ async function getCategories() {
 
   checkRequestFailed(res.status, ErrorCode.FETCH_FAILED);
 
-  const categories = res.data;
-
-  return categories;
+  return res.data;
 }
 
 const memberApi = {

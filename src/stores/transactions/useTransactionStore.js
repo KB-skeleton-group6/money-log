@@ -18,13 +18,18 @@ export const useTransactionStore = defineStore('transaction', () => {
     };
   });
 
+  // 날짜 필터링 헬퍼 함수
+  const filterByMonthYear = (list, targetMonth, targetYear) => {
+    return list.filter((t) => {
+      const d = new Date(t.transacted_at);
+      return d.getMonth() === targetMonth && d.getFullYear() === targetYear;
+    });
+  };
+
   // 이번 달 거래 내역
   const thisMonthTransactions = computed(() => {
     const { month, year } = getDateInfo.value;
-    return transactions.value.filter((t) => {
-      const d = new Date(t.transacted_at);
-      return d.getMonth() === month && d.getFullYear() === year;
-    });
+    return filterByMonthYear(transactions.value, month, year);
   });
 
   // 지난달 거래 내역
@@ -32,10 +37,7 @@ export const useTransactionStore = defineStore('transaction', () => {
     const { month, year } = getDateInfo.value;
     const lastM = month === 0 ? 11 : month - 1;
     const lastY = month === 0 ? year - 1 : year;
-    return transactions.value.filter((t) => {
-      const d = new Date(t.transacted_at);
-      return d.getMonth() === lastM && d.getFullYear() === lastY;
-    });
+    return filterByMonthYear(transactions.value, lastM, lastY);
   });
 
   // 요약 데이터 계산용 헬퍼
@@ -80,15 +82,19 @@ export const useTransactionStore = defineStore('transaction', () => {
       const authStore = useAuthStore();
       if (!authStore.isLoggedIn) {
         transactions.value = [];
+        categories.value = []; // 로그아웃 시 카테고리도 초기화
         return;
       }
       const userId = authStore.user.id;
 
-      const transactionsData =
-        await axiosClient.transactionApi.getTransactionsByUserId(userId);
-      console.log(transactionsData);
+      // Promise.all을 사용하여 트랜잭션과 카테고리 데이터를 병렬로 가져옴
+      const [transactionsData, categoriesData] = await Promise.all([
+        axiosClient.transactionApi.getTransactionsByUserId(userId),
+        axiosClient.categoryApi.getCategories(),
+      ]);
 
       transactions.value = transactionsData;
+      categories.value = categoriesData;
     } catch (error) {
       console.error('Data Fetch Error:', error);
     } finally {
