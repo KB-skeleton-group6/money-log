@@ -116,7 +116,7 @@ const isToday = (dateStr) => dateStr === dayjs().format("YYYY-MM-DD");
         </div>
         <div class="card-body">
           <h2 class="text-green">
-            {{ netIncome > 0 ? "+" : "" }}{{ formatNetIncome }}
+            {{ netIncome > 0 ? "+" : "-" }}{{ formatNetIncome }}
           </h2>
           <p class="change-rate text-green">
             <i class="fa-solid" :class="netRate.icon"></i>{{ netRate.text }}
