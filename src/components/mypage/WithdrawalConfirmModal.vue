@@ -68,7 +68,7 @@ const emit = defineEmits(["close", "confirm"]);
   border-radius: 16px;
   background-color: white;
   max-width: 800px;
-  min-width: 360px;
+  min-width: 0;
 }
 
 .header {
@@ -220,5 +220,11 @@ const emit = defineEmits(["close", "confirm"]);
   background-color: #ff4d4f;
   color: white;
   border-color: #ff4d4f;
+}
+
+@media (max-width: 768px) {
+  .withdrawal-modal {
+    width: calc(100% - 32px);
+  }
 }
 </style>
