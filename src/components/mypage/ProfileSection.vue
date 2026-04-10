@@ -62,7 +62,7 @@ const formattedCreatedAt = computed(() => {
   <div class="profile-section">
     <div class="profile-header">
       <div class="profile-image">
-        <span>{{ user?.name[0] ?? "X" }}</span>
+        <span>{{ user && user.name ? user.name[0] : "" }}</span>
       </div>
       <div class="profile-summary">
         <div class="name-grade">
@@ -204,14 +204,14 @@ const formattedCreatedAt = computed(() => {
   flex: 0 0 auto;
   margin: 0;
   font-size: 12px;
-  color: rgb(153, 153, 153);
+  color: #8a8a8e;
 }
 
 .profile-summary .created-at {
   flex: 0 0 auto;
   margin: 0;
   font-size: 10px;
-  color: rgb(195, 195, 195);
+  color: #aeaeb2;
 }
 
 .edit-profile-box {
@@ -231,11 +231,11 @@ const formattedCreatedAt = computed(() => {
   justify-content: start;
   align-items: center;
   gap: 8px;
-  border: 1px solid rgb(240, 240, 240);
+  border: 1px solid #e8e8ed;
   border-radius: 8px;
   padding: 8px;
   background: none;
-  color: rgb(50, 50, 50);
+  color: #1c1c1e;
   cursor: pointer;
   transition: background-color 0.3s ease;
 }
@@ -245,7 +245,19 @@ const formattedCreatedAt = computed(() => {
 }
 
 .edit-btn:hover {
-  background-color: rgb(240, 240, 240);
+  background-color: #f5f5f7;
+}
+
+@media (max-width: 768px) {
+  .edit-btn {
+    border: none;
+    background: none;
+    padding: 4px;
+  }
+
+  .edit-btn > span {
+    display: none;
+  }
 }
 
 .profile-detail {
@@ -278,12 +290,12 @@ const formattedCreatedAt = computed(() => {
   height: 32px;
   padding: 4px;
   border-radius: 10px;
-  background-color: #f5f5f5;
+  background-color: #f5f5f7;
 }
 
 .profile-detail-item-icon > i {
   font-size: 16px;
-  color: #c2c2c2;
+  color: #aeaeb2;
 }
 
 .profile-detail-item-content {
@@ -299,7 +311,7 @@ const formattedCreatedAt = computed(() => {
   flex: 0 0 auto;
   margin: 0;
   font-size: 12px;
-  color: #c2c2c2;
+  color: #aeaeb2;
 }
 
 .profile-detail-item-content .value {
@@ -332,10 +344,10 @@ const formattedCreatedAt = computed(() => {
 
 .profile-edit .name-input {
   flex: 0 0 auto;
-  border: 1px solid rgb(240, 240, 240);
+  border: 1px solid #e8e8ed;
   border-radius: 8px;
   padding: 8px;
-  color: rgb(79, 79, 79);
+  color: #48484a;
   background-color: white;
 }
 
@@ -355,10 +367,10 @@ const formattedCreatedAt = computed(() => {
   justify-content: center;
   align-items: center;
   gap: 8px;
-  border: 1px solid rgb(240, 240, 240);
+  border: 1px solid #e8e8ed;
   border-radius: 10px;
   padding: 8px;
-  color: rgb(79, 79, 79);
+  color: #48484a;
   background-color: white;
   cursor: pointer;
   transition: background-color 0.3s ease;
