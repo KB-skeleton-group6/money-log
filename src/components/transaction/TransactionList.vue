@@ -1,7 +1,7 @@
 <script setup>
 import { ref, computed } from 'vue';
-import { getCategoryIcon, getLightBackgroundColor } from '@/utils/category';
-import DeleteConfirmModal from '../../components/DeleteConfirmModal.vue';
+import { Categories } from '@/constant/categories';
+import DeleteConfirmModal from '../../components/transaction/DeleteConfirmModal.vue';
 import { useAddTransactionStore } from '@/stores/transactions/useAddTransactionStore';
 
 const props = defineProps({
@@ -9,19 +9,19 @@ const props = defineProps({
     type: Array,
     default: () => [],
   },
-  categories: {
-    type: Array,
-    default: () => [],
-  },
 });
 const emit = defineEmits(['edit', 'delete']);
 
 // 카테고리 찾기 함수
-const getCat = (id) =>
-  props.categories.find((c) => c.id === id) || {
-    name: '미분류',
-    color: '#888',
-  };
+const getCat = (id) => {
+  return (
+    Object.values(Categories).find((cat) => cat.id === id) || {
+      name: '미분류',
+      color: '#888',
+      icon: 'fa-solid fa-question',
+    }
+  );
+};
 
 // 데이터 그룹화 및 가공
 const groupedTransactions = computed(() => {
@@ -48,11 +48,9 @@ const groupedTransactions = computed(() => {
     (a, b) => new Date(b.date) - new Date(a.date),
   );
 
-  // 2. 각 날짜 그룹 내부의 아이템들을 시간 최신순으로 정렬
+  // 2. 각 날짜 그룹 내부의 아이템들을 이름순으로 정렬
   sortedGroups.forEach((group) => {
-    group.items.sort(
-      (a, b) => new Date(b.transacted_at) - new Date(a.transacted_at),
-    );
+    group.items.sort((a, b) => a.detail.localeCompare(b.detail));
   });
 
   return sortedGroups;
@@ -87,17 +85,18 @@ const executeDelete = () => {
   handleCloseDeleteModal();
 };
 
-const addTransactionStore = useAddTransactionStore();
+const updateTransactionStore = useAddTransactionStore();
 const handleEditClick = (item) => {
-  editTransaction.openEditModal(item);
+  console.log('수정 버튼 눌림! 데이터:', item);
+  updateTransactionStore.openEditModal(item);
 };
 </script>
 <template>
   <div class="transaction-container">
-    <div class="list-header">
+    <div class="list-header pc-only">
       <span class="col-detail">상세 내용</span>
       <span class="col-category">카테고리</span>
-      <span class="col-date">날짜 / 시간</span>
+      <span class="col-date">날짜</span>
       <span class="col-amount">금액</span>
       <span class="col-action">관리</span>
     </div>
@@ -125,16 +124,15 @@ const handleEditClick = (item) => {
             class="item-icon"
             :style="{
               color: getCat(item.category_id).color,
-              backgroundColor: getLightBackgroundColor(
-                getCat(item.category_id).color,
-              ),
+              backgroundColor: getCat(item.category_id).subColor,
             }"
           >
-            <i :class="getCategoryIcon(getCat(item.category_id).name)"></i>
+            <i :class="getCat(item.category_id).icon"></i>
           </div>
           <div class="item-info">
             <div class="item-title">{{ item.detail }}</div>
             <div class="item-memo" v-if="item.memo">{{ item.memo }}</div>
+            <div class="mobile-only mobile-date">{{ item.displayTime }}</div>
           </div>
         </div>
 
@@ -143,17 +141,15 @@ const handleEditClick = (item) => {
             class="category-tag"
             :style="{
               color: getCat(item.category_id).color,
-              backgroundColor: getLightBackgroundColor(
-                getCat(item.category_id).color,
-              ),
+              backgroundColor: getCat(item.category_id).subColor,
             }"
           >
             {{ getCat(item.category_id).name }}
           </span>
         </div>
 
-        <div class="col-date time-text">
-          <i class="far fa-clock"></i> {{ group.date }} {{ item.displayTime }}
+        <div class="col-date time-text pc-only">
+          <i class="far fa-clock"></i> {{ item.displayTime }}
         </div>
 
         <div
@@ -332,5 +328,83 @@ const handleEditClick = (item) => {
 }
 .text-red {
   color: #ff5252;
+}
+
+/* --- 기존 스타일 아래에 추가하세요 --- */
+
+/* 모바일/PC 요소 제어용 클래스 */
+.mobile-only {
+  display: none;
+}
+
+@media (max-width: 768px) {
+  .pc-only {
+    display: none;
+  }
+  .mobile-only {
+    display: block;
+  }
+
+  .transaction-container {
+    padding: 0 16px 16px 16px; /* 모바일에서 여백 살짝 축소 */
+  }
+
+  /* 1. 리스트 아이템을 카드 형태로 변경 */
+  .transaction-item {
+    display: grid;
+    grid-template-areas:
+      'detail detail amount'
+      'category action action'; /* 구역을 나눠서 배치 */
+    grid-template-columns: 1fr 1fr auto;
+    gap: 12px;
+    padding: 20px 0;
+    align-items: center;
+  }
+
+  /* 2. 각 구역 배치 설정 */
+  .col-detail {
+    grid-area: detail;
+    width: 100%;
+  }
+
+  .col-amount {
+    grid-area: amount;
+    width: auto;
+    font-size: 16px;
+  }
+
+  .col-category {
+    grid-area: category;
+    text-align: left;
+  }
+
+  .col-action {
+    grid-area: action;
+    justify-content: flex-end;
+  }
+
+  /* 3. 모바일 전용 폰트 스타일 */
+  .mobile-date {
+    font-size: 12px;
+    color: #a0abbc;
+    margin-top: 2px;
+  }
+
+  .item-title {
+    font-size: 14px;
+  }
+
+  .category-tag {
+    padding: 4px 10px;
+    font-size: 11px;
+  }
+
+  .date-header {
+    font-size: 13px;
+    position: sticky; /* 날짜 헤더 고정 (선택 사항) */
+    top: 0;
+    background: white;
+    z-index: 10;
+  }
 }
 </style>

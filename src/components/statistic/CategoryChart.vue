@@ -10,27 +10,8 @@ const props = defineProps({
   activeType: String,
 });
 
-const { aggregatedStats } = useCategoryStats(() => props.activeType);
-
-const processedData = computed(() => {
-  if (aggregatedStats.value.length === 0) {
-    return { labels: [], values: [], colors: [], count: 0 };
-  }
-
-  const totalSum = aggregatedStats.value.reduce(
-    (sum, item) => sum + item.amount,
-    0,
-  );
-
-  return {
-    labels: aggregatedStats.value.map((r) => r.name),
-    values: aggregatedStats.value.map((r) =>
-      totalSum > 0 ? ((r.amount / totalSum) * 100).toFixed(1) : 0,
-    ),
-    colors: aggregatedStats.value.map((r) => r.color),
-    count: aggregatedStats.value.length,
-  };
-});
+// 데이터 가공 로직을 훅 내부로 이동시켜 컴포넌트 단순화
+const { processedData } = useCategoryStats(() => props.activeType);
 
 const chartData = computed(() => ({
   labels: processedData.value.labels,
@@ -78,7 +59,10 @@ const chartOptions = {
       </ul>
     </div>
 
-    <div v-else class="no-data">표시할 내역이 없습니다.</div>
+    <div v-else class="no-data">
+      <i class="fa-regular fa-folder-open"></i>
+      <p>데이터가 없습니다.</p>
+    </div>
   </div>
 </template>
 
@@ -141,8 +125,31 @@ const chartOptions = {
   font-weight: 600;
 }
 .no-data {
-  text-align: center;
-  padding: 40px 0;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  gap: 12px;
   color: #999;
+}
+.no-data i {
+  font-size: 3rem;
+  color: #ddd;
+}
+.no-data p {
+  margin: 0;
+  font-size: 1rem;
+}
+
+/* 모바일 화면 최적화 */
+@media (max-width: 768px) {
+  .chart-content {
+    flex-direction: column; /* 가로 배치를 세로 배치로 변경 */
+    gap: 24px; /* 모바일 화면에 맞게 간격 조절 */
+  }
+  .legend-list {
+    width: 100%; /* 범례 영역이 화면을 꽉 채우도록 설정 */
+  }
 }
 </style>
