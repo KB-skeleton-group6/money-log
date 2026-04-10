@@ -1,18 +1,17 @@
 <script setup>
-import { ref, computed } from 'vue';
-import { useAddTransactionStore } from '@/stores/transactions/useAddTransactionStore';
-import { Categories } from '../../constant/categories';
-import { Payments } from '../../constant/paymentMethods';
+import { ref, computed } from "vue";
+import { useAddTransactionStore } from "@/stores/transactions/useAddTransactionStore";
+import { Categories } from "../../constant/categories";
+import { Payments } from "../../constant/paymentMethods";
 
 const addTransactionStore = useAddTransactionStore();
 const formData = addTransactionStore.formData;
+const allList = Object.values(Categories);
 
 const categorizedList = computed(() => {
-  const allList = Object.values(Categories);
-
   return {
-    INCOME: allList.filter((cat) => cat.label === 'INCOME'),
-    EXPENSE: allList.filter((cat) => cat.label === 'EXPENSE'),
+    INCOME: allList.filter((cat) => cat.label === "INCOME"),
+    EXPENSE: allList.filter((cat) => cat.label === "EXPENSE"),
   };
 });
 
@@ -24,13 +23,28 @@ const paymentMethods = computed(() => {
   };
 });
 
+const filterNumber = (event) => {
+  const filteredValue = event.target.value.replace(/[^0-9]/g, "");
+
+  // 데이터 업데이트
+  formData.amount = filteredValue;
+};
+
 const memoLength = computed(() => formData.memo.length);
 
 const handleSubmit = () => {
-  if (!formData.category_id || !formData.amount) {
-    alert('금액과 카테고리는 필수입니다.');
-    return;
+  if (!formData.category_id) {
+    formData.category_id = formData.type === "INCOME" ? "cat99" : "cat98";
   }
+  if (!formData.amount) {
+    formData.amount = 0;
+  }
+  if (!formData.detail) {
+    formData.detail = allList.find(
+      (cat) => cat.id === formData.category_id,
+    ).name;
+  }
+
   // 스토어의 제출 함수 호출
   addTransactionStore.submitTransaction();
 };
@@ -48,7 +62,7 @@ const handleSubmit = () => {
           <div class="modal-header">
             <!-- <h2 class="modal-title">거래 추가</h2> -->
             <h2 class="modal-title">
-              {{ addTransactionStore.isEditMode ? '거래 수정' : '거래 추가' }}
+              {{ addTransactionStore.isEditMode ? "거래 수정" : "거래 추가" }}
             </h2>
             <button class="close-btn" @click="addTransactionStore.closeModal">
               <i class="fa-solid fa-xmark"></i>
@@ -95,6 +109,7 @@ const handleSubmit = () => {
                   type="number"
                   class="input-control text-right bold"
                   v-model="formData.amount"
+                  @blur="filterNumber"
                   placeholder="0"
                 />
                 <span class="input-suffix">원</span>
@@ -161,7 +176,7 @@ const handleSubmit = () => {
 
             <!-- <button class="add-btn" type="submit">추가하기</button> -->
             <button class="add-btn" type="submit">
-              {{ addTransactionStore.isEditMode ? '수정하기' : '추가하기' }}
+              {{ addTransactionStore.isEditMode ? "수정하기" : "추가하기" }}
             </button>
           </form>
         </div>
@@ -344,12 +359,12 @@ const handleSubmit = () => {
   font-weight: bold;
   font-size: 1.1rem;
 }
-.input-control[type='number']::-webkit-outer-spin-button,
-.input-control[type='number']::-webkit-inner-spin-button {
+.input-control[type="number"]::-webkit-outer-spin-button,
+.input-control[type="number"]::-webkit-inner-spin-button {
   -webkit-appearance: none;
   margin: 0;
 }
-.input-control[type='number'] {
+.input-control[type="number"] {
   -moz-appearance: textfield;
 }
 
