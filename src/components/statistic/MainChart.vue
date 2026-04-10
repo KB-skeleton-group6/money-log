@@ -61,35 +61,40 @@ const chartData = computed(() => {
   const data = processedChartData.value;
   if (!data) return { labels: [], datasets: [] };
 
+  const applyWeight = (val) => Math.sign(val) * Math.sqrt(Math.abs(val));
+
   return {
     labels: data.labels,
     datasets: [
       {
         label: '순이익',
         type: 'line',
-        data: data.profits,
-        borderColor: '#20bf6b',
-        backgroundColor: '#20bf6b',
+        data: data.profits.map(applyWeight),
+        borderColor: '#28c76f',
+        backgroundColor: '#28c76f',
         tension: 0.4,
         pointRadius: 4,
         fill: false,
         zIndex: 2,
+        yAxisID: 'y1', // 순이익은 우측(y1) 축을 사용
       },
       {
         label: '수입',
         type: 'bar',
-        data: data.incomes,
-        backgroundColor: '#00a8ff',
+        data: data.incomes.map(applyWeight),
+        backgroundColor: '#00cfe8',
         borderRadius: 6,
         barPercentage: 0.5,
+        yAxisID: 'y', // 수입은 좌측(y) 축을 사용
       },
       {
         label: '지출',
         type: 'bar',
-        data: data.expenses,
-        backgroundColor: '#ff4d4d',
+        data: data.expenses.map(applyWeight),
+        backgroundColor: '#ea5455',
         borderRadius: 6,
         barPercentage: 0.5,
+        yAxisID: 'y', // 지출은 좌측(y) 축을 사용
       },
     ],
   };
@@ -110,18 +115,57 @@ const chartOptions = {
     tooltip: {
       callbacks: {
         label: (context) => {
-          return `${context.dataset.label}: ${context.raw.toLocaleString()}원`;
+          const realValue = Math.round(
+            Math.sign(context.raw) * Math.pow(Math.abs(context.raw), 2),
+          );
+          return `${context.dataset.label}: ${realValue.toLocaleString()}원`;
         },
       },
     },
   },
   scales: {
     y: {
+      type: 'linear',
+      display: true,
+      position: 'left',
       beginAtZero: true,
+      title: {
+        display: true,
+        text: '수입 · 지출',
+        color: '#888',
+        font: { size: 12, weight: 'bold' },
+      },
       ticks: {
-        callback: (value) => (value / 10000).toLocaleString() + '만',
+        callback: (value) => {
+          const realValue = Math.round(
+            Math.sign(value) * Math.pow(Math.abs(value), 2),
+          );
+          return (realValue / 10000).toLocaleString() + '만';
+        },
       },
       grid: { color: '#f0f0f0' },
+    },
+    y1: {
+      type: 'linear',
+      display: true,
+      position: 'right',
+      title: {
+        display: true,
+        text: '순이익',
+        color: '#28c76f',
+        font: { size: 12, weight: 'bold' },
+      },
+      ticks: {
+        callback: (value) => {
+          const realValue = Math.round(
+            Math.sign(value) * Math.pow(Math.abs(value), 2),
+          );
+          return (realValue / 10000).toLocaleString() + '만';
+        },
+      },
+      grid: {
+        drawOnChartArea: false,
+      },
     },
     x: {
       grid: { display: false },
@@ -220,17 +264,17 @@ h3 {
 }
 
 .data-row.income strong {
-  color: #00a8ff;
+  color: #00cfe8;
 }
 .data-row.expense strong {
-  color: #ff4d4d;
+  color: #ea5455;
 }
 .data-row.profit {
   font-size: 1.1rem;
   margin-top: 16px;
 }
 .data-row.profit strong {
-  color: #20bf6b;
+  color: #28c76f;
 }
 hr {
   border: none;

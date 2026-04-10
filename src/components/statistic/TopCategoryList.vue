@@ -37,7 +37,12 @@ const calculateWidth = (amount) => {
 
         <div class="rank-info">
           <div class="category-meta">
-            <span class="icon">{{ item.icon }}</span>
+            <div
+              class="icon-wrapper"
+              :style="{ backgroundColor: item.color + '1A', color: item.color }"
+            >
+              <i :class="item.icon"></i>
+            </div>
             <span class="rank-name">{{ item.name }}</span>
           </div>
           <div class="progress-bar">
@@ -100,8 +105,17 @@ const calculateWidth = (amount) => {
 .category-meta {
   display: flex;
   align-items: center;
-  gap: 8px;
+  gap: 10px;
   margin-bottom: 6px;
+}
+.icon-wrapper {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.1rem;
 }
 .rank-name {
   font-size: 0.95rem;
@@ -128,10 +142,10 @@ const calculateWidth = (amount) => {
   font-size: 0.95rem;
 }
 .amount-val.expense {
-  color: #eb4d4b;
+  color: #ea5455;
 }
 .amount-val.income {
-  color: #2d98da;
+  color: #00cfe8;
 }
 .count-val {
   font-size: 0.75rem;

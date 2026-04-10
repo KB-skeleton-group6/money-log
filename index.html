@@ -11,6 +11,33 @@
       referrerpolicy="no-referrer"
     />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+    <script type="text/javascript">
+      (function (l) {
+        if (l.search[1] === '/') {
+          var decoded = l.search
+            .slice(1)
+            .split('&')
+            .map(function (s) {
+              return s.replace(/~and~/g, '&');
+            })
+            .join('?');
+
+          // 저장소 이름(/money-log)을 유지한 채 뒤에 실제 경로를 붙임
+          window.history.replaceState(
+            null,
+            null,
+            l.pathname.slice(
+              0,
+              l.pathname.length - (l.pathname.endsWith('/') ? 1 : 0),
+            ) +
+              decoded +
+              l.hash,
+          );
+        }
+      })(window.location);
+    </script>
+
     <title>Vite App</title>
   </head>
   <body>
