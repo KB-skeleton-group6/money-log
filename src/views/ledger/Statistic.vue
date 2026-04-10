@@ -28,20 +28,11 @@ onMounted(() => {
 watch(currentFilter, (newVal) => {
   console.log(`${newVal} 필터 적용`);
 });
-
-const hasDataForChart = computed(() => {
-  return categories.value.length > 0 && transactions.value.length > 0;
-});
 </script>
 
 <template>
   <div class="statistics-page">
     <div v-if="loading" class="loading-overlay">데이터를 분석 중입니다...</div>
-
-    <!-- 데이터가 없을 때 표시할 화면 -->
-    <div v-else-if="!hasDataForChart" class="empty-state">
-      데이터가 없습니다.
-    </div>
 
     <div v-else class="content-wrapper">
       <section class="summary-container">
@@ -106,18 +97,6 @@ const hasDataForChart = computed(() => {
   padding: 20px;
   background-color: #f8f9fa;
   min-height: 100vh;
-}
-
-.empty-state {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  min-height: 60vh;
-  font-size: 1.2rem;
-  color: #888;
-  background: white;
-  border-radius: 15px;
-  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.03);
 }
 
 .summary-container {

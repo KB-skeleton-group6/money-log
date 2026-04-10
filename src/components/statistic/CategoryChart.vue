@@ -59,7 +59,10 @@ const chartOptions = {
       </ul>
     </div>
 
-    <div v-else class="no-data">표시할 내역이 없습니다.</div>
+    <div v-else class="no-data">
+      <i class="fa-regular fa-folder-open"></i>
+      <p>데이터가 없습니다.</p>
+    </div>
   </div>
 </template>
 
@@ -122,9 +125,21 @@ const chartOptions = {
   font-weight: 600;
 }
 .no-data {
-  text-align: center;
-  padding: 40px 0;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  gap: 12px;
   color: #999;
+}
+.no-data i {
+  font-size: 3rem;
+  color: #ddd;
+}
+.no-data p {
+  margin: 0;
+  font-size: 1rem;
 }
 
 /* 모바일 화면 최적화 */
