@@ -1,17 +1,20 @@
 <script setup>
-import { Categories } from "@/constant/categories.js";
+import { useCategoryStore } from "@/stores/categories/useCategoryStore";
+import { storeToRefs } from "pinia";
 import { formatAmount, formatAmountShort } from "@/utils/formatter";
-import { computed, ref } from "vue";
+import { computed, ref, watch } from "vue";
 
 const isEditMode = ref(false);
 
-const expenseCategories = Object.values(Categories).filter(
-  (cat) => cat.label === "EXPENSE",
-);
+const { categories } = storeToRefs(useCategoryStore());
+const expenseCategories = computed(() => categories.value.filter((cat) => cat.type === "EXPENSE"));
 
-const budgets = ref(
-  Object.fromEntries(expenseCategories.map((cat) => [cat.id, 100000])),
-);
+const budgets = ref({});
+watch(expenseCategories, (cats) => {
+  if (cats.length > 0 && Object.keys(budgets.value).length === 0) {
+    budgets.value = Object.fromEntries(cats.map((cat) => [cat.id, 100000]));
+  }
+}, { immediate: true });
 
 const draftBudgets = ref({});
 

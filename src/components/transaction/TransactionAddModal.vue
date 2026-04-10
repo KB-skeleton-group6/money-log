@@ -1,19 +1,20 @@
 <script setup>
 import { ref, computed } from "vue";
 import { useAddTransactionStore } from "@/stores/transactions/useAddTransactionStore";
-import { Categories } from "../../constant/categories";
+import { useCategoryStore } from "@/stores/categories/useCategoryStore";
+import { storeToRefs } from "pinia";
 import { Payments } from "../../constant/paymentMethods";
 import { DatePicker } from "v-calendar";
 import "v-calendar/style.css";
 
 const addTransactionStore = useAddTransactionStore();
 const formData = addTransactionStore.formData;
-const allList = Object.values(Categories);
+const { categories } = storeToRefs(useCategoryStore());
 
 const categorizedList = computed(() => {
   return {
-    INCOME: allList.filter((cat) => cat.label === "INCOME"),
-    EXPENSE: allList.filter((cat) => cat.label === "EXPENSE"),
+    INCOME: categories.value.filter((cat) => cat.type === "INCOME"),
+    EXPENSE: categories.value.filter((cat) => cat.type === "EXPENSE"),
   };
 });
 
@@ -35,15 +36,14 @@ const memoLength = computed(() => formData.memo.length);
 
 const handleSubmit = () => {
   if (!formData.category_id) {
-    formData.category_id = formData.type === "INCOME" ? "cat99" : "cat98";
+    const etcCode = formData.type === "INCOME" ? "ETC_INCOME" : "ETC_EXPENSE";
+    formData.category_id = categories.value.find((c) => c.code === etcCode)?.id;
   }
   if (!formData.amount) {
     formData.amount = 0;
   }
   if (!formData.detail) {
-    formData.detail = allList.find(
-      (cat) => cat.id === formData.category_id,
-    ).name;
+    formData.detail = categories.value.find((c) => c.id === formData.category_id)?.name ?? '';
   }
   addTransactionStore.submitTransaction();
 };

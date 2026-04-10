@@ -20,7 +20,8 @@ import {
   useDashboardCalculations,
 } from '../../utils/dataChart';
 import { useTransactionStore } from '@/stores/transactions/useTransactionStore';
-import { Categories } from '../../constant/categories';
+import { useCategoryStore } from '@/stores/categories/useCategoryStore';
+import { DEFAULT_CATEGORY_UI } from '@/constant/categories';
 import { formatDate } from '@/utils/formatter';
 
 ChartJS.register(
@@ -34,7 +35,8 @@ ChartJS.register(
 
 const transactionStore = useTransactionStore();
 const { transactions } = storeToRefs(transactionStore);
-const allList = Object.values(Categories);
+const { categories } = storeToRefs(useCategoryStore());
+const getCat = (id) => categories.value.find((c) => c.id === id) ?? DEFAULT_CATEGORY_UI;
 
 
 const recentTransaction = computed(() => {
@@ -212,15 +214,11 @@ const isToday = (dateStr) => dateStr === dayjs().format('YYYY-MM-DD');
             <div
               class="icon-wrapper"
               :style="{
-                backgroundColor: allList.find(
-                  (cat) => cat.id === item.category_id,
-                ).subColor,
-                color: allList.find((cat) => cat.id === item.category_id).color,
+                backgroundColor: getCat(item.category_id).subColor,
+                color: getCat(item.category_id).color,
               }"
             >
-              <i
-                :class="allList.find((cat) => cat.id === item.category_id).icon"
-              ></i>
+              <i :class="getCat(item.category_id).icon"></i>
             </div>
             <div class="item-info">
               <h4>{{ item.detail }}</h4>

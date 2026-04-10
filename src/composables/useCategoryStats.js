@@ -1,12 +1,12 @@
 import { computed, toValue } from 'vue';
 import { useTransactionStore } from '@/stores/transactions/useTransactionStore';
+import { useCategoryStore } from '@/stores/categories/useCategoryStore';
 import { storeToRefs } from 'pinia';
-import { getCategoryById } from '@/constant/categories';
 import { calculatePercent } from '@/utils/formatter';
 
 export function useCategoryStats(activeTypeRef) {
-  const store = useTransactionStore();
-  const { categories, thisMonthTransactions } = storeToRefs(store);
+  const { thisMonthTransactions } = storeToRefs(useTransactionStore());
+  const { categories } = storeToRefs(useCategoryStore());
 
   const aggregatedStats = computed(() => {
     if (!thisMonthTransactions.value?.length || !categories.value?.length) {
@@ -32,14 +32,12 @@ export function useCategoryStats(activeTypeRef) {
           (c) => String(c.id) === String(catId),
         );
 
-        const staticCategory = getCategoryById(catId);
-
         return {
           name: category ? category.name : '기타',
           amount: stats.amount,
           count: stats.count,
           color: category?.color || '#ccc',
-          icon: staticCategory?.icon || 'fa-solid fa-tag',
+          icon: category?.icon || 'fa-solid fa-tag',
         };
       })
       .sort((a, b) => b.amount - a.amount);

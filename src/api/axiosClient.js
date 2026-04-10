@@ -115,6 +115,11 @@ async function deleteMember(memberId) {
   await client.delete(`${urlPrefix}/members/${memberId}`);
 }
 
+async function getCategories() {
+  const res = await client.get(`${urlPrefix}/categories`);
+  return res.data;
+}
+
 async function getTransactions() {
   const res = await client.get(`${urlPrefix}/transactions`);
 
@@ -168,6 +173,10 @@ const memberApi = {
   deleteMember,
 };
 
+const categoryApi = {
+  getCategories,
+};
+
 const transactionApi = {
   getTransactions,
   getTransaction,
@@ -176,4 +185,4 @@ const transactionApi = {
   deleteTransaction,
 };
 
-export default { authApi, profileApi, memberApi, transactionApi };
+export default { authApi, profileApi, memberApi, categoryApi, transactionApi };

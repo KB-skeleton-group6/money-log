@@ -2,17 +2,16 @@
 import { ref, computed, onMounted, watch } from 'vue';
 import { storeToRefs } from 'pinia';
 import { useTransactionStore } from '@/stores/transactions/useTransactionStore';
+import { useCategoryStore } from '@/stores/categories/useCategoryStore';
 import TransactionList from '@/components/transaction/TransactionList.vue';
 import TransactionAddModal from '@/components/transaction/TransactionAddModal.vue';
 
 // Pinia Store 연결
 const transactionStore = useTransactionStore();
-
-// 데이터(ref)는 storeToRefs로 감싸서 꺼내야 화면이 실시간으로 바뀜
-const { transactions, categories, loading } = storeToRefs(transactionStore);
-
-// 함수(액션)는 그냥 바로 꺼냅니다.
+const { transactions, loading } = storeToRefs(transactionStore);
 const { fetchData, deleteTransaction, updateTransaction } = transactionStore;
+
+const { categories } = storeToRefs(useCategoryStore());
 
 // 화면 전용 상태 및 로직
 // 필터 상태
