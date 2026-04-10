@@ -84,7 +84,7 @@ export function useDashboardCalculations(transactionsRef) {
   const formatTotalExpense = computed(() =>
     formatAmountShort(totalExpense.value),
   );
-  const formatNetIncome = computed(() => formatAmountShort(netIncome.value));
+  const formatNetIncome = computed(() => formatAmountShort(Math.abs(netIncome.value)));
 
   const calculateRateInfo = (current, previous, previousCount) => {
     if (previousCount === 0) {
