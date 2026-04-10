@@ -1,6 +1,7 @@
 import { computed, toValue } from 'vue';
 import { useTransactionStore } from '@/stores/useTransactionStore';
 import { storeToRefs } from 'pinia';
+import { Categories } from '@/constant/categories';
 
 export function useCategoryStats(activeTypeRef) {
   const store = useTransactionStore();
@@ -28,12 +29,17 @@ export function useCategoryStats(activeTypeRef) {
       const category = categories.value.find(
         (c) => String(c.id) === String(catId),
       );
+
+      const staticCategory = Object.values(Categories).find(
+        (c) => String(c.id) === String(catId),
+      );
+
       return {
         name: category ? category.name : '기타',
         amount: categoryMap[catId].amount,
         count: categoryMap[catId].count,
-        color: category ? category.color : '#ccc',
-        icon: category?.label === 'INCOME' ? '💰' : '💸',
+        color: category?.color || '#ccc',
+        icon: staticCategory?.icon || 'fa-solid fa-tag',
       };
     });
 
