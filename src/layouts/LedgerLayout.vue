@@ -4,7 +4,26 @@ import LedgerLayoutSidebar from '@/components/ledger-layout/LedgerLayoutSidebar.
 import LedgerLayoutBottomNav from '@/components/ledger-layout/LedgerLayoutBottomNav.vue';
 
 import TransactionAddModal from '@/components/transaction/TransactionAddModal.vue';
+import TransactionQuickAddModal from '@/components/transaction/TransactionQuickAddModal.vue';
 import { useAddTransactionStore } from '@/stores/transactions/useAddTransactionStore';
+import { ref } from 'vue';
+
+const isFabOpen = ref(false);
+const isQuickAddModalOpen = ref(false);
+
+const toggleFab = () => {
+  isFabOpen.value = !isFabOpen.value;
+};
+
+const openStandardModal = () => {
+  useAddTransactionStore().openModal();
+  isFabOpen.value = false;
+};
+
+const handleQuickAdd = () => {
+  isQuickAddModalOpen.value = true;
+  isFabOpen.value = false;
+};
 </script>
 
 <template>
@@ -16,16 +35,45 @@ import { useAddTransactionStore } from '@/stores/transactions/useAddTransactionS
         <router-view></router-view>
       </div>
     </div>
-    <button
-      class="add-transaction-btn"
-      @click="useAddTransactionStore().openModal"
-    >
-      <i class="fa-solid fa-plus"></i>
-    </button>
+
+    <transition name="fade">
+      <div
+        v-if="isFabOpen"
+        class="fab-overlay"
+        @click="isFabOpen = false"
+      ></div>
+    </transition>
+
+    <div class="fab-container">
+      <transition name="fade-up">
+        <div v-if="isFabOpen" class="fab-actions">
+          <button class="fab-action-btn" @click="handleQuickAdd">
+            <span class="fab-tooltip">빠른 추가</span>
+            <div class="fab-icon"><i class="fa-solid fa-bolt"></i></div>
+          </button>
+          <button class="fab-action-btn" @click="openStandardModal">
+            <span class="fab-tooltip">직접 추가</span>
+            <div class="fab-icon"><i class="fa-solid fa-pen"></i></div>
+          </button>
+        </div>
+      </transition>
+      <button
+        class="add-transaction-btn"
+        :class="{ open: isFabOpen }"
+        @click="toggleFab"
+      >
+        <i class="fa-solid fa-plus"></i>
+      </button>
+    </div>
   </div>
 
   <LedgerLayoutBottomNav />
   <TransactionAddModal />
+
+  <TransactionQuickAddModal
+    :is-open="isQuickAddModalOpen"
+    @close="isQuickAddModalOpen = false"
+  />
 </template>
 
 <style scoped>
@@ -53,29 +101,120 @@ import { useAddTransactionStore } from '@/stores/transactions/useAddTransactionS
   overflow-y: scroll;
 }
 
-.add-transaction-btn {
+.fab-container {
   position: fixed;
+  bottom: 32px;
+  right: 32px;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  z-index: 999;
+}
+
+.fab-actions {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  margin-bottom: 16px;
+  align-items: flex-end;
+}
+
+.fab-action-btn {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  padding: 0;
+  margin-right: 8px;
+}
+
+.fab-tooltip {
+  background: white;
+  padding: 8px 14px;
+  border-radius: 8px;
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: #333;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  white-space: nowrap;
+}
+
+.fab-icon {
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  background-color: white;
+  color: #00bc7c;
   display: flex;
   justify-content: center;
   align-items: center;
+  font-size: 1.2rem;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  transition: transform 0.2s ease;
+}
+
+.fab-action-btn:hover .fab-icon {
+  transform: scale(1.1);
+}
+
+.add-transaction-btn {
   width: 64px;
   height: 64px;
-  bottom: 32px;
-  right: 32px;
   border: none;
   border-radius: 50%;
   box-shadow:
     0 4px 8px 0 rgba(0, 0, 0, 0.2),
     0 6px 20px 0 rgba(0, 0, 0, 0.19);
-  transition: background-color 0.3s ease;
+  transition:
+    transform 0.3s ease,
+    background-color 0.3s ease;
   background-color: #00bc7c;
   color: white;
   cursor: pointer;
   font-size: 24px;
 }
 
+.add-transaction-btn.open {
+  transform: rotate(45deg);
+  background-color: #ff4757;
+}
+
+/* 오버레이 스타일 */
+.fab-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background: rgba(0, 0, 0, 0.4);
+  z-index: 998;
+}
+
+/* Vue Transition (오버레이 페이드 효과) */
+.fade-enter-active,
+.fade-leave-active {
+  transition: opacity 0.3s ease;
+}
+.fade-enter-from,
+.fade-leave-to {
+  opacity: 0;
+}
+
+/* Vue Transition (페이드 업 효과) */
+.fade-up-enter-active,
+.fade-up-leave-active {
+  transition: all 0.3s ease;
+}
+.fade-up-enter-from,
+.fade-up-leave-to {
+  opacity: 0;
+  transform: translateY(20px);
+}
+
 @media (max-width: 768px) {
-  .add-transaction-btn {
+  .fab-container {
     display: none;
   }
 
