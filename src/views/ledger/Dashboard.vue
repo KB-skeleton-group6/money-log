@@ -23,7 +23,6 @@ import { useTransactionStore } from "@/stores/useTransactionStore";
 import { Categories } from "../../constant/categories";
 import { formatDate } from "@/utils/formatter";
 
-
 ChartJS.register(
   Title,
   Tooltip,
@@ -38,7 +37,10 @@ const { transactions } = storeToRefs(transactionStore);
 const allList = Object.values(Categories);
 
 const recentTransaction = computed(() => {
-  if (!transactionStore.transactions || transactionStore.transactions.length === 0) {
+  if (
+    !transactionStore.transactions ||
+    transactionStore.transactions.length === 0
+  ) {
     return [];
   }
 
@@ -65,6 +67,9 @@ const {
   chartOptionsNet,
   chartOptionsIncome,
   chartOptionsExpense,
+  formatTotalIncome,
+  formatTotalExpense,
+  formatNetIncome,
 } = useDashboardCalculations(transactions);
 
 const baseDate = ref(dayjs("2026-04-01"));
@@ -105,12 +110,12 @@ const isToday = (dateStr) => dateStr === dayjs().format("YYYY-MM-DD");
     <div class="summary-cards">
       <div class="card summary-card">
         <div class="card-header">
-          <span>순이익</span>
+          <span>총 순이익</span>
           <i class="fa-solid fa-arrow-right-arrow-left icon-bg text-green"></i>
         </div>
         <div class="card-body">
           <h2 class="text-green">
-            {{ netIncome > 0 ? "+" : "" }}{{ formatCurrency(netIncome) }}원
+            {{ netIncome > 0 ? "+" : "" }}{{ formatNetIncome }}
           </h2>
           <p class="change-rate text-green">
             <i class="fa-solid" :class="netRate.icon"></i>{{ netRate.text }}
@@ -138,7 +143,7 @@ const isToday = (dateStr) => dateStr === dayjs().format("YYYY-MM-DD");
           <i class="fa-solid fa-arrow-down icon-bg text-blue"></i>
         </div>
         <div class="card-body">
-          <h2 class="text-blue">+{{ formatCurrency(totalIncome) }}원</h2>
+          <h2 class="text-blue">+{{ formatTotalIncome }}</h2>
           <p class="change-rate text-blue">
             <i class="fa-solid" :class="incomeRate.icon"></i
             >{{ incomeRate.text }}
@@ -166,7 +171,7 @@ const isToday = (dateStr) => dateStr === dayjs().format("YYYY-MM-DD");
           <i class="fa-solid fa-arrow-up icon-bg text-red"></i>
         </div>
         <div class="card-body">
-          <h2 class="text-red">{{ formatCurrency(totalExpense) }}원</h2>
+          <h2 class="text-red">+{{ formatTotalExpense }}</h2>
           <p class="change-rate text-red">
             <i class="fa-solid" :class="expenseRate.icon"></i
             >{{ expenseRate.text }}
@@ -564,5 +569,20 @@ a.view-all:hover {
   display: flex;
   align-items: center;
   gap: 5px;
+}
+
+/* --- 모바일 반응형 스타일 (화면 너비 768px 이하) --- */
+@media screen and (max-width: 768px) {
+  .summary-cards {
+    grid-template-columns: 1fr;
+  }
+
+  .bottom-section {
+    grid-template-columns: 1fr;
+  }
+
+  .summary-card .chart-container {
+    display: none;
+  }
 }
 </style>
