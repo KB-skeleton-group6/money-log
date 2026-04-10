@@ -139,6 +139,7 @@ const handleSubmit = () => {
                   class="input-control text-right bold"
                   v-model="formData.amount"
                   placeholder="0"
+                  @input="filterNumber"
                 />
                 <span class="input-suffix">원</span>
               </div>
