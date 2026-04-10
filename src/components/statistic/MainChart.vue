@@ -1,7 +1,7 @@
 <script setup>
 import { computed, ref, onMounted, onUnmounted } from 'vue';
 import { Bar } from 'vue-chartjs';
-import { useTransactionStore } from '@/stores/useTransactionStore';
+import { useTransactionStore } from '@/stores/transactions/useTransactionStore';
 import { storeToRefs } from 'pinia';
 import { aggregateChartData } from '@/utils/chartUtils';
 import {
@@ -206,7 +206,10 @@ const chartOptions = computed(() => ({
         :data="chartData"
         :options="chartOptions"
       />
-      <div v-else class="loading-placeholder">데이터 분석 중...</div>
+      <div v-else class="empty-msg">
+        <i class="fa-regular fa-folder-open"></i>
+        <p>데이터가 없습니다.</p>
+      </div>
     </div>
   </div>
 </template>
@@ -223,12 +226,22 @@ const chartOptions = computed(() => ({
   position: relative;
   width: 100%;
 }
-.loading-placeholder {
+.empty-msg {
   display: flex;
+  flex-direction: column;
   justify-content: center;
   align-items: center;
+  gap: 12px;
   height: 100%;
   color: #999;
+}
+.empty-msg i {
+  font-size: 3rem;
+  color: #ddd;
+}
+.empty-msg p {
+  margin: 0;
+  font-size: 1rem;
 }
 h3 {
   margin-bottom: 20px;

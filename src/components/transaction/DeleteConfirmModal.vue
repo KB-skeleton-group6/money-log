@@ -1,3 +1,10 @@
+<script setup>
+defineProps({
+  isOpen: { type: Boolean, required: true },
+});
+defineEmits(['cancel', 'confirm']);
+</script>
+
 <template>
   <Teleport to="body">
     <div v-if="isOpen" class="modal-overlay" @click.self="$emit('cancel')">
@@ -15,13 +22,6 @@
     </div>
   </Teleport>
 </template>
-
-<script setup>
-defineProps({
-  isOpen: { type: Boolean, required: true },
-});
-defineEmits(['cancel', 'confirm']);
-</script>
 
 <style scoped>
 .modal-overlay {

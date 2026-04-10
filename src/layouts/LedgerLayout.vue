@@ -1,10 +1,10 @@
 <script setup>
-import LedgerLayoutHeader from "@/components/ledger-layout/LedgerLayoutHeader.vue";
-import LedgerLayoutSidebar from "@/components/ledger-layout/LedgerLayoutSidebar.vue";
-import LedgerLayoutBottomNav from "@/components/ledger-layout/LedgerLayoutBottomNav.vue";
+import LedgerLayoutHeader from '@/components/ledger-layout/LedgerLayoutHeader.vue';
+import LedgerLayoutSidebar from '@/components/ledger-layout/LedgerLayoutSidebar.vue';
+import LedgerLayoutBottomNav from '@/components/ledger-layout/LedgerLayoutBottomNav.vue';
 
-import TransectionAddModal from "@/components/transection/TransectionAddModal.vue";
-import { useAddTransactionStore } from "@/stores/transactions/useAddTransactionStore";
+import TransactionAddModal from '@/components/transaction/TransactionAddModal.vue';
+import { useAddTransactionStore } from '@/stores/transactions/useAddTransactionStore';
 </script>
 
 <template>
@@ -25,7 +25,7 @@ import { useAddTransactionStore } from "@/stores/transactions/useAddTransactionS
   </div>
 
   <LedgerLayoutBottomNav />
-  <TransectionAddModal />
+  <TransactionAddModal />
 </template>
 
 <style scoped>

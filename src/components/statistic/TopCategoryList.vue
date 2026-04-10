@@ -27,46 +27,55 @@ const calculateWidth = (amount) => {
 
 <template>
   <div class="top-category-list main-content-card">
-    <div class="header">
-      <h3>{{ activeType === 'expense' ? '지출' : '수입' }} TOP 카테고리</h3>
-    </div>
+    <!-- 데이터가 있을 때만 헤더와 리스트 표시 -->
+    <template v-if="sortedData.length > 0">
+      <div class="header">
+        <h3>{{ activeType === 'expense' ? '지출' : '수입' }} TOP 카테고리</h3>
+      </div>
 
-    <ul class="ranking-list" v-if="sortedData.length > 0">
-      <li v-for="(item, index) in sortedData" :key="index">
-        <div class="rank-badge">{{ index + 1 }}</div>
+      <ul class="ranking-list">
+        <li v-for="(item, index) in sortedData" :key="index">
+          <div class="rank-badge">{{ index + 1 }}</div>
 
-        <div class="rank-info">
-          <div class="category-meta">
-            <div
-              class="icon-wrapper"
-              :style="{ backgroundColor: item.color + '1A', color: item.color }"
-            >
-              <i :class="item.icon"></i>
+          <div class="rank-info">
+            <div class="category-meta">
+              <div
+                class="icon-wrapper"
+                :style="{
+                  backgroundColor: item.color + '1A',
+                  color: item.color,
+                }"
+              >
+                <i :class="item.icon"></i>
+              </div>
+              <span class="rank-name">{{ item.name }}</span>
             </div>
-            <span class="rank-name">{{ item.name }}</span>
+            <div class="progress-bar">
+              <div
+                class="progress-fill"
+                :style="{
+                  width: calculateWidth(item.amount) + '%',
+                  backgroundColor: item.color,
+                }"
+              ></div>
+            </div>
           </div>
-          <div class="progress-bar">
-            <div
-              class="progress-fill"
-              :style="{
-                width: calculateWidth(item.amount) + '%',
-                backgroundColor: item.color,
-              }"
-            ></div>
+
+          <div class="rank-amount">
+            <span class="amount-val" :class="activeType">
+              {{ activeType === 'expense' ? '-' : '+'
+              }}{{ formatAmount(Math.abs(item.amount)) }}원
+            </span>
+            <span class="count-val">{{ item.count }}건</span>
           </div>
-        </div>
+        </li>
+      </ul>
+    </template>
 
-        <div class="rank-amount">
-          <span class="amount-val" :class="activeType">
-            {{ activeType === 'expense' ? '-' : '+'
-            }}{{ formatAmount(Math.abs(item.amount)) }}원
-          </span>
-          <span class="count-val">{{ item.count }}건</span>
-        </div>
-      </li>
-    </ul>
-
-    <div v-else class="empty-msg">내역이 없습니다.</div>
+    <div v-else class="empty-msg">
+      <i class="fa-regular fa-folder-open"></i>
+      <p>데이터가 없습니다.</p>
+    </div>
   </div>
 </template>
 
@@ -152,8 +161,20 @@ const calculateWidth = (amount) => {
   color: #999;
 }
 .empty-msg {
-  text-align: center;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  gap: 12px;
   color: #999;
-  padding: 40px 0;
+}
+.empty-msg i {
+  font-size: 3rem;
+  color: #ddd;
+}
+.empty-msg p {
+  margin: 0;
+  font-size: 1rem;
 }
 </style>
