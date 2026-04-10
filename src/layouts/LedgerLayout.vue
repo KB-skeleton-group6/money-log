@@ -1,9 +1,9 @@
 <script setup>
-import LedgerLayoutHeader from "@/components/ledger-layout/LedgerLayoutHeader.vue";
-import LedgerLayoutSidebar from "@/components/ledger-layout/LedgerLayoutSidebar.vue";
+import LedgerLayoutHeader from '@/components/ledger-layout/LedgerLayoutHeader.vue';
+import LedgerLayoutSidebar from '@/components/ledger-layout/LedgerLayoutSidebar.vue';
 
-import TransectionAddModal from "@/components/transection/TransectionAddModal.vue";
-import { useAddTransactionStore } from "@/stores/transactions/useAddTransactionStore";
+import TransectionAddModal from '@/components/transection/TransectionAddModal.vue';
+import { useAddTransactionStore } from '@/stores/transactions/useAddTransactionStore';
 </script>
 
 <template>
@@ -15,7 +15,10 @@ import { useAddTransactionStore } from "@/stores/transactions/useAddTransactionS
         <router-view></router-view>
       </div>
     </div>
-    <button class="add-transaction-btn" @click="useAddTransactionStore().openModal">
+    <button
+      class="add-transaction-btn"
+      @click="useAddTransactionStore().openModal"
+    >
       <i class="fa-solid fa-plus"></i>
     </button>
   </div>
