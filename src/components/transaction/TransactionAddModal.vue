@@ -14,8 +14,6 @@ const categorizedList = computed(() => {
   return {
     INCOME: allList.filter((cat) => cat.label === "INCOME"),
     EXPENSE: allList.filter((cat) => cat.label === "EXPENSE"),
-    INCOME: allList.filter((cat) => cat.label === "INCOME"),
-    EXPENSE: allList.filter((cat) => cat.label === "EXPENSE"),
   };
 });
 
@@ -46,21 +44,8 @@ const handleSubmit = () => {
     formData.detail = allList.find(
       (cat) => cat.id === formData.category_id,
     ).name;
-    if (!formData.category_id) {
-      formData.category_id = formData.type === "INCOME" ? "cat99" : "cat98";
-    }
-    if (!formData.amount) {
-      formData.amount = 0;
-    }
-    if (!formData.detail) {
-      formData.detail = allList.find(
-        (cat) => cat.id === formData.category_id,
-      ).name;
-    }
-
-    // 스토어의 제출 함수 호출
-    addTransactionStore.submitTransaction();
   }
+  addTransactionStore.submitTransaction();
 };
 </script>
 
@@ -115,6 +100,7 @@ const handleSubmit = () => {
                 v-model="formData.transacted_at"
                 mode="date"
                 :masks="{ title: 'YYYY년 MMM', modelValue: 'YYYY-MM-DD' }"
+                @dayclick="(day, event) => event.target.blur()"
               >
                 <template #default="{ inputValue, inputEvents }">
                   <div class="input-box clickable" v-on="inputEvents">
