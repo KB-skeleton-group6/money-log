@@ -1,7 +1,7 @@
 <script setup>
 import { computed } from 'vue';
 import { Bar } from 'vue-chartjs';
-import { useTransactionStore } from '@/stores/useTransactionStore';
+import { useTransactionStore } from '@/stores/transactions/useTransactionStore';
 import { storeToRefs } from 'pinia';
 import { aggregateChartData } from '@/utils/chartUtils';
 import {

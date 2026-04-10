@@ -2,7 +2,7 @@
 import LedgerLayoutHeader from '@/components/ledger-layout/LedgerLayoutHeader.vue';
 import LedgerLayoutSidebar from '@/components/ledger-layout/LedgerLayoutSidebar.vue';
 
-import TransectionAddModal from '@/components/transection/TransectionAddModal.vue';
+import TransactionAddModal from '@/components/transaction/TransactionAddModal.vue';
 import { useAddTransactionStore } from '@/stores/transactions/useAddTransactionStore';
 </script>
 
@@ -23,7 +23,7 @@ import { useAddTransactionStore } from '@/stores/transactions/useAddTransactionS
     </button>
   </div>
 
-  <TransectionAddModal />
+  <TransactionAddModal />
 </template>
 
 <style scoped>

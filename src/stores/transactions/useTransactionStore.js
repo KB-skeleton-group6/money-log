@@ -73,11 +73,11 @@ export const useTransactionStore = defineStore('transaction', () => {
   });
 
   // actions
-  async function fetchData() {
+  async function fetchData(userId = 'user01') {
     loading.value = true;
     try {
       const [transactionsData, categoriesData] = await Promise.all([
-        axiosClient.transactionApi.getTransactions(),
+        axiosClient.transactionApi.getTransactions(`?user_id=${userId}`),
         axiosClient.categoryApi.getCategories(),
       ]);
       transactions.value = transactionsData;
@@ -121,7 +121,31 @@ export const useTransactionStore = defineStore('transaction', () => {
       return false;
     }
   }
-  async function editTransaction() {}
+  async function updateTransaction(id, payload) {
+    try {
+      // 1. 서버에 수정 요청 (axiosClient를 통해 PUT/PATCH 호출)
+      const updatedData = await axiosClient.transactionApi.updateTransaction(
+        id,
+        payload,
+      );
+
+      if (updatedData) {
+        // 2. 내 로컬 데이터(배열)에서 해당 항목을 찾아 업데이트
+        const index = transactions.value.findIndex((t) => t.id === id);
+        if (index !== -1) {
+          transactions.value[index] = updatedData;
+        }
+      } else {
+        // 만약 응답값이 명확하지 않다면 전체 데이터를 다시 불러오기
+        await fetchData();
+      }
+      return true; // 성공 시 true 반환
+    } catch (error) {
+      console.error('거래 수정 실패:', error);
+      alert('거래 내역을 수정하는데 실패했습니다.');
+      return false; // 실패 시 false 반환
+    }
+  }
 
   return {
     transactions,
@@ -134,5 +158,6 @@ export const useTransactionStore = defineStore('transaction', () => {
     fetchData,
     deleteTransaction,
     addTransaction,
+    updateTransaction,
   };
 });

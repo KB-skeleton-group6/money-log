@@ -1,5 +1,5 @@
 import { computed, toValue } from 'vue';
-import { useTransactionStore } from '@/stores/useTransactionStore';
+import { useTransactionStore } from '@/stores/transactions/useTransactionStore';
 import { storeToRefs } from 'pinia';
 import { Categories } from '@/constant/categories';
 
