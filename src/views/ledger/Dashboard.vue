@@ -1,7 +1,8 @@
 <script setup>
-import { ref, computed, onMounted } from "vue";
-import dayjs from "dayjs";
+import { computed, onMounted } from "vue";
 import { Bar } from "vue-chartjs";
+import { Calendar } from "v-calendar";
+import "v-calendar/style.css";
 import {
   Chart as ChartJS,
   Title,
@@ -11,9 +12,7 @@ import {
   CategoryScale,
   LinearScale,
 } from "chart.js";
-
 import { storeToRefs } from "pinia";
-
 import {
   formatCurrency,
   formatDateTime,
@@ -37,16 +36,12 @@ const { transactions } = storeToRefs(transactionStore);
 const allList = Object.values(Categories);
 
 const recentTransaction = computed(() => {
-  if (
-    !transactionStore.transactions ||
-    transactionStore.transactions.length === 0
-  ) {
-    return [];
-  }
+  const txs = transactionStore.transactions;
+  if (!txs || txs.length === 0) return [];
 
-  return [...transactionStore.transactions]
+  return [...txs]
     .sort((a, b) => new Date(b.created_at) - new Date(a.created_at))
-    .slice(0, 7);
+    .slice(0, 5);
 });
 
 onMounted(() => {
@@ -72,37 +67,91 @@ const {
   formatNetIncome,
 } = useDashboardCalculations(transactions);
 
-const baseDate = ref(dayjs("2026-04-01"));
-const currentYear = computed(() => baseDate.value.year());
-const currentMonth = computed(() => baseDate.value.month() + 1);
+const summaryCards = computed(() => [
+  {
+    id: "net",
+    title: "총 순이익",
+    icon: "fa-arrow-right-arrow-left",
+    color: "green",
+    amountText: `${netIncome.value > 0 ? "+" : netIncome.value < 0 ? "-" : ""}${formatNetIncome.value}`,
+    rate: netRate.value,
+    chartData: chartDataNet.value,
+    chartOptions: chartOptionsNet.value,
+  },
+  {
+    id: "income",
+    title: "이번 달 수입",
+    icon: "fa-arrow-down",
+    color: "blue",
+    amountText: `+${formatTotalIncome.value}`,
+    rate: incomeRate.value,
+    chartData: chartDataIncome.value,
+    chartOptions: chartOptionsIncome.value,
+  },
+  {
+    id: "expense",
+    title: "이번 달 지출",
+    icon: "fa-arrow-up",
+    color: "red",
+    amountText: `+${formatTotalExpense.value}`,
+    rate: expenseRate.value,
+    chartData: chartDataExpense.value,
+    chartOptions: chartOptionsExpense.value,
+  },
+]);
 
-const prevMonth = () => {
-  baseDate.value = baseDate.value.subtract(1, "month");
-};
-const nextMonth = () => {
-  baseDate.value = baseDate.value.add(1, "month");
-};
+const attributes = computed(() => {
+  if (!transactions.value) return [];
 
-const calendarDays = computed(() => {
-  const startDate = baseDate.value.startOf("month").startOf("week");
-  return Array.from({ length: 42 }).map((_, index) => {
-    const targetDate = startDate.add(index, "day");
-    const dateStr = targetDate.format("YYYY-MM-DD");
-    const dayTx = transactions.value.filter((t) =>
-      t.transacted_at.startsWith(dateStr),
-    );
+  const grouped = {};
+
+  transactions.value.forEach((tx) => {
+    const dateStr = tx.transacted_at.substring(0, 10);
+    const dayNum = new Date(dateStr).getDate();
+
+    if (!grouped[dateStr]) {
+      grouped[dateStr] = {
+        date: new Date(dateStr),
+        dayNum: dayNum,
+        incomeCount: 0,
+        incomeTotal: 0,
+        expenseCount: 0,
+        expenseTotal: 0,
+      };
+    }
+
+    if (tx.type === "INCOME") {
+      grouped[dateStr].incomeCount++;
+      grouped[dateStr].incomeTotal += tx.amount;
+    } else if (tx.type === "EXPENSE") {
+      grouped[dateStr].expenseCount++;
+      grouped[dateStr].expenseTotal += tx.amount;
+    }
+  });
+
+  return Object.entries(grouped).map(([dateStr, data]) => {
+    const netAmount = data.incomeTotal - data.expenseTotal;
+    let dotColor = "gray";
+
+    if (data.incomeCount > 0 && data.expenseCount > 0) dotColor = "purple";
+    else if (data.incomeCount > 0) dotColor = "blue";
+    else if (data.expenseCount > 0) dotColor = "red";
+
     return {
-      date: dateStr,
-      dayNumber: targetDate.date(),
-      isCurrentMonth: targetDate.month() === baseDate.value.month(),
-      hasIncome: dayTx.some((t) => t.type === "INCOME"),
-      hasExpense: dayTx.some((t) => t.type === "EXPENSE"),
-      transactions: dayTx,
+      key: dateStr,
+      dates: data.date,
+      dot: { color: dotColor },
+      customData: {
+        ...data,
+        netAmount,
+      },
+      popover: {
+        visibility: "hover",
+        hideIndicator: true,
+      },
     };
   });
 });
-
-const isToday = (dateStr) => dateStr === dayjs().format("YYYY-MM-DD");
 </script>
 
 <template>
@@ -198,9 +247,9 @@ const isToday = (dateStr) => dateStr === dayjs().format("YYYY-MM-DD");
       <div class="card transaction-list-card">
         <div class="card-header border-bottom">
           <h3>최근 거래내역</h3>
-          <RouterLink to="/ledger/transactions">
-            <a class="view-all">전체보기 ></a>
-          </RouterLink>
+          <RouterLink to="/ledger/transactions" class="view-all"
+            >전체보기 ></RouterLink
+          >
         </div>
         <ul class="transaction-list">
           <li
@@ -213,12 +262,15 @@ const isToday = (dateStr) => dateStr === dayjs().format("YYYY-MM-DD");
               :style="{
                 backgroundColor: allList.find(
                   (cat) => cat.id === item.category_id,
-                ).subColor,
-                color: allList.find((cat) => cat.id === item.category_id).color,
+                )?.subColor,
+                color: allList.find((cat) => cat.id === item.category_id)
+                  ?.color,
               }"
             >
               <i
-                :class="allList.find((cat) => cat.id === item.category_id).icon"
+                :class="
+                  allList.find((cat) => cat.id === item.category_id)?.icon
+                "
               ></i>
             </div>
             <div class="item-info">
@@ -238,52 +290,58 @@ const isToday = (dateStr) => dateStr === dayjs().format("YYYY-MM-DD");
       </div>
 
       <div class="card calendar-card">
-        <div class="calendar-header">
-          <button @click="prevMonth">
-            <i class="fa-solid fa-chevron-left"></i>
-          </button>
-          <h3>{{ currentYear }}년 {{ currentMonth }}월</h3>
-          <button @click="nextMonth">
-            <i class="fa-solid fa-chevron-right"></i>
-          </button>
-        </div>
-        <div class="calendar-grid">
-          <div class="weekday text-red">일</div>
-          <div class="weekday">월</div>
-          <div class="weekday">화</div>
-          <div class="weekday">수</div>
-          <div class="weekday">목</div>
-          <div class="weekday">금</div>
-          <div class="weekday text-blue">토</div>
-          <div
-            v-for="(day, index) in calendarDays"
-            :key="index"
-            class="day-cell"
-            :class="{
-              'is-today': isToday(day.date),
-              'other-month': !day.isCurrentMonth,
-            }"
-          >
-            <span class="day-number">{{ day.dayNumber }}</span>
-            <div class="dots">
-              <span v-if="day.hasIncome" class="dot dot-blue"></span>
-              <span v-if="day.hasExpense" class="dot dot-red"></span>
-            </div>
-            <div v-if="day.transactions.length > 0" class="day-tooltip">
-              <div
-                v-for="tx in day.transactions"
-                :key="tx.id"
-                class="tooltip-tx"
-              >
-                <span>{{ tx.detail }}</span>
-                <span :class="tx.type === 'INCOME' ? 'text-blue' : 'text-red'">
-                  {{ tx.type === "INCOME" ? "+" : ""
-                  }}{{ formatCurrency(tx.amount) }}
+        <Calendar
+          class="custom-calendar"
+          :attributes="attributes"
+          expanded
+          borderless
+          transparent
+        >
+          <template #day-popover="{ attributes }">
+            <div
+              v-for="attr in attributes.filter((a) => a.customData)"
+              :key="attr.key"
+              class="custom-popover"
+            >
+              <div class="popover-header">{{ attr.customData.dayNum }}일</div>
+
+              <div v-if="attr.customData.incomeCount > 0" class="popover-row">
+                <span class="label">
+                  <span class="dot-icon dot-blue"></span> 수입
+                  {{ attr.customData.incomeCount }}건
+                </span>
+                <span class="amount text-blue">
+                  +{{ formatCurrency(attr.customData.incomeTotal) }}원
+                </span>
+              </div>
+
+              <div v-if="attr.customData.expenseCount > 0" class="popover-row">
+                <span class="label">
+                  <span class="dot-icon dot-red"></span> 지출
+                  {{ attr.customData.expenseCount }}건
+                </span>
+                <span class="amount text-red">
+                  -{{ formatCurrency(attr.customData.expenseTotal) }}원
+                </span>
+              </div>
+
+              <div class="popover-divider"></div>
+
+              <div class="popover-row net-row">
+                <span class="label">순이익</span>
+                <span
+                  class="amount"
+                  :class="
+                    attr.customData.netAmount >= 0 ? 'text-blue' : 'text-red'
+                  "
+                >
+                  {{ attr.customData.netAmount > 0 ? "+" : ""
+                  }}{{ formatCurrency(attr.customData.netAmount) }}원
                 </span>
               </div>
             </div>
-          </div>
-        </div>
+          </template>
+        </Calendar>
         <div class="calendar-legend">
           <span class="legend-item"
             ><span class="dot dot-blue"></span> 수입</span
@@ -298,7 +356,6 @@ const isToday = (dateStr) => dateStr === dayjs().format("YYYY-MM-DD");
 </template>
 
 <style scoped>
-/* 전체 레이아웃 및 폰트 */
 .dashboard-container {
   max-width: 100%;
   margin: 0 auto;
@@ -316,7 +373,6 @@ const isToday = (dateStr) => dateStr === dayjs().format("YYYY-MM-DD");
   color: #ea5455;
 }
 
-/* 카드 공통 스타일 */
 .card {
   background: white;
   border-radius: 16px;
@@ -359,14 +415,12 @@ const isToday = (dateStr) => dateStr === dayjs().format("YYYY-MM-DD");
   font-size: 0.85rem;
   margin: 0;
 }
-
 .chart-container {
-  position: relative; /* 툴팁이 이 박스를 기준으로 뜨도록 설정 */
+  position: relative;
   height: 40px;
   margin-top: auto;
   padding-top: 15px;
 }
-
 .custom-tooltip {
   position: absolute;
   background-color: #333333;
@@ -387,8 +441,6 @@ const isToday = (dateStr) => dateStr === dayjs().format("YYYY-MM-DD");
   font-size: 13px;
   font-weight: bold;
 }
-
-/* 하단 영역 그리드 */
 .bottom-section {
   display: grid;
   grid-template-columns: 1fr 1fr;
@@ -400,26 +452,24 @@ const isToday = (dateStr) => dateStr === dayjs().format("YYYY-MM-DD");
   margin-bottom: 15px;
 }
 
-/* 강제 밑줄 제거용 철벽 CSS */
-a.view-all {
+.view-all {
   text-decoration: none !important;
   border-bottom: none !important;
   box-shadow: none !important;
   color: #666 !important;
   font-size: 0.9rem;
 }
-a.view-all:visited,
-a.view-all:active {
+.view-all:visited,
+.view-all:active {
   text-decoration: none !important;
   border-bottom: none !important;
   color: #666 !important;
 }
-a.view-all:hover {
+.view-all:hover {
   text-decoration: none !important;
   color: #28c76f !important;
 }
 
-/* 리스트 아이템 */
 .transaction-list {
   list-style: none;
   padding: 0;
@@ -457,64 +507,47 @@ a.view-all:hover {
   font-weight: 600;
 }
 
-/* 달력 디자인 */
-.calendar-header {
+.custom-popover {
+  padding: 4px;
+  min-width: 170px;
+}
+.popover-header {
+  font-size: 0.9rem;
+  font-weight: bold;
+  margin-bottom: 12px;
+  color: #e0e0e0;
+}
+.popover-row {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 20px;
-}
-.calendar-header button {
-  background: none;
-  border: none;
-  cursor: pointer;
-  color: #888;
-}
-.calendar-grid {
-  display: grid;
-  grid-template-columns: repeat(7, 1fr);
-  gap: 8px;
-  text-align: center;
-}
-.weekday {
+  margin-bottom: 8px;
   font-size: 0.85rem;
-  font-weight: 600;
-  color: #666;
-  margin-bottom: 10px;
 }
-.day-cell {
-  position: relative;
-  height: 60px;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  padding-top: 5px;
-  border-radius: 8px;
-  cursor: pointer;
-  transition: background-color 0.2s;
-}
-.day-cell:hover {
-  background-color: #f1f3f5;
-}
-.other-month {
-  opacity: 0.3;
-}
-.is-today .day-number {
-  background-color: #e6f7ef;
-  color: #28c76f;
-  border-radius: 50%;
-  width: 28px;
-  height: 28px;
+.popover-row .label {
   display: flex;
   align-items: center;
-  justify-content: center;
+  gap: 8px;
+  color: #cccccc;
+}
+.popover-row .amount {
   font-weight: bold;
 }
-.dots {
-  display: flex;
-  gap: 3px;
-  margin-top: 5px;
+.dot-icon {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  display: inline-block;
 }
+.popover-divider {
+  height: 1px;
+  background-color: #444;
+  margin: 12px 0;
+}
+.net-row {
+  margin-bottom: 0;
+}
+
 .dot {
   width: 5px;
   height: 5px;
@@ -526,36 +559,6 @@ a.view-all:hover {
 }
 .dot-red {
   background-color: #ea5455;
-}
-
-/* 달력 툴팁 */
-.day-tooltip {
-  display: none;
-  position: absolute;
-  bottom: 100%;
-  left: 50%;
-  transform: translateX(-50%);
-  background-color: #333;
-  color: white;
-  padding: 8px 12px;
-  border-radius: 6px;
-  white-space: nowrap;
-  z-index: 10;
-  font-size: 0.8rem;
-  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-  min-width: 120px;
-}
-.day-cell:hover .day-tooltip {
-  display: block;
-}
-.tooltip-tx {
-  display: flex;
-  justify-content: space-between;
-  gap: 15px;
-  margin-bottom: 4px;
-}
-.tooltip-tx:last-child {
-  margin-bottom: 0;
 }
 .calendar-legend {
   display: flex;
@@ -570,17 +573,79 @@ a.view-all:hover {
   align-items: center;
   gap: 5px;
 }
+:deep(.vc-container.custom-calendar) {
+  font-family: inherit !important;
+}
+:deep(.vc-popover-content-wrapper .vc-popover-content) {
+  background-color: #333 !important;
+  color: white !important;
+  border: none !important;
+  border-radius: 6px !important;
+  padding: 8px 12px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1) !important;
+  white-space: pre-line !important;
+  line-height: 1.5;
+}
+:deep(.vc-day) {
+  min-height: 64px;
+  width: 100%;
+  padding: 8px 4px;
+  cursor: pointer;
+}
+:deep(.vc-day-content) {
+  font-size: 1.2rem !important;
+  width: 36px !important;
+  height: 36px !important;
+}
 
-/* --- 모바일 반응형 스타일 (화면 너비 768px 이하) --- */
-@media screen and (max-width: 768px) {
+/* 1. 상단 년/월 타이틀 배경 제거 및 호버 시 글자색만 변경 */
+:deep(.vc-title) {
+  font-family: inherit !important;
+  font-size: 1.2rem !important;
+
+  background-color: transparent !important; /* 기본 회색 배경 제거 */
+  transition: color 0.2s ease-in-out; /* 부드러운 색상 전환 효과 (선택 사항) */
+}
+
+:deep(.vc-title:hover) {
+  background-color: transparent !important; /* 호버 시에도 배경 투명 유지 */
+  color: #28c76f !important; /* 마우스를 올렸을 때 바뀔 글자 색상 (현재 테마의 초록색) */
+  opacity: 0.8; /* 살짝 투명해지는 효과를 원하면 추가 (필요 없으면 삭제) */
+}
+
+/* 2. 좌우 화살표 버튼 배경 제거 및 호버 시 아이콘 색상만 변경 */
+:deep(.vc-arrow) {
+  background-color: transparent !important; /* 화살표 뒤 회색 배경 제거 */
+  transition: color 0.2s ease-in-out;
+}
+
+:deep(.vc-arrow:hover) {
+  background-color: transparent !important; /* 호버 시에도 배경 투명 유지 */
+  color: #28c76f !important; /* 마우스를 올렸을 때 바뀔 화살표 색상 */
+}
+:deep(.vc-arrow) {
+  width: 36px !important;
+  height: 36px !important;
+}
+:deep(.vc-arrow svg) {
+  width: 24px !important;
+  height: 24px !important;
+}
+:deep(.vc-header) {
+  padding-bottom: 15px !important;
+}
+:deep(.vc-weekday) {
+  font-size: 1rem !important;
+  padding-bottom: 10px;
+}
+
+@media screen and (max-width: 1024px) {
   .summary-cards {
     grid-template-columns: 1fr;
   }
-
   .bottom-section {
     grid-template-columns: 1fr;
   }
-
   .summary-card .chart-container {
     display: none;
   }
