@@ -9,9 +9,12 @@ import "v-calendar/style.css";
 const addTransactionStore = useAddTransactionStore();
 const formData = addTransactionStore.formData;
 const allList = Object.values(Categories);
+const allList = Object.values(Categories);
 
 const categorizedList = computed(() => {
   return {
+    INCOME: allList.filter((cat) => cat.label === "INCOME"),
+    EXPENSE: allList.filter((cat) => cat.label === "EXPENSE"),
     INCOME: allList.filter((cat) => cat.label === "INCOME"),
     EXPENSE: allList.filter((cat) => cat.label === "EXPENSE"),
   };
@@ -44,7 +47,18 @@ const handleSubmit = () => {
     formData.detail = allList.find(
       (cat) => cat.id === formData.category_id,
     ).name;
+  if (!formData.category_id) {
+    formData.category_id = formData.type === "INCOME" ? "cat99" : "cat98";
   }
+  if (!formData.amount) {
+    formData.amount = 0;
+  }
+  if (!formData.detail) {
+    formData.detail = allList.find(
+      (cat) => cat.id === formData.category_id,
+    ).name;
+  }
+
 
   // 스토어의 제출 함수 호출
   addTransactionStore.submitTransaction();
@@ -69,6 +83,7 @@ const handleSubmit = () => {
           <div class="modal-header">
             <!-- <h2 class="modal-title">거래 추가</h2> -->
             <h2 class="modal-title">
+              {{ addTransactionStore.isEditMode ? "거래 수정" : "거래 추가" }}
               {{ addTransactionStore.isEditMode ? "거래 수정" : "거래 추가" }}
             </h2>
             <button class="close-btn" @click="addTransactionStore.closeModal">
@@ -192,6 +207,7 @@ const handleSubmit = () => {
 
             <!-- <button class="add-btn" type="submit">추가하기</button> -->
             <button class="add-btn" type="submit">
+              {{ addTransactionStore.isEditMode ? "수정하기" : "추가하기" }}
               {{ addTransactionStore.isEditMode ? "수정하기" : "추가하기" }}
             </button>
           </form>
@@ -394,6 +410,8 @@ const handleSubmit = () => {
   font-weight: bold;
   font-size: 1.1rem;
 }
+.input-control[type="number"]::-webkit-outer-spin-button,
+.input-control[type="number"]::-webkit-inner-spin-button {
 .input-control[type="number"]::-webkit-outer-spin-button,
 .input-control[type="number"]::-webkit-inner-spin-button {
   -webkit-appearance: none;
