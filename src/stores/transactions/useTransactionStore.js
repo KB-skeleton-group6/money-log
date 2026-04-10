@@ -1,9 +1,9 @@
-import { defineStore } from "pinia";
-import { ref, computed } from "vue";
-import axiosClient from "@/api/axiosClient";
-import { useAuthStore } from "./auth/useAuthStore";
+import { defineStore } from 'pinia';
+import { ref, computed } from 'vue';
+import axiosClient from '@/api/axiosClient';
+import { useAuthStore } from './auth/useAuthStore';
 
-export const useTransactionStore = defineStore("transaction", () => {
+export const useTransactionStore = defineStore('transaction', () => {
   // state
   const transactions = ref([]);
   const categories = ref([]);
@@ -48,12 +48,12 @@ export const useTransactionStore = defineStore("transaction", () => {
 
     const stats = {
       income: {
-        current: calculateTotal(tMonth, "INCOME"),
-        last: calculateTotal(lMonth, "INCOME"),
+        current: calculateTotal(tMonth, 'INCOME'),
+        last: calculateTotal(lMonth, 'INCOME'),
       },
       expense: {
-        current: calculateTotal(tMonth, "EXPENSE"),
-        last: calculateTotal(lMonth, "EXPENSE"),
+        current: calculateTotal(tMonth, 'EXPENSE'),
+        last: calculateTotal(lMonth, 'EXPENSE'),
       },
     };
 
@@ -74,7 +74,7 @@ export const useTransactionStore = defineStore("transaction", () => {
   });
 
   // actions
-  async function fetchData() {
+  async function fetchData(userId = 'user01') {
     loading.value = true;
     try {
       const authStore = useAuthStore();
@@ -90,7 +90,7 @@ export const useTransactionStore = defineStore("transaction", () => {
 
       transactions.value = transactionsData;
     } catch (error) {
-      console.error("Data Fetch Error:", error);
+      console.error('Data Fetch Error:', error);
     } finally {
       loading.value = false;
     }
@@ -106,7 +106,7 @@ export const useTransactionStore = defineStore("transaction", () => {
         await axiosClient.transactionApi.deleteTransaction(id);
       } catch (error) {
         transactions.value.splice(index, 0, backup);
-        alert("삭제에 실패했습니다.");
+        alert('삭제에 실패했습니다.');
       }
     }
   }
@@ -123,12 +123,36 @@ export const useTransactionStore = defineStore("transaction", () => {
       }
       return true;
     } catch (error) {
-      console.error("거래 추가 실패:", error);
-      alert("거래 내역을 추가하는데 실패했습니다.");
+      console.error('거래 추가 실패:', error);
+      alert('거래 내역을 추가하는데 실패했습니다.');
       return false;
     }
   }
-  async function editTransaction() {}
+  async function updateTransaction(id, payload) {
+    try {
+      // 1. 서버에 수정 요청 (axiosClient를 통해 PUT/PATCH 호출)
+      const updatedData = await axiosClient.transactionApi.updateTransaction(
+        id,
+        payload,
+      );
+
+      if (updatedData) {
+        // 2. 내 로컬 데이터(배열)에서 해당 항목을 찾아 업데이트
+        const index = transactions.value.findIndex((t) => t.id === id);
+        if (index !== -1) {
+          transactions.value[index] = updatedData;
+        }
+      } else {
+        // 만약 응답값이 명확하지 않다면 전체 데이터를 다시 불러오기
+        await fetchData();
+      }
+      return true; // 성공 시 true 반환
+    } catch (error) {
+      console.error('거래 수정 실패:', error);
+      alert('거래 내역을 수정하는데 실패했습니다.');
+      return false; // 실패 시 false 반환
+    }
+  }
 
   return {
     transactions,
@@ -141,5 +165,6 @@ export const useTransactionStore = defineStore("transaction", () => {
     fetchData,
     deleteTransaction,
     addTransaction,
+    updateTransaction,
   };
 });

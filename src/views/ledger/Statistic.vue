@@ -1,6 +1,6 @@
 <script setup>
 import { ref, onMounted, watch } from 'vue';
-import { useTransactionStore } from '@/stores/useTransactionStore';
+import { useTransactionStore } from '@/stores/transactions/useTransactionStore';
 import { storeToRefs } from 'pinia';
 
 import CategoryChart from '@/components/statistic/CategoryChart.vue';
