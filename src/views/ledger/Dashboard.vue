@@ -570,4 +570,19 @@ a.view-all:hover {
   align-items: center;
   gap: 5px;
 }
+
+/* --- 모바일 반응형 스타일 (화면 너비 768px 이하) --- */
+@media screen and (max-width: 768px) {
+  .summary-cards {
+    grid-template-columns: 1fr;
+  }
+
+  .bottom-section {
+    grid-template-columns: 1fr;
+  }
+
+  .summary-card .chart-container {
+    display: none;
+  }
+}
 </style>
