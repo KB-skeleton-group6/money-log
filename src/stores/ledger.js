@@ -1,6 +1,6 @@
 import { defineStore } from "pinia";
 import { ref, computed } from "vue";
-import { useRoute, useRouter } from "vue-router";
+import { useRoute } from "vue-router";
 
 export const useLedgerLayoutStore = defineStore("ledger-layout", () => {
   const pages = [
@@ -31,20 +31,30 @@ export const useLedgerLayoutStore = defineStore("ledger-layout", () => {
 
   const route = useRoute();
   const menuOpen = ref(false);
+  const isFabOpen = ref(false);
+  const isQuickAddOpen = ref(false);
 
   const currentPage = computed(() => {
     const page = pages.find((page) => page.to.path === route.path);
     return { ...page };
   });
 
-  const toggleMenu = () => {
-    menuOpen.value = !menuOpen.value;
-  };
+  const toggleMenu = () => { menuOpen.value = !menuOpen.value; };
+  const toggleFab = () => { isFabOpen.value = !isFabOpen.value; };
+  const closeFab = () => { isFabOpen.value = false; };
+  const openQuickAdd = () => { isQuickAddOpen.value = true; isFabOpen.value = false; };
+  const closeQuickAdd = () => { isQuickAddOpen.value = false; };
 
   return {
     pages: computed(() => structuredClone(pages)),
     menuOpen: computed(() => menuOpen.value),
+    isFabOpen: computed(() => isFabOpen.value),
+    isQuickAddOpen: computed(() => isQuickAddOpen.value),
     currentPage,
     toggleMenu,
+    toggleFab,
+    closeFab,
+    openQuickAdd,
+    closeQuickAdd,
   };
 });

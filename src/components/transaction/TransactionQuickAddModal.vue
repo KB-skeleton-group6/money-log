@@ -46,7 +46,9 @@ const proceedAdd = async () => {
     amount: confirmingItem.value.amount,
     category_id: confirmingItem.value.category_id,
     detail: confirmingItem.value.detail,
-    transacted_at: new Date().toISOString(), // 날짜/시간은 현재 시점으로 갱신
+    memo: confirmingItem.value.memo,
+    method: confirmingItem.value.method,
+    transacted_at: new Date().toISOString(),
   };
 
   const success = await store.addTransaction(payload);

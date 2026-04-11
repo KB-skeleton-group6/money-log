@@ -24,7 +24,7 @@ router.get("/:id", (req, res) => {
       .prepare("SELECT * FROM transactions WHERE id = ?")
       .get(transactionId);
     if (!transaction) return res.status(404).json({ error: "Not found" });
-    if (transaction.user_id !== currentUserId)
+    if (Number(transaction.user_id) !== Number(currentUserId))
       return res.status(403).json({ error: "Forbidden" });
     return res.status(200).json(transaction);
   } catch (error) {
@@ -35,16 +35,8 @@ router.get("/:id", (req, res) => {
 
 router.post("/", async (req, res) => {
   const { id: currentUserId } = req.user;
-  const {
-    type,
-    amount,
-    category_id,
-    detail,
-    memo,
-    method,
-    transacted_at,
-    created_at,
-  } = req.body;
+  const { type, amount, category_id, detail, memo, method, transacted_at } = req.body;
+  const created_at = new Date().toISOString();
   try {
     const result = db
       .prepare(
@@ -62,7 +54,7 @@ router.post("/", async (req, res) => {
         transacted_at,
         created_at,
       );
-    return res.status(201).json({ id: result.lastInsertRowid, ...req.body });
+    return res.status(201).json({ id: result.lastInsertRowid, ...req.body, created_at });
   } catch (error) {
     console.error("트랜잭션 생성 에러:", error);
     return res.status(500).json({ error: "서버 오류가 발생했습니다." });
@@ -83,7 +75,7 @@ router.put("/:id", (req, res) => {
     if (!transaction) {
       return res.status(404).json({ error: "Not found" });
     }
-    if (transaction.user_id !== currentUserId) {
+    if (Number(transaction.user_id) !== Number(currentUserId)) {
       return res.status(403).json({ error: "Forbidden" });
     }
 
@@ -117,7 +109,7 @@ router.delete("/:id", (req, res) => {
     .prepare("SELECT * FROM transactions WHERE id = ?")
     .get(transactionId);
   if (!transaction) return res.status(404).json({ error: "Not found" });
-  if (transaction.user_id !== currentUserId)
+  if (Number(transaction.user_id) !== Number(currentUserId))
     return res.status(403).json({ error: "Forbidden" });
 
   try {

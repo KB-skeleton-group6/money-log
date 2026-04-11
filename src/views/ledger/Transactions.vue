@@ -98,12 +98,30 @@ const pageNumbers = computed(() => {
   return nums;
 });
 
+// 분류 선택에 따라 보여줄 카테고리 목록
+const filteredCategories = computed(() => {
+  if (!filters.value.type) return categories.value;
+  return categories.value.filter((cat) => cat.type === filters.value.type);
+});
+
 watch(
   filters,
   () => {
     currentPage.value = 1;
   },
   { deep: true },
+);
+
+// 분류 변경 시 해당 분류에 속하지 않는 카테고리가 선택된 경우 초기화
+watch(
+  () => filters.value.type,
+  (newType) => {
+    if (!newType) return;
+    const selected = categories.value.find((cat) => cat.id === filters.value.categoryId);
+    if (selected && selected.type !== newType) {
+      filters.value.categoryId = '';
+    }
+  },
 );
 
 // 걸러진 데이터로 합계 계산하기 (기존 로직 완벽히 동일)
@@ -168,7 +186,7 @@ const formatCurrency = (val) => new Intl.NumberFormat('ko-KR').format(val);
           <label>카테고리</label>
           <select v-model="filters.categoryId" class="filter-input">
             <option value="">전체</option>
-            <option v-for="cat in categories" :key="cat.id" :value="cat.id">
+            <option v-for="cat in filteredCategories" :key="cat.id" :value="cat.id">
               {{ cat.name }}
             </option>
           </select>

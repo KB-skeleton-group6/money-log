@@ -6,23 +6,13 @@ import LedgerLayoutBottomNav from '@/components/ledger-layout/LedgerLayoutBottom
 import TransactionAddModal from '@/components/transaction/TransactionAddModal.vue';
 import TransactionQuickAddModal from '@/components/transaction/TransactionQuickAddModal.vue';
 import { useAddTransactionStore } from '@/stores/transactions/useAddTransactionStore';
-import { ref } from 'vue';
+import { useLedgerLayoutStore } from '@/stores/ledger';
 
-const isFabOpen = ref(false);
-const isQuickAddModalOpen = ref(false);
-
-const toggleFab = () => {
-  isFabOpen.value = !isFabOpen.value;
-};
+const layoutStore = useLedgerLayoutStore();
 
 const openStandardModal = () => {
   useAddTransactionStore().openModal();
-  isFabOpen.value = false;
-};
-
-const handleQuickAdd = () => {
-  isQuickAddModalOpen.value = true;
-  isFabOpen.value = false;
+  layoutStore.closeFab();
 };
 </script>
 
@@ -38,16 +28,16 @@ const handleQuickAdd = () => {
 
     <transition name="fade">
       <div
-        v-if="isFabOpen"
+        v-if="layoutStore.isFabOpen"
         class="fab-overlay"
-        @click="isFabOpen = false"
+        @click="layoutStore.closeFab()"
       ></div>
     </transition>
 
     <div class="fab-container">
       <transition name="fade-up">
-        <div v-if="isFabOpen" class="fab-actions">
-          <button class="fab-action-btn" @click="handleQuickAdd">
+        <div v-if="layoutStore.isFabOpen" class="fab-actions">
+          <button class="fab-action-btn" @click="layoutStore.openQuickAdd()">
             <span class="fab-tooltip">빠른 추가</span>
             <div class="fab-icon"><i class="fa-solid fa-bolt"></i></div>
           </button>
@@ -59,8 +49,8 @@ const handleQuickAdd = () => {
       </transition>
       <button
         class="add-transaction-btn"
-        :class="{ open: isFabOpen }"
-        @click="toggleFab"
+        :class="{ open: layoutStore.isFabOpen }"
+        @click="layoutStore.toggleFab()"
       >
         <i class="fa-solid fa-plus"></i>
       </button>
@@ -71,8 +61,8 @@ const handleQuickAdd = () => {
   <TransactionAddModal />
 
   <TransactionQuickAddModal
-    :is-open="isQuickAddModalOpen"
-    @close="isQuickAddModalOpen = false"
+    :is-open="layoutStore.isQuickAddOpen"
+    @close="layoutStore.closeQuickAdd()"
   />
 </template>
 
@@ -215,6 +205,10 @@ const handleQuickAdd = () => {
 
 @media (max-width: 768px) {
   .fab-container {
+    display: none;
+  }
+
+  .fab-overlay {
     display: none;
   }
 

@@ -64,7 +64,6 @@ export const useAddTransactionStore = defineStore("addTransaction", () => {
         ...formData,
         amount: Number(formData.amount),
         transacted_at: new Date(formData.transacted_at).toISOString(),
-        created_at: new Date(),
       };
 
       let isSuccess = false;
