@@ -1,12 +1,13 @@
-import axios from "axios";
+import axios from 'axios';
 import {
   FetchFailedError,
   NetworkOfflineError,
   SaveFailedError,
-} from "./networkError";
-import { ErrorCode } from "@/constant/errorCode";
+} from './networkError';
+import { ErrorCode } from '@/constant/errorCode';
 
-const urlPrefix = "/api";
+// 환경 변수에서 VITE_API_BASE를 가져오고, 없으면 기본값 '/api'(Vite Proxy)를 사용
+const urlPrefix = import.meta.env.VITE_API_BASE || '/api';
 
 const isRequestSuccessful = (statusCode) => {
   return statusCode >= 200 && statusCode < 300;
@@ -197,7 +198,9 @@ async function createTransactionTemplate(template) {
 }
 
 async function deleteTransactionTemplate(templateId) {
-  const res = await axios.delete(`${urlPrefix}/transaction_templates/${templateId}`);
+  const res = await axios.delete(
+    `${urlPrefix}/transaction_templates/${templateId}`,
+  );
 
   checkRequestFailed(res.status, ErrorCode.FETCH_FAILED);
 }
@@ -240,4 +243,11 @@ const transactionTemplateApi = {
   deleteTransactionTemplate,
 };
 
-export default { memberApi, transactionApi, categoryApi, paymentApi, budgetApi, transactionTemplateApi };
+export default {
+  memberApi,
+  transactionApi,
+  categoryApi,
+  paymentApi,
+  budgetApi,
+  transactionTemplateApi,
+};

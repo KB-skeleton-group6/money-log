@@ -1,0 +1,240 @@
+{
+  "members": [
+    {
+      "id": "user01",
+      "email": "test@email.com",
+      "name": "홍길동",
+      "createdAt": "2026-03-18T10:47:58.313Z",
+      "password": "test12345!"
+    },
+    {
+      "email": "test2@email.com",
+      "password": "test1234!",
+      "name": "gildong",
+      "created_at": "2026-04-10T08:15:05.537Z",
+      "id": "H_vtEWpsFvM"
+    }
+  ],
+  "categories": [],
+  "transactions": [
+    {
+      "id": "tx0001",
+      "user_id": "user01",
+      "category_id": "cat05",
+      "amount": 14675,
+      "detail": "Handmade Cotton Shirt",
+      "type": "EXPENSE",
+      "memo": "내일부터 다이어트",
+      "method": "CARD",
+      "transacted_at": "2025-12-16T08:21:50.921Z",
+      "created_at": "2026-04-10T06:14:09.453Z"
+    },
+    {
+      "id": "tx0002",
+      "user_id": "user01",
+      "category_id": "cat05",
+      "amount": 84802,
+      "detail": "Fantastic Aluminum Fish",
+      "type": "EXPENSE",
+      "memo": "편의점 쇼핑",
+      "method": "CARD",
+      "transacted_at": "2026-04-04T11:45:50.423Z",
+      "created_at": "2026-04-10T06:14:09.453Z"
+    },
+    {
+      "id": "tx0003",
+      "user_id": "user01",
+      "category_id": "cat03",
+      "amount": 92020,
+      "detail": "Fresh Bamboo Chips",
+      "type": "EXPENSE",
+      "memo": "친구랑 같이 먹음",
+      "method": "TRANSFER",
+      "transacted_at": "2025-12-14T19:46:28.569Z",
+      "created_at": "2026-04-10T06:14:09.453Z"
+    },
+    {
+      "id": "tx0004",
+      "user_id": "user01",
+      "category_id": "cat01",
+      "amount": 35765,
+      "detail": "Frozen Metal Ball",
+      "type": "EXPENSE",
+      "memo": "간식 거리",
+      "method": "CASH",
+      "transacted_at": "2026-01-02T04:11:42.448Z",
+      "created_at": "2026-04-10T06:14:09.453Z"
+    },
+    {
+      "id": "tx0005",
+      "user_id": "user01",
+      "category_id": "cat13",
+      "amount": 1854122,
+      "detail": "용돈 입금",
+      "type": "INCOME",
+      "memo": "부수입 개꿀",
+      "method": "CASH",
+      "transacted_at": "2026-01-12T01:02:53.481Z",
+      "created_at": "2026-04-10T06:14:09.453Z"
+    },
+    {
+      "id": "tx0006",
+      "user_id": "user01",
+      "category_id": "cat12",
+      "amount": 1359169,
+      "detail": "투자 입금",
+      "type": "INCOME",
+      "memo": "부수입 개꿀",
+      "method": "CASH",
+      "transacted_at": "2026-03-06T15:49:03.139Z",
+      "created_at": "2026-04-10T06:14:09.453Z"
+    },
+    {
+      "id": "tx0007",
+      "user_id": "user01",
+      "category_id": "cat05",
+      "amount": 15231,
+      "detail": "Awesome Rubber Hat",
+      "type": "EXPENSE",
+      "memo": "간식 거리",
+      "method": "CARD",
+      "transacted_at": "2026-02-16T07:36:15.711Z",
+      "created_at": "2026-04-10T06:14:09.453Z"
+    },
+    {
+      "id": "tx0008",
+      "user_id": "user01",
+      "category_id": "cat05",
+      "amount": 13818,
+      "detail": "Fantastic Rubber Bike",
+      "type": "EXPENSE",
+      "memo": "월정액 결제됨",
+      "method": "CARD",
+      "transacted_at": "2026-03-08T14:08:39.230Z",
+      "created_at": "2026-04-10T06:14:09.453Z"
+    },
+    {
+      "id": "tx0010",
+      "user_id": "user01",
+      "category_id": "cat01",
+      "amount": 66275,
+      "detail": "Incredible Plastic Pizza",
+      "type": "EXPENSE",
+      "memo": "간식 거리",
+      "method": "CARD",
+      "transacted_at": "2026-01-25T02:58:51.006Z",
+      "created_at": "2026-04-10T06:14:09.454Z"
+    },
+    {
+      "type": "INCOME",
+      "amount": 1359169,
+      "category_id": "cat12",
+      "detail": "투자 입금",
+      "transacted_at": "2026-04-11T02:57:40.446Z",
+      "user_id": "user01",
+      "created_at": "2026-04-11T02:57:40.446Z",
+      "id": "DdQww_Nu7b0"
+    },
+    {
+      "type": "EXPENSE",
+      "transacted_at": "2026-04-11T00:00:00.000Z",
+      "amount": 4500,
+      "category_id": "cat02",
+      "detail": "카페",
+      "memo": "",
+      "method": "CARD",
+      "user_id": "user01",
+      "created_at": "2026-04-11T03:00:37.760Z",
+      "id": "IjLK5d5KjLk"
+    },
+    {
+      "type": "INCOME",
+      "amount": 1359169,
+      "category_id": "cat12",
+      "detail": "투자 입금",
+      "transacted_at": "2026-04-11T03:45:29.774Z",
+      "user_id": "user01",
+      "created_at": "2026-04-11T03:45:29.775Z",
+      "id": "HBayoh60xK4"
+    },
+    {
+      "type": "EXPENSE",
+      "amount": 4500,
+      "category_id": "cat02",
+      "detail": "카페",
+      "transacted_at": "2026-04-11T04:12:51.089Z",
+      "user_id": "user01",
+      "created_at": "2026-04-11T04:12:51.089Z",
+      "id": "3sGg1Z41Q7M"
+    },
+    {
+      "type": "EXPENSE",
+      "amount": 13818,
+      "category_id": "cat05",
+      "detail": "Fantastic Rubber Bike",
+      "transacted_at": "2026-04-11T04:14:33.489Z",
+      "user_id": "user01",
+      "created_at": "2026-04-11T04:14:33.490Z",
+      "id": "eC9-pmw7C5M"
+    },
+    {
+      "type": "EXPENSE",
+      "transacted_at": "2026-04-11T00:00:00.000Z",
+      "amount": 1233,
+      "category_id": "cat03",
+      "detail": "아메리카노",
+      "memo": "",
+      "method": "CARD",
+      "user_id": "user01",
+      "created_at": "2026-04-11T04:21:44.782Z",
+      "id": "ANCdASVcv9Q"
+    },
+    {
+      "type": "EXPENSE",
+      "transacted_at": "2026-04-11T00:00:00.000Z",
+      "amount": 1232,
+      "category_id": "cat04",
+      "detail": "아메리카노",
+      "memo": "아메리카노",
+      "method": "CREDIT_CARD",
+      "user_id": "user01",
+      "created_at": "2026-04-11T04:22:01.282Z",
+      "id": "i3Ay0rt8S1k"
+    },
+    {
+      "type": "INCOME",
+      "transacted_at": "2026-04-09T15:00:00.000Z",
+      "amount": 346356,
+      "category_id": "cat13",
+      "detail": "용돈",
+      "memo": "용돈",
+      "method": "CASH",
+      "user_id": "user01",
+      "created_at": "2026-04-11T04:22:15.948Z",
+      "id": "kQhmZ63syS0"
+    },
+    {
+      "type": "EXPENSE",
+      "transacted_at": "2026-04-11T00:00:00.000Z",
+      "amount": 45000,
+      "category_id": "cat08",
+      "detail": "교육",
+      "memo": "",
+      "method": "CHECK_CARD",
+      "user_id": "user01",
+      "created_at": "2026-04-11T04:22:31.315Z",
+      "id": "fpXcC1f1yGM"
+    },
+    {
+      "type": "EXPENSE",
+      "amount": 4500,
+      "category_id": "cat02",
+      "detail": "카페",
+      "transacted_at": "2026-04-11T05:33:45.647Z",
+      "user_id": "user01",
+      "created_at": "2026-04-11T05:33:45.648Z",
+      "id": "QSQxxUk"
+    }
+  ],
+  "$schema": "./node_modules/json-server/schema.json"
+}
