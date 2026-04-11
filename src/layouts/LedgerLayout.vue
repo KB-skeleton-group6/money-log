@@ -67,7 +67,7 @@ const handleQuickAdd = () => {
     </div>
   </div>
 
-  <LedgerLayoutBottomNav />
+  <LedgerLayoutBottomNav @open-quick-add="handleQuickAdd" />
   <TransactionAddModal />
 
   <TransactionQuickAddModal

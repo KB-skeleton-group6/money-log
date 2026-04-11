@@ -282,6 +282,7 @@ const proceedAdd = async () => {
   display: flex;
   flex-direction: column;
   gap: 4px;
+  min-width: 0; /* 텍스트가 길어질 때 컨테이너 밖으로 넘어가지 않게 제한 */
 }
 .item-category {
   font-size: 0.85rem;
@@ -291,6 +292,9 @@ const proceedAdd = async () => {
   font-size: 1.05rem;
   color: #333;
   font-weight: 600;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 .item-amount {
   font-weight: 700;
@@ -422,6 +426,60 @@ const proceedAdd = async () => {
   }
   to {
     opacity: 1;
+  }
+}
+
+/* 반응형 모바일 크기 조정 */
+@media (max-width: 768px) {
+  .modal-header {
+    padding: 16px 20px;
+  }
+  .modal-header h3 {
+    font-size: 1.1rem;
+  }
+  .modal-body {
+    padding: 16px 20px;
+  }
+  .recent-item {
+    padding: 12px 8px;
+    margin: 0 -8px;
+    gap: 12px;
+  }
+  .item-icon {
+    width: 36px;
+    height: 36px;
+    font-size: 1rem;
+  }
+  .item-desc {
+    font-size: 0.95rem;
+  }
+  .item-category {
+    font-size: 0.8rem;
+  }
+  .item-amount {
+    font-size: 0.95rem;
+  }
+  .confirm-icon {
+    font-size: 2.5rem;
+  }
+  .confirm-view h4 {
+    font-size: 1.05rem;
+    margin-bottom: 16px;
+  }
+  .confirm-card {
+    padding: 16px;
+    margin-bottom: 16px;
+  }
+  .cc-detail {
+    font-size: 1.05rem;
+  }
+  .cc-amount {
+    font-size: 1.15rem;
+  }
+  .btn-cancel,
+  .btn-submit {
+    padding: 12px 0;
+    font-size: 0.9rem;
   }
 }
 </style>
