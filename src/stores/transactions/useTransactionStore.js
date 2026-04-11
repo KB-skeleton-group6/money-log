@@ -117,11 +117,23 @@ export const useTransactionStore = defineStore('transaction', () => {
 
   async function addTransaction(payload) {
     try {
+      const authStore = useAuthStore();
+      const userId = authStore.user?.id;
+
+      const finalPayload = {
+        ...payload,
+        user_id: payload.user_id || userId,
+        created_at: payload.created_at || new Date().toISOString(),
+      };
+
       const newTransaction =
-        await axiosClient.transactionApi.createTransaction(payload);
+        await axiosClient.transactionApi.createTransaction(finalPayload);
 
       if (newTransaction) {
         transactions.value.push(newTransaction);
+        transactions.value.sort(
+          (a, b) => new Date(b.transacted_at) - new Date(a.transacted_at),
+        );
       } else {
         await fetchData();
       }
