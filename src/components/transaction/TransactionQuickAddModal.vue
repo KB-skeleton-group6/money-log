@@ -16,6 +16,7 @@ const emit = defineEmits(['close', 'success']);
 
 const close = () => {
   confirmingItem.value = null; // 모달 닫을 때 상태 초기화
+  displayLimit.value = 5; // 모달 닫을 때 노출 개수 초기화
   emit('close');
 };
 
@@ -23,18 +24,27 @@ const store = useTransactionStore();
 const { transactions } = storeToRefs(store);
 
 const confirmingItem = ref(null);
+const displayLimit = ref(5);
 
 const recentTransactions = computed(() => {
   if (!transactions.value || transactions.value.length === 0) return [];
   return [...transactions.value]
     .sort((a, b) => new Date(b.transacted_at) - new Date(a.transacted_at))
-    .slice(0, 3);
+    .slice(0, displayLimit.value);
+});
+
+const hasMore = computed(() => {
+  return transactions.value && transactions.value.length > displayLimit.value;
 });
 
 const getCategory = (id) => getCategoryById(id) || {};
 
 const handleItemClick = (item) => {
   confirmingItem.value = item;
+};
+
+const loadMore = () => {
+  displayLimit.value += 5; // 더보기 클릭 시 5개씩 추가 로드
 };
 
 const proceedAdd = async () => {
@@ -94,38 +104,50 @@ const proceedAdd = async () => {
           </div>
 
           <!-- 최근 내역 리스트 -->
-          <ul v-else-if="recentTransactions.length > 0" class="recent-list">
-            <li
-              v-for="item in recentTransactions"
-              :key="item.id"
-              class="recent-item"
-              @click="handleItemClick(item)"
-            >
-              <div
-                class="item-icon"
-                :style="{
-                  backgroundColor: getCategory(item.category_id).color + '1A',
-                  color: getCategory(item.category_id).color,
-                }"
+          <div
+            v-else-if="recentTransactions.length > 0"
+            class="recent-list-container"
+          >
+            <ul class="recent-list">
+              <li
+                v-for="item in recentTransactions"
+                :key="item.id"
+                class="recent-item"
+                @click="handleItemClick(item)"
               >
-                <i
-                  :class="
-                    getCategory(item.category_id).icon || 'fa-solid fa-tag'
-                  "
-                ></i>
-              </div>
-              <div class="item-info">
-                <span class="item-desc">{{ item.detail || '내역 없음' }}</span>
-                <span class="item-category">{{
-                  getCategory(item.category_id).name || '기타'
-                }}</span>
-              </div>
-              <div class="item-amount" :class="item.type.toLowerCase()">
-                {{ item.type === 'EXPENSE' ? '-' : '+'
-                }}{{ formatAmount(Math.abs(item.amount)) }}원
-              </div>
-            </li>
-          </ul>
+                <div
+                  class="item-icon"
+                  :style="{
+                    backgroundColor: getCategory(item.category_id).color + '1A',
+                    color: getCategory(item.category_id).color,
+                  }"
+                >
+                  <i
+                    :class="
+                      getCategory(item.category_id).icon || 'fa-solid fa-tag'
+                    "
+                  ></i>
+                </div>
+                <div class="item-info">
+                  <span class="item-desc">{{
+                    item.detail || '내역 없음'
+                  }}</span>
+                  <span class="item-category">{{
+                    getCategory(item.category_id).name || '기타'
+                  }}</span>
+                </div>
+                <div class="item-amount" :class="item.type.toLowerCase()">
+                  {{ item.type === 'EXPENSE' ? '-' : '+'
+                  }}{{ formatAmount(Math.abs(item.amount)) }}원
+                </div>
+              </li>
+            </ul>
+            <div v-if="hasMore" class="load-more-container">
+              <button class="btn-load-more" @click="loadMore">
+                더보기 <i class="fa-solid fa-chevron-down"></i>
+              </button>
+            </div>
+          </div>
 
           <!-- 내역이 없을 때 -->
           <div v-else class="empty-placeholder">
@@ -187,9 +209,11 @@ const proceedAdd = async () => {
 .modal-body {
   padding: 24px;
   min-height: 200px;
+  max-height: 60vh;
+  overflow-y: auto;
   display: flex;
   flex-direction: column;
-  justify-content: center;
+  justify-content: flex-start;
   align-items: center;
 }
 
@@ -198,6 +222,33 @@ const proceedAdd = async () => {
   padding: 0;
   margin: 0;
   width: 100%;
+}
+
+.recent-list-container {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+}
+
+.load-more-container {
+  text-align: center;
+  margin-top: 16px;
+  padding-bottom: 8px;
+}
+
+.btn-load-more {
+  background: #f1f2f6;
+  color: #747d8c;
+  border: none;
+  padding: 8px 20px;
+  border-radius: 20px;
+  font-size: 0.9rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+.btn-load-more:hover {
+  background: #dfe4ea;
 }
 
 .recent-item {
@@ -255,6 +306,7 @@ const proceedAdd = async () => {
 .empty-placeholder {
   text-align: center;
   color: #999;
+  margin: auto 0;
 }
 
 .empty-placeholder i {
@@ -282,6 +334,7 @@ const proceedAdd = async () => {
   width: 100%;
   text-align: center;
   animation: fadeIn 0.2s ease-out;
+  margin: auto 0;
 }
 .confirm-icon {
   font-size: 3rem;
