@@ -1,9 +1,9 @@
-import { defineStore } from 'pinia';
-import { ref, computed } from 'vue';
-import { transactionService } from '@/api/services/transactionService';
-import { Categories } from '@/constant/categories';
+import { defineStore } from "pinia";
+import { ref, computed } from "vue";
+import { transactionService } from "@/api/services/transactionService";
+import { Categories } from "@/constant/categories";
 
-export const useTransactionStore = defineStore('transaction', () => {
+export const useTransactionStore = defineStore("transaction", () => {
   // state
   const transactions = ref([]);
   const categories = ref(Object.values(Categories));
@@ -50,12 +50,12 @@ export const useTransactionStore = defineStore('transaction', () => {
 
     const stats = {
       income: {
-        current: calculateTotal(tMonth, 'INCOME'),
-        last: calculateTotal(lMonth, 'INCOME'),
+        current: calculateTotal(tMonth, "INCOME"),
+        last: calculateTotal(lMonth, "INCOME"),
       },
       expense: {
-        current: calculateTotal(tMonth, 'EXPENSE'),
-        last: calculateTotal(lMonth, 'EXPENSE'),
+        current: calculateTotal(tMonth, "EXPENSE"),
+        last: calculateTotal(lMonth, "EXPENSE"),
       },
     };
 
@@ -82,7 +82,7 @@ export const useTransactionStore = defineStore('transaction', () => {
       transactions.value = await transactionService.fetchAll();
       categories.value = Object.values(Categories);
     } catch (error) {
-      console.error('Data Fetch Error:', error);
+      console.error("Data Fetch Error:", error);
     } finally {
       loading.value = false;
     }
@@ -98,7 +98,7 @@ export const useTransactionStore = defineStore('transaction', () => {
         await transactionService.remove(id);
       } catch (error) {
         transactions.value.splice(index, 0, backup);
-        alert('삭제에 실패했습니다.');
+        alert("삭제에 실패했습니다.");
       }
     }
   }
@@ -109,13 +109,16 @@ export const useTransactionStore = defineStore('transaction', () => {
 
       if (newTransaction) {
         transactions.value.push(newTransaction);
+        transactions.value.sort(
+          (a, b) => new Date(b.transacted_at) - new Date(a.transacted_at),
+        );
       } else {
         await fetchData();
       }
       return true;
     } catch (error) {
-      console.error('거래 추가 실패:', error);
-      alert('거래 내역을 추가하는데 실패했습니다.');
+      console.error("거래 추가 실패:", error);
+      alert("거래 내역을 추가하는데 실패했습니다.");
       return false;
     }
   }
@@ -134,8 +137,8 @@ export const useTransactionStore = defineStore('transaction', () => {
       }
       return true;
     } catch (error) {
-      console.error('거래 수정 실패:', error);
-      alert('거래 내역을 수정하는데 실패했습니다.');
+      console.error("거래 수정 실패:", error);
+      alert("거래 내역을 수정하는데 실패했습니다.");
       return false;
     }
   }
