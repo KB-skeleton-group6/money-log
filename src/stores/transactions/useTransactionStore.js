@@ -108,8 +108,7 @@ export const useTransactionStore = defineStore("transaction", () => {
       const newTransaction = await transactionService.create(payload);
 
       if (newTransaction) {
-        transactions.value.push(newTransaction);
-        transactions.value.sort(
+        transactions.value = [...transactions.value, newTransaction].sort(
           (a, b) => new Date(b.transacted_at) - new Date(a.transacted_at),
         );
       } else {
