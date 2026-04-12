@@ -25,14 +25,16 @@ const { openEditModal } = useAddTransactionStore();
 
 const isExpanded = ref(false);
 
+const formatAmountDisplay = (amt) =>
+  amt >= 100_000_000
+    ? formatAmountShort(amt)
+    : new Intl.NumberFormat("ko-KR").format(amt) + "원";
+
 const formatAmount = (amt, type) => {
-  const formatted = new Intl.NumberFormat("ko-KR").format(amt);
-  return type === "INCOME" ? `+${formatted}원` : `-${formatted}원`;
-};
-const formatAmountMobile = (amt, type) => {
-  const formatted = formatAmountShort(Math.abs(amt));
+  const formatted = formatAmountDisplay(Math.abs(amt));
   return type === "INCOME" ? `+${formatted}` : `-${formatted}`;
 };
+const formatAmountMobile = formatAmount;
 const formatExpandDate = (dateStr, time) => {
   const d = new Date(dateStr);
   return `${d.getMonth() + 1}월 ${d.getDate()}일 ${time}`;

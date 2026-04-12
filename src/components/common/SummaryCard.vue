@@ -19,11 +19,10 @@ const formattedDiff = computed(() => {
   return `${sign}${props.diff}`;
 });
 
-// 타입에 따라 금액 색상 변경
 const amountClass = computed(() => {
   if (props.type === 'income') return 'text-blue';
   if (props.type === 'expense') return 'text-red';
-  return 'text-green'; // profit
+  return 'text-green';
 });
 
 const diffClass = computed(() => (props.diff >= 0 ? 'up' : 'down'));
@@ -33,9 +32,9 @@ const diffClass = computed(() => (props.diff >= 0 ? 'up' : 'down'));
   <div class="summary-card">
     <div class="card-header">
       <span class="icon-wrapper" :class="type">
-        <i v-if="type === 'income'" class="fa-solid fa-arrow-down"></i>
-        <i v-else-if="type === 'expense'" class="fa-solid fa-arrow-up"></i>
-        <i v-else class="fa-solid fa-arrow-right-arrow-left"></i>
+        <i v-if="type === 'income'" class="fa-solid fa-arrow-circle-down"></i>
+        <i v-else-if="type === 'expense'" class="fa-solid fa-arrow-circle-up"></i>
+        <i v-else class="fa-solid fa-check-circle"></i>
       </span>
       <span class="title">{{ title }}</span>
     </div>
@@ -46,15 +45,16 @@ const diffClass = computed(() => (props.diff >= 0 ? 'up' : 'down'));
         <span :class="diffClass">{{ formattedDiff }}%</span>
       </p>
     </div>
+    <slot name="chart" />
   </div>
 </template>
 
 <style scoped>
 .summary-card {
   background: white;
-  padding: 20px;
+  padding: 24px;
   border-radius: 12px;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.02);
   flex: 1;
   min-width: 200px;
   transition: transform 0.2s;
@@ -72,25 +72,26 @@ const diffClass = computed(() => (props.diff >= 0 ? 'up' : 'down'));
 }
 
 .icon-wrapper {
-  width: 32px;
-  height: 32px;
+  width: 48px;
+  height: 48px;
   display: flex;
   align-items: center;
   justify-content: center;
   border-radius: 50%;
-  font-size: 1.2rem;
+  font-size: 24px;
+  flex-shrink: 0;
 }
 .icon-wrapper.income {
-  background: #e0f2fe;
-  color: #00cfe8;
+  background: #eff6ff;
+  color: #3b82f6;
 }
 .icon-wrapper.expense {
-  background: #fceaea;
-  color: #ea5455;
+  background: #fef2f2;
+  color: #ef4444;
 }
 .icon-wrapper.profit {
-  background: #e6f7ef;
-  color: #28c76f;
+  background: #f0fdf4;
+  color: #10b981;
 }
 
 .title {
@@ -101,18 +102,18 @@ const diffClass = computed(() => (props.diff >= 0 ? 'up' : 'down'));
 
 .card-content h2 {
   font-size: 1.5rem;
-  font-weight: 700;
+  font-weight: 800;
   margin: 0;
 }
 
 .text-blue {
-  color: #00cfe8;
+  color: #3b82f6;
 }
 .text-red {
-  color: #ea5455;
+  color: #ef4444;
 }
 .text-green {
-  color: #28c76f;
+  color: #10b981;
 }
 
 .comparison {
@@ -122,15 +123,14 @@ const diffClass = computed(() => (props.diff >= 0 ? 'up' : 'down'));
 }
 
 .up {
-  color: #ea5455;
+  color: #ef4444;
   font-weight: 600;
 }
 .down {
-  color: #00cfe8;
+  color: #3b82f6;
   font-weight: 600;
 }
 
-/* 모바일 화면 최적화 */
 @media (max-width: 768px) {
   .summary-card {
     display: flex;

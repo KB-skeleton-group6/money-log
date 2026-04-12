@@ -5,7 +5,7 @@ import { storeToRefs } from 'pinia';
 
 import CategoryChart from '@/components/statistic/CategoryChart.vue';
 import MainChart from '@/components/statistic/MainChart.vue';
-import SummaryCard from '@/components/statistic/SummaryCard.vue';
+import SummaryCard from '@/components/common/SummaryCard.vue';
 import TopCategoryList from '@/components/statistic/TopCategoryList.vue';
 
 const store = useTransactionStore();

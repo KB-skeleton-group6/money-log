@@ -47,6 +47,22 @@ export function formatAmountShort(amount) {
 }
 
 /**
+ * 숫자를 천 단위 구분 쉼표 문자열로 변환 (원 미포함)
+ * 예: 1250000 -> "1,250,000"
+ */
+export function formatCurrency(val) {
+  return new Intl.NumberFormat('ko-KR').format(val);
+}
+
+/**
+ * ISO 날짜 문자열을 "YYYY-MM-DD HH:mm" 형태로 변환
+ */
+export function formatDateTime(dateStr) {
+  const d = new Date(dateStr);
+  return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')} ${String(d.getHours()).padStart(2, '0')}:${String(d.getMinutes()).padStart(2, '0')}`;
+}
+
+/**
  * 퍼센트 계산 (도넛 차트나 프로그레스 바용)
  */
 export function calculatePercent(value, total) {
