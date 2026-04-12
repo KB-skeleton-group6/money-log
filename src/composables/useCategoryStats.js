@@ -1,8 +1,8 @@
-import { computed, toValue } from 'vue';
-import { useTransactionStore } from '@/stores/transactions/useTransactionStore';
-import { useCategoryStore } from '@/stores/categories/useCategoryStore';
-import { storeToRefs } from 'pinia';
-import { calculatePercent } from '@/utils/formatter';
+import { computed, toValue } from "vue";
+import { useTransactionStore } from "@/stores/transactions/useTransactionStore";
+import { useCategoryStore } from "@/stores/categories/useCategoryStore";
+import { storeToRefs } from "pinia";
+import { calculatePercent } from "@/utils/formatter";
 
 export function useCategoryStats(activeTypeRef) {
   const transactionStore = useTransactionStore();
@@ -10,7 +10,10 @@ export function useCategoryStats(activeTypeRef) {
   const { thisMonthTransactions } = storeToRefs(transactionStore);
 
   const aggregatedStats = computed(() => {
-    if (!thisMonthTransactions.value?.length || !categoryStore.categories.length) {
+    if (
+      !thisMonthTransactions.value?.length ||
+      !categoryStore.categories.length
+    ) {
       return [];
     }
 
@@ -29,14 +32,14 @@ export function useCategoryStats(activeTypeRef) {
 
     return Object.entries(categoryMap)
       .map(([catId, stats]) => {
-        const category = categoryStore.getCategoryById(Number(catId));
+        const category = categoryStore.getCategoryById(catId);
 
         return {
-          name: category?.name ?? '기타',
+          name: category?.name ?? "기타",
           amount: stats.amount,
           count: stats.count,
-          color: category?.color ?? '#ccc',
-          icon: category?.icon ?? 'fa-solid fa-tag',
+          color: category?.color ?? "#ccc",
+          icon: category?.icon ?? "fa-solid fa-tag",
         };
       })
       .sort((a, b) => b.amount - a.amount);

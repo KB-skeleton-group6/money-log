@@ -9,7 +9,7 @@ import SummaryCard from '@/components/statistic/SummaryCard.vue';
 import TopCategoryList from '@/components/statistic/TopCategoryList.vue';
 
 const store = useTransactionStore();
-const { transactions, categories, summaryStats, loading } = storeToRefs(store);
+const { transactions, summaryStats, loading } = storeToRefs(store);
 
 const filters = [
   { label: '주간별', value: 'weekly' },
