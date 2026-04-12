@@ -555,19 +555,6 @@
       "payment": "CREDIT_CARD"
     },
     {
-      "type": "INCOME",
-      "transacted_at": "2026-04-12T15:00:00.000Z",
-      "amount": 3000,
-      "category_id": "3",
-      "detail": "교통",
-      "memo": "",
-      "created_at": "2026-04-12T18:13:21.276Z",
-      "user_id": "1",
-      "id": "m2_ychF",
-      "displayTime": "09:00",
-      "payment": null
-    },
-    {
       "type": "EXPENSE",
       "transacted_at": "2026-04-12T15:00:00.000Z",
       "amount": 3000,
@@ -593,13 +580,13 @@
     },
     {
       "type": "EXPENSE",
-      "transacted_at": "2026-04-13T15:00:00.000Z",
+      "transacted_at": "2026-04-13T02:54:00.000Z",
       "amount": 500000,
       "category_id": "7",
       "detail": "건강보험",
       "memo": "",
       "payment": "BANK_TRANSFER",
-      "created_at": "2026-04-12T20:13:54.156Z",
+      "created_at": "2026-04-12T20:54:28.475Z",
       "user_id": "1",
       "id": "Jagjx8A",
       "displayTime": "00:00"
