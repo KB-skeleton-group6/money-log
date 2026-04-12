@@ -6,7 +6,12 @@ import LedgerLayoutBottomNav from '@/components/ledger-layout/LedgerLayoutBottom
 import TransactionAddModal from '@/components/transaction/TransactionAddModal.vue';
 import TransactionQuickAddModal from '@/components/transaction/TransactionQuickAddModal.vue';
 import { useAddTransactionStore } from '@/stores/transactions/useAddTransactionStore';
-import { ref } from 'vue';
+import { useCategoryStore } from '@/stores/categories/useCategoryStore';
+import { ref, onMounted } from 'vue';
+
+onMounted(() => {
+  useCategoryStore().fetchCategories();
+});
 
 const isFabOpen = ref(false);
 const isQuickAddModalOpen = ref(false);

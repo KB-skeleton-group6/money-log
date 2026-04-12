@@ -1,17 +1,22 @@
 <script setup>
-import { Categories } from "@/constant/categories.js";
+import { useCategoryStore } from "@/stores/categories/useCategoryStore";
 import { formatAmount, formatAmountShort } from "@/utils/formatter";
-import { computed, ref } from "vue";
+import { computed, ref, watch } from "vue";
 
+const categoryStore = useCategoryStore();
 const isEditMode = ref(false);
 
-const expenseCategories = Object.values(Categories).filter(
-  (cat) => cat.label === "EXPENSE",
+const expenseCategories = computed(() =>
+  categoryStore.categories.filter((cat) => cat.type === "EXPENSE"),
 );
 
-const budgets = ref(
-  Object.fromEntries(expenseCategories.map((cat) => [cat.id, 100000])),
-);
+const budgets = ref({});
+
+watch(expenseCategories, (cats) => {
+  if (cats.length && !Object.keys(budgets.value).length) {
+    budgets.value = Object.fromEntries(cats.map((cat) => [cat.id, 100000]));
+  }
+}, { immediate: true });
 
 const draftBudgets = ref({});
 
