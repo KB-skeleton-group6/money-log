@@ -1,10 +1,9 @@
-import { defineStore } from 'pinia';
-import { ref, computed } from 'vue';
-import axiosClient from '@/api/axiosClient';
-import { useAuthStore } from '@/stores/auth/useAuthStore';
-import { Categories } from '@/constant/categories';
+import { defineStore } from "pinia";
+import { ref, computed } from "vue";
+import { transactionService } from "@/api/services/transactionService";
+import { Categories } from "@/constant/categories";
 
-export const useTransactionStore = defineStore('transaction', () => {
+export const useTransactionStore = defineStore("transaction", () => {
   // state
   const transactions = ref([]);
   const categories = ref(Object.values(Categories));
@@ -51,12 +50,12 @@ export const useTransactionStore = defineStore('transaction', () => {
 
     const stats = {
       income: {
-        current: calculateTotal(tMonth, 'INCOME'),
-        last: calculateTotal(lMonth, 'INCOME'),
+        current: calculateTotal(tMonth, "INCOME"),
+        last: calculateTotal(lMonth, "INCOME"),
       },
       expense: {
-        current: calculateTotal(tMonth, 'EXPENSE'),
-        last: calculateTotal(lMonth, 'EXPENSE'),
+        current: calculateTotal(tMonth, "EXPENSE"),
+        last: calculateTotal(lMonth, "EXPENSE"),
       },
     };
 
@@ -80,21 +79,10 @@ export const useTransactionStore = defineStore('transaction', () => {
   async function fetchData() {
     loading.value = true;
     try {
-      const authStore = useAuthStore();
-      if (!authStore.isLoggedIn) {
-        transactions.value = [];
-        categories.value = []; // 로그아웃 시 카테고리도 초기화
-        return;
-      }
-      const userId = authStore.user.id;
-
-      // Promise.all을 사용하여 트랜잭션과 카테고리 데이터를 병렬로 가져옴
-      const transactionsData =
-        await axiosClient.transactionApi.getTransactionsByUserId(userId);
-      transactions.value = transactionsData;
+      transactions.value = await transactionService.fetchAll();
       categories.value = Object.values(Categories);
     } catch (error) {
-      console.error('Data Fetch Error:', error);
+      console.error("Data Fetch Error:", error);
     } finally {
       loading.value = false;
     }
@@ -107,31 +95,20 @@ export const useTransactionStore = defineStore('transaction', () => {
       transactions.value.splice(index, 1);
 
       try {
-        await axiosClient.transactionApi.deleteTransaction(id);
+        await transactionService.remove(id);
       } catch (error) {
         transactions.value.splice(index, 0, backup);
-        alert('삭제에 실패했습니다.');
+        alert("삭제에 실패했습니다.");
       }
     }
   }
 
   async function addTransaction(payload) {
     try {
-      const authStore = useAuthStore();
-      const userId = authStore.user?.id;
-
-      const finalPayload = {
-        ...payload,
-        user_id: payload.user_id || userId,
-        created_at: payload.created_at || new Date().toISOString(),
-      };
-
-      const newTransaction =
-        await axiosClient.transactionApi.createTransaction(finalPayload);
+      const newTransaction = await transactionService.create(payload);
 
       if (newTransaction) {
-        transactions.value.push(newTransaction);
-        transactions.value.sort(
+        transactions.value = [...transactions.value, newTransaction].sort(
           (a, b) => new Date(b.transacted_at) - new Date(a.transacted_at),
         );
       } else {
@@ -139,34 +116,29 @@ export const useTransactionStore = defineStore('transaction', () => {
       }
       return true;
     } catch (error) {
-      console.error('거래 추가 실패:', error);
-      alert('거래 내역을 추가하는데 실패했습니다.');
+      console.error("거래 추가 실패:", error);
+      alert("거래 내역을 추가하는데 실패했습니다.");
       return false;
     }
   }
+
   async function updateTransaction(id, payload) {
     try {
-      // 1. 서버에 수정 요청 (axiosClient를 통해 PUT/PATCH 호출)
-      const updatedData = await axiosClient.transactionApi.updateTransaction(
-        id,
-        payload,
-      );
+      const updatedData = await transactionService.update(id, payload);
 
       if (updatedData) {
-        // 2. 내 로컬 데이터(배열)에서 해당 항목을 찾아 업데이트
         const index = transactions.value.findIndex((t) => t.id === id);
         if (index !== -1) {
           transactions.value[index] = updatedData;
         }
       } else {
-        // 만약 응답값이 명확하지 않다면 전체 데이터를 다시 불러오기
         await fetchData();
       }
-      return true; // 성공 시 true 반환
+      return true;
     } catch (error) {
-      console.error('거래 수정 실패:', error);
-      alert('거래 내역을 수정하는데 실패했습니다.');
-      return false; // 실패 시 false 반환
+      console.error("거래 수정 실패:", error);
+      alert("거래 내역을 수정하는데 실패했습니다.");
+      return false;
     }
   }
 
