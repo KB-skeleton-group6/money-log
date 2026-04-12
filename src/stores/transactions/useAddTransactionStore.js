@@ -1,5 +1,6 @@
 import { defineStore } from "pinia";
 import { ref, reactive } from "vue";
+import dayjs from "dayjs";
 import { useTransactionStore } from "./useTransactionStore";
 
 export const useAddTransactionStore = defineStore("addTransaction", () => {
@@ -11,7 +12,8 @@ export const useAddTransactionStore = defineStore("addTransaction", () => {
 
   const initialFormState = {
     type: "EXPENSE",
-    transacted_at: new Date().toISOString().split("T")[0],
+    transacted_at: dayjs().format("YYYY-MM-DD"),
+    transacted_time: dayjs().format("HH:mm"),
     amount: "",
     category_id: "",
     detail: "",
@@ -27,13 +29,11 @@ export const useAddTransactionStore = defineStore("addTransaction", () => {
   };
 
   const openEditModal = (transactionData) => {
-    const formattedDate = new Date(transactionData.transacted_at)
-      .toISOString()
-      .split("T")[0];
-    // 기존 데이터를 폼에 덮어씌움
+    const dt = dayjs(transactionData.transacted_at);
     Object.assign(formData, {
       ...transactionData,
-      transacted_at: formattedDate,
+      transacted_at: dt.format("YYYY-MM-DD"),
+      transacted_time: dt.format("HH:mm"),
     });
 
     isEditMode.value = true;
@@ -47,7 +47,11 @@ export const useAddTransactionStore = defineStore("addTransaction", () => {
   };
 
   const resetForm = () => {
-    Object.assign(formData, initialFormState);
+    Object.assign(formData, {
+      ...initialFormState,
+      transacted_at: dayjs().format("YYYY-MM-DD"),
+      transacted_time: dayjs().format("HH:mm"),
+    });
     // 모달이 닫히면 수정 모드 상태도 초기화
     isEditMode.value = false;
     editTargetId.value = null;
@@ -58,11 +62,13 @@ export const useAddTransactionStore = defineStore("addTransaction", () => {
     const transactionStore = useTransactionStore();
 
     try {
+      // transacted_time은 payload에 포함하지 않음
+      const { transacted_time, ...formRest } = formData;
       const payload = {
-        ...formData,
+        ...formRest,
         amount: Number(formData.amount),
-        transacted_at: new Date(formData.transacted_at).toISOString(),
-        created_at: new Date(),
+        transacted_at: dayjs(`${formData.transacted_at} ${transacted_time}`).toISOString(),
+        created_at: new Date().toISOString(),
       };
 
       let isSuccess = false;
