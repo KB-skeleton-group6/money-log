@@ -1,15 +1,16 @@
 import { computed, toValue } from 'vue';
 import { useTransactionStore } from '@/stores/transactions/useTransactionStore';
+import { useCategoryStore } from '@/stores/categories/useCategoryStore';
 import { storeToRefs } from 'pinia';
-import { getCategoryById } from '@/constant/categories';
 import { calculatePercent } from '@/utils/formatter';
 
 export function useCategoryStats(activeTypeRef) {
-  const store = useTransactionStore();
-  const { categories, thisMonthTransactions } = storeToRefs(store);
+  const transactionStore = useTransactionStore();
+  const categoryStore = useCategoryStore();
+  const { thisMonthTransactions } = storeToRefs(transactionStore);
 
   const aggregatedStats = computed(() => {
-    if (!thisMonthTransactions.value?.length || !categories.value?.length) {
+    if (!thisMonthTransactions.value?.length || !categoryStore.categories.length) {
       return [];
     }
 
@@ -28,18 +29,14 @@ export function useCategoryStats(activeTypeRef) {
 
     return Object.entries(categoryMap)
       .map(([catId, stats]) => {
-        const category = categories.value.find(
-          (c) => String(c.id) === String(catId),
-        );
-
-        const staticCategory = getCategoryById(catId);
+        const category = categoryStore.getCategoryById(Number(catId));
 
         return {
-          name: category ? category.name : '기타',
+          name: category?.name ?? '기타',
           amount: stats.amount,
           count: stats.count,
-          color: category?.color || '#ccc',
-          icon: staticCategory?.icon || 'fa-solid fa-tag',
+          color: category?.color ?? '#ccc',
+          icon: category?.icon ?? 'fa-solid fa-tag',
         };
       })
       .sort((a, b) => b.amount - a.amount);

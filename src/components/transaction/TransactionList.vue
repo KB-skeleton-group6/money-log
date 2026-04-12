@@ -1,6 +1,6 @@
 <script setup>
 import { ref, computed } from 'vue';
-import { Categories } from '@/constant/categories';
+import { useCategoryStore } from '@/stores/categories/useCategoryStore';
 import DeleteConfirmModal from '../../components/transaction/DeleteConfirmModal.vue';
 import { useAddTransactionStore } from '@/stores/transactions/useAddTransactionStore';
 
@@ -12,16 +12,8 @@ const props = defineProps({
 });
 const emit = defineEmits(['edit', 'delete']);
 
-// 카테고리 찾기 함수
-const getCat = (id) => {
-  return (
-    Object.values(Categories).find((cat) => cat.id === id) || {
-      name: '미분류',
-      color: '#888',
-      icon: 'fa-solid fa-question',
-    }
-  );
-};
+const categoryStore = useCategoryStore();
+const getCat = (id) => categoryStore.getCategoryById(id);
 
 // 데이터 그룹화 및 가공
 const groupedTransactions = computed(() => {

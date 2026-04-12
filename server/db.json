@@ -1,0 +1,19 @@
+{
+  "categories": [
+    { "id": 1,  "code": "FOOD",         "name": "식비",   "type": "EXPENSE" },
+    { "id": 2,  "code": "CAFE",         "name": "카페",   "type": "EXPENSE" },
+    { "id": 3,  "code": "TRANSPORT",    "name": "교통",   "type": "EXPENSE" },
+    { "id": 4,  "code": "SHOPPING",     "name": "쇼핑",   "type": "EXPENSE" },
+    { "id": 5,  "code": "GROCERIES",    "name": "식료품", "type": "EXPENSE" },
+    { "id": 6,  "code": "SUBSCRIPTION", "name": "구독",   "type": "EXPENSE" },
+    { "id": 7,  "code": "HEALTH",       "name": "건강",   "type": "EXPENSE" },
+    { "id": 8,  "code": "EDUCATION",    "name": "교육",   "type": "EXPENSE" },
+    { "id": 9,  "code": "LEISURE",      "name": "여가",   "type": "EXPENSE" },
+    { "id": 10, "code": "ETC_EXPENSE",  "name": "기타",   "type": "EXPENSE" },
+    { "id": 11, "code": "SALARY",       "name": "급여",   "type": "INCOME"  },
+    { "id": 12, "code": "SIDE_JOB",     "name": "부업",   "type": "INCOME"  },
+    { "id": 13, "code": "INVESTMENT",   "name": "투자",   "type": "INCOME"  },
+    { "id": 14, "code": "ALLOWANCE",    "name": "용돈",   "type": "INCOME"  },
+    { "id": 15, "code": "ETC_INCOME",   "name": "기타",   "type": "INCOME"  }
+  ]
+}

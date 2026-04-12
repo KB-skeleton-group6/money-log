@@ -1,12 +1,10 @@
 import { defineStore } from "pinia";
 import { ref, computed } from "vue";
 import { transactionService } from "@/api/services/transactionService";
-import { Categories } from "@/constant/categories";
 
 export const useTransactionStore = defineStore("transaction", () => {
   // state
   const transactions = ref([]);
-  const categories = ref(Object.values(Categories));
   const loading = ref(false);
 
   // getters
@@ -80,7 +78,6 @@ export const useTransactionStore = defineStore("transaction", () => {
     loading.value = true;
     try {
       transactions.value = await transactionService.fetchAll();
-      categories.value = Object.values(Categories);
     } catch (error) {
       console.error("Data Fetch Error:", error);
     } finally {
@@ -144,7 +141,6 @@ export const useTransactionStore = defineStore("transaction", () => {
 
   return {
     transactions,
-    categories,
     loading,
     getDateInfo,
     thisMonthTransactions,

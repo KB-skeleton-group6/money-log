@@ -1,9 +1,9 @@
 <script setup>
 import { computed, ref } from 'vue';
 import { useTransactionStore } from '@/stores/transactions/useTransactionStore';
+import { useCategoryStore } from '@/stores/categories/useCategoryStore';
 import { storeToRefs } from 'pinia';
 import { formatAmount } from '@/utils/formatter';
-import { getCategoryById } from '@/constant/categories';
 
 const props = defineProps({
   isOpen: {
@@ -21,6 +21,7 @@ const close = () => {
 };
 
 const store = useTransactionStore();
+const categoryStore = useCategoryStore();
 const { transactions } = storeToRefs(store);
 
 const confirmingItem = ref(null);
@@ -37,7 +38,7 @@ const hasMore = computed(() => {
   return transactions.value && transactions.value.length > displayLimit.value;
 });
 
-const getCategory = (id) => getCategoryById(id) || {};
+const getCategory = (id) => categoryStore.getCategoryById(id) ?? {};
 
 const handleItemClick = (item) => {
   confirmingItem.value = item;
