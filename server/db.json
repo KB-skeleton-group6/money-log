@@ -17,5 +17,12 @@
     { "id": 13, "code": "INVESTMENT",   "name": "투자",   "type": "INCOME"  },
     { "id": 14, "code": "ALLOWANCE",    "name": "용돈",   "type": "INCOME"  },
     { "id": 15, "code": "ETC_INCOME",   "name": "기타",   "type": "INCOME"  }
+  ],
+  "payments": [
+    { "id": 1, "code": "CREDIT_CARD", "name": "신용카드" },
+    { "id": 2, "code": "CHECK_CARD", "name": "체크카드" },
+    { "id": 3, "code": "CASH", "name": "현금" },
+    { "id": 4, "code": "BANK_TRANSFER", "name": "계좌이체" },
+    { "id": 5, "code": "EASY_PAY", "name": "간편결제" }
   ]
 }

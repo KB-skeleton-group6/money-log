@@ -7,10 +7,12 @@ import TransactionAddModal from '@/components/transaction/TransactionAddModal.vu
 import TransactionQuickAddModal from '@/components/transaction/TransactionQuickAddModal.vue';
 import { useAddTransactionStore } from '@/stores/transactions/useAddTransactionStore';
 import { useCategoryStore } from '@/stores/categories/useCategoryStore';
+import { usePaymentMethodStore } from '@/stores/payments/usePaymentMethodStore';
 import { ref, onMounted } from 'vue';
 
 onMounted(() => {
   useCategoryStore().fetchCategories();
+  usePaymentMethodStore().fetchPaymentMethods();
 });
 
 const isFabOpen = ref(false);
