@@ -1,27 +1,33 @@
 <script setup>
 import { useCategoryStore } from "@/stores/categories/useCategoryStore";
+import { useBudgetStore } from "@/stores/budgets/useBudgetStore";
+import { useTransactionStore } from "@/stores/transactions/useTransactionStore";
+import { storeToRefs } from "pinia";
 import { formatAmount, formatAmountShort } from "@/utils/formatter";
-import { computed, ref, watch } from "vue";
+import { computed, ref, onMounted } from "vue";
+
+const isEditMode = ref(false);
+const isSaving = ref(false);
 
 const categoryStore = useCategoryStore();
-const isEditMode = ref(false);
-
 const expenseCategories = computed(() =>
   categoryStore.categories.filter((cat) => cat.type === "EXPENSE"),
 );
 
-const budgets = ref({});
+const budgetStore = useBudgetStore();
+const { budgets } = storeToRefs(budgetStore);
 
-watch(expenseCategories, (cats) => {
-  if (cats.length && !Object.keys(budgets.value).length) {
-    budgets.value = Object.fromEntries(cats.map((cat) => [cat.id, 100000]));
-  }
-}, { immediate: true });
+onMounted(() => {
+  budgetStore.fetchBudgets();
+  transactionStore.fetchData();
+});
 
 const draftBudgets = ref({});
 
 const enterEditMode = () => {
-  draftBudgets.value = { ...budgets.value };
+  draftBudgets.value = Object.fromEntries(
+    expenseCategories.value.map((cat) => [cat.id, budgets.value[cat.id] ?? 0]),
+  );
   isEditMode.value = true;
 };
 
@@ -29,10 +35,31 @@ const cancelEdit = () => {
   isEditMode.value = false;
 };
 
-const saveEdit = () => {
-  budgets.value = { ...draftBudgets.value };
-  isEditMode.value = false;
+const saveEdit = async () => {
+  isSaving.value = true;
+  try {
+    await budgetStore.saveBudgets(draftBudgets.value);
+    isEditMode.value = false;
+  } catch {
+    alert("저장에 실패했습니다.");
+  } finally {
+    isSaving.value = false;
+  }
 };
+
+const transactionStore = useTransactionStore();
+const { thisMonthTransactions } = storeToRefs(transactionStore);
+
+const spendingByCategory = computed(() =>
+  thisMonthTransactions.value
+    .filter((t) => t.type === "EXPENSE")
+    .reduce((acc, t) => {
+      acc[String(t.category_id)] = (acc[String(t.category_id)] ?? 0) + t.amount;
+      return acc;
+    }, {}),
+);
+
+const getSpending = (catId) => spendingByCategory.value[String(catId)] ?? 0;
 
 const totalBudget = computed(() => {
   const source = isEditMode.value ? draftBudgets.value : budgets.value;
@@ -40,7 +67,6 @@ const totalBudget = computed(() => {
 });
 
 const formatKRW = (amount) => formatAmount(amount) + "원";
-
 const formatComma = (amount) => Number(amount).toLocaleString("ko-KR");
 
 const onBudgetInput = (event, catId) => {
@@ -51,12 +77,14 @@ const onBudgetInput = (event, catId) => {
 };
 
 const getPercent = (catId) => {
-  if (totalBudget.value === 0) return 0;
-  return (budgets.value[catId] / totalBudget.value) * 100;
+  const budget = budgets.value[String(catId)] ?? 0;
+  if (budget === 0) return 0;
+  return Math.min((getSpending(catId) / budget) * 100, 100);
 };
 
-const formatPercent = (catId) => {
-  return `전체의 ${getPercent(catId).toFixed(1)}%`;
+const isOverBudget = (catId) => {
+  const budget = budgets.value[String(catId)] ?? 0;
+  return budget > 0 && getSpending(catId) > budget;
 };
 
 const hexToRgba = (hex, alpha) => {
@@ -128,24 +156,31 @@ const hexToRgba = (hex, alpha) => {
           <span class="unit">원</span>
         </div>
         <template v-if="!isEditMode">
-          <span class="cat-amount">{{ formatKRW(budgets[cat.id]) }}</span>
+          <span class="spending-amount" :class="{ 'over-budget': isOverBudget(cat.id) }">
+            {{ formatKRW(getSpending(cat.id)) }}
+          </span>
+          <span class="budget-label">예산 {{ formatKRW(budgets[cat.id] ?? 0) }}</span>
           <div class="progress-bar-track">
             <div
               class="progress-bar-fill"
               :style="{
                 width: getPercent(cat.id) + '%',
-                backgroundColor: cat.color,
+                backgroundColor: isOverBudget(cat.id) ? '#ef4444' : cat.color,
               }"
             ></div>
           </div>
-          <span class="cat-percent">{{ formatPercent(cat.id) }}</span>
+          <span class="cat-percent" :class="{ 'over-budget': isOverBudget(cat.id) }">
+            {{ getPercent(cat.id).toFixed(1) }}%
+          </span>
         </template>
       </div>
     </div>
 
     <div v-if="isEditMode" class="edit-actions">
-      <button class="cancel-btn" @click="cancelEdit">취소</button>
-      <button class="save-btn" @click="saveEdit">저장하기</button>
+      <button class="cancel-btn" @click="cancelEdit" :disabled="isSaving">취소</button>
+      <button class="save-btn" @click="saveEdit" :disabled="isSaving">
+        {{ isSaving ? "저장 중..." : "저장하기" }}
+      </button>
     </div>
   </div>
 </template>
@@ -313,10 +348,19 @@ const hexToRgba = (hex, alpha) => {
   color: #1c1c1e;
 }
 
-.cat-amount {
+.spending-amount {
   font-size: 14px;
   font-weight: bold;
   color: #1c1c1e;
+}
+
+.spending-amount.over-budget {
+  color: #ef4444;
+}
+
+.budget-label {
+  font-size: 11px;
+  color: #8a8a8e;
 }
 
 .progress-bar-track {
@@ -336,6 +380,10 @@ const hexToRgba = (hex, alpha) => {
 .cat-percent {
   font-size: 11px;
   color: #8a8a8e;
+}
+
+.cat-percent.over-budget {
+  color: #ef4444;
 }
 
 .budget-input-wrapper {
@@ -392,6 +440,11 @@ const hexToRgba = (hex, alpha) => {
   transition: background-color 0.3s ease;
 }
 
+.edit-actions > button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
 .cancel-btn {
   background-color: white;
   color: #48484a;
@@ -443,8 +496,6 @@ const hexToRgba = (hex, alpha) => {
     grid-template-columns: 1fr;
   }
 
-  .cat-amount {
-    text-align: right;
-  }
 }
+
 </style>
