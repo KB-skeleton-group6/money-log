@@ -1,7 +1,8 @@
 <script setup>
-import { computed, ref } from 'vue';
+import { computed, ref, watch } from 'vue';
 import { useTransactionStore } from '@/stores/transactions/useTransactionStore';
 import { useCategoryStore } from '@/stores/categories/useCategoryStore';
+import { useTransactionTemplateStore } from '@/stores/transactions/useTransactionTemplateStore';
 import { storeToRefs } from 'pinia';
 import { formatAmount } from '@/utils/formatter';
 
@@ -15,17 +16,25 @@ const props = defineProps({
 const emit = defineEmits(['close', 'success']);
 
 const close = () => {
-  confirmingItem.value = null; // 모달 닫을 때 상태 초기화
-  displayLimit.value = 5; // 모달 닫을 때 노출 개수 초기화
+  confirmingItem.value = null;
+  displayLimit.value = 5;
+  activeTab.value = 'recent';
   emit('close');
 };
 
 const store = useTransactionStore();
 const categoryStore = useCategoryStore();
+const templateStore = useTransactionTemplateStore();
 const { transactions } = storeToRefs(store);
+const { templates } = storeToRefs(templateStore);
 
+const activeTab = ref('recent');
 const confirmingItem = ref(null);
 const displayLimit = ref(5);
+
+watch(() => props.isOpen, (isOpen) => {
+  if (isOpen) templateStore.fetchTemplates();
+});
 
 const recentTransactions = computed(() => {
   if (!transactions.value || transactions.value.length === 0) return [];
@@ -44,8 +53,13 @@ const handleItemClick = (item) => {
   confirmingItem.value = item;
 };
 
+const handleTemplateDelete = async (e, templateId) => {
+  e.stopPropagation();
+  await templateStore.removeTemplate(templateId);
+};
+
 const loadMore = () => {
-  displayLimit.value += 5; // 더보기 클릭 시 5개씩 추가 로드
+  displayLimit.value += 5;
 };
 
 const proceedAdd = async () => {
@@ -56,7 +70,9 @@ const proceedAdd = async () => {
     amount: confirmingItem.value.amount,
     category_id: confirmingItem.value.category_id,
     detail: confirmingItem.value.detail,
-    transacted_at: new Date().toISOString(), // 날짜/시간은 현재 시점으로 갱신
+    memo: confirmingItem.value.memo ?? '',
+    payment: confirmingItem.value.payment ?? null,
+    transacted_at: new Date().toISOString(),
   };
 
   const success = await store.addTransaction(payload);
@@ -77,6 +93,25 @@ const proceedAdd = async () => {
             <i class="fa-solid fa-xmark"></i>
           </button>
         </div>
+
+        <!-- 탭 -->
+        <div class="tab-bar">
+          <button
+            class="tab-btn"
+            :class="{ active: activeTab === 'recent' }"
+            @click="activeTab = 'recent'; confirmingItem = null"
+          >
+            <i class="fa-solid fa-clock-rotate-left"></i> 최근 거래
+          </button>
+          <button
+            class="tab-btn"
+            :class="{ active: activeTab === 'saved' }"
+            @click="activeTab = 'saved'; confirmingItem = null"
+          >
+            <i class="fa-solid fa-bookmark"></i> 저장 거래
+          </button>
+        </div>
+
         <div class="modal-body">
           <!-- 자체 확인(Confirm) 화면 -->
           <div v-if="confirmingItem" class="confirm-view">
@@ -104,58 +139,94 @@ const proceedAdd = async () => {
             </div>
           </div>
 
-          <!-- 최근 내역 리스트 -->
-          <div
-            v-else-if="recentTransactions.length > 0"
-            class="recent-list-container"
-          >
-            <ul class="recent-list">
-              <li
-                v-for="item in recentTransactions"
-                :key="item.id"
-                class="recent-item"
-                @click="handleItemClick(item)"
-              >
-                <div
-                  class="item-icon"
-                  :style="{
-                    backgroundColor: getCategory(item.category_id).color + '1A',
-                    color: getCategory(item.category_id).color,
-                  }"
+          <!-- 최근 거래 탭 -->
+          <template v-else-if="activeTab === 'recent'">
+            <div v-if="recentTransactions.length > 0" class="recent-list-container">
+              <ul class="recent-list">
+                <li
+                  v-for="item in recentTransactions"
+                  :key="item.id"
+                  class="recent-item"
+                  @click="handleItemClick(item)"
                 >
-                  <i
-                    :class="
-                      getCategory(item.category_id).icon || 'fa-solid fa-tag'
-                    "
-                  ></i>
-                </div>
-                <div class="item-info">
-                  <span class="item-desc">{{
-                    item.detail || '내역 없음'
-                  }}</span>
-                  <span class="item-category">{{
-                    getCategory(item.category_id).name || '기타'
-                  }}</span>
-                </div>
-                <div class="item-amount" :class="item.type.toLowerCase()">
-                  {{ item.type === 'EXPENSE' ? '-' : '+'
-                  }}{{ formatAmount(Math.abs(item.amount)) }}원
-                </div>
-              </li>
-            </ul>
-            <div v-if="hasMore" class="load-more-container">
-              <button class="btn-load-more" @click="loadMore">
-                더보기 <i class="fa-solid fa-chevron-down"></i>
-              </button>
+                  <div
+                    class="item-icon"
+                    :style="{
+                      backgroundColor: getCategory(item.category_id).color + '1A',
+                      color: getCategory(item.category_id).color,
+                    }"
+                  >
+                    <i :class="getCategory(item.category_id).icon || 'fa-solid fa-tag'"></i>
+                  </div>
+                  <div class="item-info">
+                    <span class="item-desc">{{ item.detail || '내역 없음' }}</span>
+                    <span class="item-category">{{ getCategory(item.category_id).name || '기타' }}</span>
+                  </div>
+                  <div class="item-amount" :class="item.type.toLowerCase()">
+                    {{ item.type === 'EXPENSE' ? '-' : '+' }}{{ formatAmount(Math.abs(item.amount)) }}원
+                  </div>
+                </li>
+              </ul>
+              <div v-if="hasMore" class="load-more-container">
+                <button class="btn-load-more" @click="loadMore">
+                  더보기 <i class="fa-solid fa-chevron-down"></i>
+                </button>
+              </div>
             </div>
-          </div>
+            <div v-else class="empty-placeholder">
+              <i class="fa-regular fa-clock"></i>
+              <p>최근 거래 내역이 아직 없습니다.</p>
+            </div>
+          </template>
 
-          <!-- 내역이 없을 때 -->
-          <div v-else class="empty-placeholder">
-            <i class="fa-regular fa-clock"></i>
-            <p>최근 거래 내역이 아직 없습니다.</p>
-            <span>자주 쓰는 내역을 여기에 보여드릴 예정입니다.</span>
-          </div>
+          <!-- 저장 거래 탭 -->
+          <template v-else-if="activeTab === 'saved'">
+            <div v-if="templateStore.loading" class="empty-placeholder">
+              <i class="fa-solid fa-spinner fa-spin"></i>
+              <p>불러오는 중...</p>
+            </div>
+            <div v-else-if="templates.length > 0" class="recent-list-container">
+              <ul class="recent-list">
+                <li
+                  v-for="template in templates"
+                  :key="template.id"
+                  class="recent-item"
+                  @click="handleItemClick(template)"
+                >
+                  <div
+                    class="item-icon"
+                    :style="{
+                      backgroundColor: getCategory(template.category_id).color + '1A',
+                      color: getCategory(template.category_id).color,
+                    }"
+                  >
+                    <i :class="getCategory(template.category_id).icon || 'fa-solid fa-tag'"></i>
+                  </div>
+                  <div class="item-info">
+                    <span class="item-desc">{{ template.detail || '내역 없음' }}</span>
+                    <span class="item-category">{{ getCategory(template.category_id).name || '기타' }}</span>
+                  </div>
+                  <div class="item-right">
+                    <div class="item-amount" :class="template.type.toLowerCase()">
+                      {{ template.type === 'EXPENSE' ? '-' : '+' }}{{ formatAmount(Math.abs(template.amount)) }}원
+                    </div>
+                    <button
+                      class="template-delete-btn"
+                      @click="handleTemplateDelete($event, template.id)"
+                      title="삭제"
+                    >
+                      <i class="fa-solid fa-xmark"></i>
+                    </button>
+                  </div>
+                </li>
+              </ul>
+            </div>
+            <div v-else class="empty-placeholder">
+              <i class="fa-regular fa-bookmark"></i>
+              <p>저장된 거래가 없습니다.</p>
+              <span>거래 추가 시 북마크 버튼을 눌러 저장해보세요.</span>
+            </div>
+          </template>
         </div>
       </div>
     </div>
@@ -180,7 +251,7 @@ const proceedAdd = async () => {
   background: white;
   border-radius: 16px;
   width: 90%;
-  max-width: 400px;
+  max-width: 560px;
   box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
   overflow: hidden;
 }
@@ -189,7 +260,7 @@ const proceedAdd = async () => {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 20px 24px;
+  padding: 22px 32px;
   border-bottom: 1px solid #f0f0f0;
 }
 
@@ -207,10 +278,39 @@ const proceedAdd = async () => {
   cursor: pointer;
 }
 
+/* 탭 바 */
+.tab-bar {
+  display: flex;
+  border-bottom: 1px solid #f0f0f0;
+}
+.tab-btn {
+  flex: 1;
+  padding: 12px 0;
+  background: none;
+  border: none;
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: #aaa;
+  cursor: pointer;
+  border-bottom: 2px solid transparent;
+  transition: color 0.2s, border-color 0.2s;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+}
+.tab-btn.active {
+  color: #00bc7c;
+  border-bottom-color: #00bc7c;
+}
+.tab-btn:hover:not(.active) {
+  color: #555;
+}
+
 .modal-body {
-  padding: 24px;
-  min-height: 200px;
-  max-height: 60vh;
+  padding: 28px 32px;
+  min-height: 240px;
+  max-height: 65vh;
   overflow-y: auto;
   display: flex;
   flex-direction: column;
@@ -256,8 +356,8 @@ const proceedAdd = async () => {
   display: flex;
   align-items: center;
   gap: 16px;
-  padding: 14px 12px;
-  margin: 0 -12px;
+  padding: 16px 14px;
+  margin: 0 -14px;
   border-bottom: 1px solid #f5f5f5;
   cursor: pointer;
   transition: background-color 0.2s ease;
@@ -272,6 +372,7 @@ const proceedAdd = async () => {
 .item-icon {
   width: 44px;
   height: 44px;
+  flex-shrink: 0;
   border-radius: 50%;
   display: flex;
   align-items: center;
@@ -283,7 +384,7 @@ const proceedAdd = async () => {
   display: flex;
   flex-direction: column;
   gap: 4px;
-  min-width: 0; /* 텍스트가 길어질 때 컨테이너 밖으로 넘어가지 않게 제한 */
+  min-width: 0;
 }
 .item-category {
   font-size: 0.85rem;
@@ -297,6 +398,13 @@ const proceedAdd = async () => {
   overflow: hidden;
   text-overflow: ellipsis;
 }
+.item-right {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 4px;
+  flex-shrink: 0;
+}
 .item-amount {
   font-weight: 700;
   font-size: 1.05rem;
@@ -307,17 +415,34 @@ const proceedAdd = async () => {
 .item-amount.income {
   color: #00cfe8;
 }
+.template-delete-btn {
+  background: none;
+  border: none;
+  color: #ccc;
+  font-size: 0.8rem;
+  cursor: pointer;
+  padding: 2px 4px;
+  border-radius: 4px;
+  line-height: 1;
+  transition: color 0.2s, background-color 0.2s;
+}
+.template-delete-btn:hover {
+  color: #ea5455;
+  background-color: #fff0f0;
+}
 
 .empty-placeholder {
   text-align: center;
   color: #999;
   margin: auto 0;
+  padding: 24px 0;
 }
 
 .empty-placeholder i {
   font-size: 3rem;
   color: #ddd;
   margin-bottom: 12px;
+  display: inline-block;
 }
 
 .empty-placeholder p {
@@ -422,16 +547,15 @@ const proceedAdd = async () => {
   opacity: 0;
 }
 @keyframes fadeIn {
-  from {
-    opacity: 0;
-  }
-  to {
-    opacity: 1;
-  }
+  from { opacity: 0; }
+  to { opacity: 1; }
 }
 
 /* 반응형 모바일 크기 조정 */
-@media (max-width: 768px) {
+@media (max-width: 600px) {
+  .modal-content {
+    width: 95%;
+  }
   .modal-header {
     padding: 16px 20px;
   }
@@ -481,6 +605,10 @@ const proceedAdd = async () => {
   .btn-submit {
     padding: 12px 0;
     font-size: 0.9rem;
+  }
+  .tab-btn {
+    font-size: 0.85rem;
+    padding: 10px 0;
   }
 }
 </style>

@@ -2,13 +2,17 @@
 import { ref, computed } from "vue";
 import { useAddTransactionStore } from "@/stores/transactions/useAddTransactionStore";
 import { useCategoryStore } from "@/stores/categories/useCategoryStore";
+import { useTransactionTemplateStore } from "@/stores/transactions/useTransactionTemplateStore";
 import { Payments } from "../../constant/paymentMethods";
 import { DatePicker } from "v-calendar";
 import "v-calendar/style.css";
 
 const addTransactionStore = useAddTransactionStore();
 const categoryStore = useCategoryStore();
+const templateStore = useTransactionTemplateStore();
 const formData = addTransactionStore.formData;
+
+const bookmarkOn = ref(false);
 
 const categorizedList = computed(() => {
   return {
@@ -33,7 +37,7 @@ const filterNumber = (event) => {
 
 const memoLength = computed(() => formData.memo.length);
 
-const handleSubmit = () => {
+const handleSubmit = async () => {
   if (!formData.category_id) {
     const defaultCode = formData.type === 'INCOME' ? 'ETC_INCOME' : 'ETC_EXPENSE';
     formData.category_id = categoryStore.categories.find((c) => c.code === defaultCode)?.id;
@@ -44,7 +48,17 @@ const handleSubmit = () => {
   if (!formData.detail) {
     formData.detail = categoryStore.getCategoryById(formData.category_id)?.name;
   }
-  addTransactionStore.submitTransaction();
+
+  // 북마크가 켜져 있으면 제출 전 스냅샷 캡처 (폼은 제출 후 초기화되므로)
+  const shouldSaveTemplate = bookmarkOn.value && !addTransactionStore.isEditMode;
+  const templateSnapshot = shouldSaveTemplate ? { ...formData } : null;
+
+  const isSuccess = await addTransactionStore.submitTransaction();
+
+  if (isSuccess && shouldSaveTemplate) {
+    await templateStore.addTemplate(templateSnapshot);
+    bookmarkOn.value = false;
+  }
 };
 </script>
 
@@ -64,13 +78,24 @@ const handleSubmit = () => {
           }"
         >
           <div class="modal-header">
-            <!-- <h2 class="modal-title">거래 추가</h2> -->
             <h2 class="modal-title">
               {{ addTransactionStore.isEditMode ? "거래 수정" : "거래 추가" }}
             </h2>
-            <button class="close-btn" @click="addTransactionStore.closeModal">
-              <i class="fa-solid fa-xmark"></i>
-            </button>
+            <div class="header-actions">
+              <button
+                v-if="!addTransactionStore.isEditMode"
+                type="button"
+                class="bookmark-btn"
+                :class="{ active: bookmarkOn }"
+                @click="bookmarkOn = !bookmarkOn"
+                :title="bookmarkOn ? '즐겨찾기 저장 켜짐 (추가 시 템플릿 저장)' : '즐겨찾기 저장 꺼짐'"
+              >
+                <i :class="bookmarkOn ? 'fa-solid fa-bookmark' : 'fa-regular fa-bookmark'"></i>
+              </button>
+              <button class="close-btn" @click="addTransactionStore.closeModal">
+                <i class="fa-solid fa-xmark"></i>
+              </button>
+            </div>
           </div>
 
           <form class="form-container" @submit.prevent="handleSubmit">
@@ -298,6 +323,28 @@ const handleSubmit = () => {
   font-size: 1.5rem;
   font-weight: bold;
   margin: 0;
+}
+.header-actions {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+.bookmark-btn {
+  background: none;
+  border: none;
+  font-size: 1.2rem;
+  cursor: pointer;
+  color: var(--color-text-muted);
+  padding: 4px 6px;
+  border-radius: 6px;
+  transition: color 0.2s, background-color 0.2s;
+}
+.bookmark-btn:hover {
+  background-color: var(--color-bg-light);
+  color: var(--color-primary);
+}
+.bookmark-btn.active {
+  color: var(--color-primary);
 }
 .close-btn {
   background: none;

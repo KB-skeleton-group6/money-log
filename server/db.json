@@ -1,4 +1,5 @@
 {
+  "transaction_templates": [],
   "budgets": [],
   "categories": [
     { "id": 1,  "code": "FOOD",         "name": "식비",   "type": "EXPENSE" },

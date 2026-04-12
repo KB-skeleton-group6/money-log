@@ -81,8 +81,10 @@ export const useAddTransactionStore = defineStore("addTransaction", () => {
       if (isSuccess) {
         closeModal();
       }
+      return isSuccess;
     } catch (error) {
       console.error("서버 통신 에러:", error);
+      return false;
     }
   };
 
