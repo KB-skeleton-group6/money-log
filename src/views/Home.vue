@@ -1,25 +1,33 @@
 <script setup>
-import { ref, onMounted, onUnmounted } from "vue";
+import { inject, ref, onMounted, onUnmounted } from "vue";
 import { useRouter } from "vue-router";
-import AuthModal from "@/components/auth/AuthModal.vue";
 import { useAuthStore } from "@/stores/auth/useAuthStore";
 
 const router = useRouter();
 const authStore = useAuthStore();
 const { isLoggedIn } = authStore;
-
-const scrollToSection = (sectionId) => {
-  const element = document.getElementById(sectionId);
-  if (element) {
-    element.scrollIntoView({ behavior: "smooth" });
-  }
-};
+const openAuthModal = inject("openAuthModal", null);
 
 const showScrollTop = ref(false);
-const showAuthModal = ref(false);
 
 const handleScroll = () => {
   showScrollTop.value = window.scrollY > 300;
+};
+
+const handlePrimaryAction = () => {
+  if (isLoggedIn) {
+    router.push("/ledger/dashboard");
+    return;
+  }
+
+  openAuthModal?.();
+};
+
+const scrollToIntro = () => {
+  const element = document.getElementById("intro");
+  if (element) {
+    element.scrollIntoView({ behavior: "smooth" });
+  }
 };
 
 onMounted(() => {
@@ -32,33 +40,6 @@ onUnmounted(() => {
 
 <template>
   <div class="landing-page">
-    <!-- 네비게이션 바 -->
-    <header class="navbar">
-      <div class="logo"><i class="fa-solid fa-wallet"></i>머니로그</div>
-
-      <nav class="nav-menu">
-        <button @click="scrollToSection('intro')">소개</button>
-        <button @click="scrollToSection('features')">핵심 기능</button>
-        <button @click="scrollToSection('preview')">실제 화면</button>
-      </nav>
-
-      <button
-        v-if="!isLoggedIn"
-        class="login-btn"
-        @click="showAuthModal = true"
-      >
-        로그인
-      </button>
-      <button
-        v-else
-        class="login-btn"
-        @click="router.push('/ledger/dashboard')"
-      >
-        대시보드
-      </button>
-    </header>
-
-    <!-- 메인 히어로 섹션 -->
     <main id="intro" class="hero-section">
       <div class="hero-content">
         <span class="badge">스마트한 가계부</span>
@@ -70,7 +51,7 @@ onUnmounted(() => {
         <button
           v-if="!isLoggedIn"
           class="cta-btn"
-          @click="showAuthModal = true"
+          @click="handlePrimaryAction"
         >
           지금 바로 시작하기
         </button>
@@ -88,26 +69,22 @@ onUnmounted(() => {
         </div>
       </div>
 
-      <!-- 스크롤 유도 애니메이션 -->
       <div class="scroll-indicator">
         <i class="fa-solid fa-chevron-down"></i>
       </div>
     </main>
 
-    <!-- 기능 소개 섹션 -->
     <section id="features" class="features-section">
       <div class="features-header">
         <h2>- 핵심 기능 -</h2>
         <p>복잡한 자산 관리를 쉽고 간편하게 만들어주는 기능을 만나보세요.</p>
       </div>
       <div class="features-grid">
-        <!-- Feature 1 -->
         <div class="feature-card">
           <div class="feature-icon"><i class="fa-solid fa-chart-line"></i></div>
           <h3>한눈에 보는 대시보드</h3>
           <p>수입과 지출 흐름을 달력과 차트로 직관적으로 파악할 수 있습니다.</p>
         </div>
-        <!-- Feature 2 -->
         <div class="feature-card">
           <div class="feature-icon"><i class="fa-solid fa-chart-pie"></i></div>
           <h3>상세한 통계 분석</h3>
@@ -115,7 +92,6 @@ onUnmounted(() => {
             카테고리별, 기간별 통계를 통해 나의 소비 패턴을 정확하게 분석합니다.
           </p>
         </div>
-        <!-- Feature 3 -->
         <div class="feature-card">
           <div class="feature-icon"><i class="fa-solid fa-list-check"></i></div>
           <h3>간편한 내역 관리</h3>
@@ -124,7 +100,6 @@ onUnmounted(() => {
       </div>
     </section>
 
-    <!-- 실제 화면 프리뷰 섹션 -->
     <section id="preview" class="preview-section">
       <div class="preview-header">
         <h2>- 실제 화면 -</h2>
@@ -132,7 +107,6 @@ onUnmounted(() => {
       </div>
       <div class="preview-content">
         <div class="mockup-window">
-          <!-- 추후 실제 대시보드 캡처 이미지로 교체할 영역 -->
           <div class="mockup-placeholder">
             <i class="fa-solid fa-laptop-code"></i>
             <p>대시보드 화면 캡처가 들어갈 자리입니다.</p>
@@ -141,73 +115,20 @@ onUnmounted(() => {
       </div>
     </section>
 
-    <!-- 최상단으로 이동 버튼 -->
     <button
       v-if="showScrollTop"
       class="scroll-top-btn"
-      @click="scrollToSection('intro')"
+      @click="scrollToIntro"
     >
       <i class="fa-solid fa-arrow-up"></i>
     </button>
-
-    <!-- 로그인/회원가입 모달 -->
-    <AuthModal v-if="showAuthModal" @close="showAuthModal = false" />
   </div>
 </template>
 
 <style scoped>
 .landing-page {
-  min-height: 100vh;
-  background-color: #f8f9fa;
   display: flex;
   flex-direction: column;
-}
-
-/* 네비게이션 바 */
-.navbar {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 20px 50px;
-  background: white;
-  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
-}
-.logo {
-  font-size: 1.5rem;
-  font-weight: 800;
-  color: #20bf6b;
-}
-
-/* 중앙 네비게이션 메뉴 */
-.nav-menu {
-  display: flex;
-  gap: 30px;
-}
-.nav-menu button {
-  background: none;
-  border: none;
-  font-size: 1rem;
-  font-weight: 600;
-  color: #2f3542;
-  cursor: pointer;
-  transition: color 0.2s;
-}
-.nav-menu button:hover {
-  color: #20bf6b;
-}
-
-.login-btn {
-  padding: 10px 24px;
-  border: none;
-  border-radius: 8px;
-  background-color: #2f3542;
-  color: white;
-  font-weight: 600;
-  cursor: pointer;
-  transition: background-color 0.2s;
-}
-.login-btn:hover {
-  background-color: #57606f;
 }
 
 /* 히어로 섹션 */
@@ -479,9 +400,6 @@ onUnmounted(() => {
 }
 
 @media (max-width: 768px) {
-  .navbar {
-    padding: 15px 20px;
-  }
   .title {
     font-size: 2.2rem;
   }
@@ -492,9 +410,6 @@ onUnmounted(() => {
     width: 240px;
     height: 240px;
     font-size: 5rem;
-  }
-  .nav-menu {
-    display: none; /* 모바일 환경에서는 텍스트 메뉴를 임시로 숨김 */
   }
   .features-grid {
     grid-template-columns: 1fr;

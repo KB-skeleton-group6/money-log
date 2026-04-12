@@ -1,7 +1,6 @@
 import "@/assets/main.css";
 
 import { createRouter, createWebHistory } from "vue-router";
-import Home from "@/views/Home.vue";
 import { useAuthStore } from "@/stores/auth/useAuthStore";
 
 const router = createRouter({
@@ -9,8 +8,19 @@ const router = createRouter({
   routes: [
     {
       path: "/",
-      name: "Home",
-      component: Home,
+      component: () => import("@/layouts/LandingLayout.vue"),
+      children: [
+        {
+          path: "",
+          name: "Home",
+          component: () => import("@/views/Home.vue"),
+        },
+        {
+          path: ":pathMatch(.*)*",
+          name: "NotFound",
+          component: () => import("@/views/NotFound.vue"),
+        },
+      ],
     },
     {
       path: "/ledger",
