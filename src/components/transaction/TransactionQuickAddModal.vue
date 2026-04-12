@@ -56,6 +56,8 @@ const proceedAdd = async () => {
     amount: confirmingItem.value.amount,
     category_id: confirmingItem.value.category_id,
     detail: confirmingItem.value.detail,
+    memo: confirmingItem.value.memo ?? "",
+    payment: confirmingItem.value.payment ?? "CREDIT_CARD",
     transacted_at: new Date().toISOString(), // 날짜/시간은 현재 시점으로 갱신
   };
 

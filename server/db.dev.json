@@ -1,7 +1,7 @@
 {
   "members": [
     {
-      "id": 1,
+      "id": "1",
       "email": "test@example.com",
       "password": "test1234@",
       "name": "테스트 유저",
@@ -10,497 +10,574 @@
   ],
   "categories": [
     {
-      "id": 1,
+      "id": "1",
       "code": "FOOD",
       "name": "식비",
       "type": "EXPENSE"
     },
     {
-      "id": 2,
+      "id": "2",
       "code": "CAFE",
       "name": "카페",
       "type": "EXPENSE"
     },
     {
-      "id": 3,
+      "id": "3",
       "code": "TRANSPORT",
       "name": "교통",
       "type": "EXPENSE"
     },
     {
-      "id": 4,
+      "id": "4",
       "code": "SHOPPING",
       "name": "쇼핑",
       "type": "EXPENSE"
     },
     {
-      "id": 5,
+      "id": "5",
       "code": "GROCERIES",
       "name": "식료품",
       "type": "EXPENSE"
     },
     {
-      "id": 6,
+      "id": "6",
       "code": "SUBSCRIPTION",
       "name": "구독",
       "type": "EXPENSE"
     },
     {
-      "id": 7,
+      "id": "7",
       "code": "HEALTH",
       "name": "건강",
       "type": "EXPENSE"
     },
     {
-      "id": 8,
+      "id": "8",
       "code": "EDUCATION",
       "name": "교육",
       "type": "EXPENSE"
     },
     {
-      "id": 9,
+      "id": "9",
       "code": "LEISURE",
       "name": "여가",
       "type": "EXPENSE"
     },
     {
-      "id": 10,
+      "id": "10",
       "code": "ETC_EXPENSE",
       "name": "기타",
       "type": "EXPENSE"
     },
     {
-      "id": 11,
+      "id": "11",
       "code": "SALARY",
       "name": "급여",
       "type": "INCOME"
     },
     {
-      "id": 12,
+      "id": "12",
       "code": "SIDE_JOB",
       "name": "부업",
       "type": "INCOME"
     },
     {
-      "id": 13,
+      "id": "13",
       "code": "INVESTMENT",
       "name": "투자",
       "type": "INCOME"
     },
     {
-      "id": 14,
+      "id": "14",
       "code": "ALLOWANCE",
       "name": "용돈",
       "type": "INCOME"
     },
     {
-      "id": 15,
+      "id": "15",
       "code": "ETC_INCOME",
       "name": "기타",
       "type": "INCOME"
     }
   ],
+  "payments": [
+    {
+      "id": 1,
+      "code": "CREDIT_CARD",
+      "name": "신용카드"
+    },
+    {
+      "id": 2,
+      "code": "CHECK_CARD",
+      "name": "체크카드"
+    },
+    {
+      "id": 3,
+      "code": "CASH",
+      "name": "현금"
+    },
+    {
+      "id": 4,
+      "code": "BANK_TRANSFER",
+      "name": "계좌이체"
+    },
+    {
+      "id": 5,
+      "code": "EASY_PAY",
+      "name": "간편결제"
+    }
+  ],
   "budgets": [
     {
-      "user_id": 1,
-      "category_id": 1,
-      "amount": 1000000,
+      "user_id": "1",
+      "category_id": "1",
+      "amount": 10000,
       "id": 1
     },
     {
-      "user_id": 1,
-      "category_id": 2,
+      "user_id": "1",
+      "category_id": "2",
       "amount": 0,
       "id": 2
     },
     {
-      "user_id": 1,
-      "category_id": 3,
+      "user_id": "1",
+      "category_id": "3",
       "amount": 50000,
       "id": 3
     },
     {
-      "user_id": 1,
-      "category_id": 4,
+      "user_id": "1",
+      "category_id": "4",
       "amount": 0,
       "id": 4
     },
     {
-      "user_id": 1,
-      "category_id": 5,
+      "user_id": "1",
+      "category_id": "5",
       "amount": 0,
       "id": 5
     },
     {
-      "user_id": 1,
-      "category_id": 6,
+      "user_id": "1",
+      "category_id": "6",
       "amount": 0,
       "id": 6
     },
     {
-      "user_id": 1,
-      "category_id": 7,
+      "user_id": "1",
+      "category_id": "7",
       "amount": 0,
       "id": 7
     },
     {
-      "user_id": 1,
-      "category_id": 8,
+      "user_id": "1",
+      "category_id": "8",
       "amount": 0,
       "id": 8
     },
     {
-      "user_id": 1,
-      "category_id": 9,
+      "user_id": "1",
+      "category_id": "9",
       "amount": 0,
       "id": 9
     },
     {
-      "user_id": 1,
-      "category_id": 10,
+      "user_id": "1",
+      "category_id": "10",
       "amount": 0,
       "id": 10
     }
   ],
   "transactions": [
     {
-      "id": 1,
+      "id": "1",
       "user_id": 1,
       "type": "INCOME",
       "amount": 3000000,
       "category_id": 11,
       "detail": "2월 급여",
       "memo": "",
-      "method": "TRANSFER",
       "transacted_at": "2026-02-01T09:00:00.000Z",
-      "created_at": "2026-02-01T09:00:00.000Z"
+      "created_at": "2026-02-01T09:00:00.000Z",
+      "payment": null
     },
     {
-      "id": 2,
+      "id": "2",
       "user_id": 1,
       "type": "EXPENSE",
       "amount": 9500,
       "category_id": 1,
       "detail": "점심 식사",
       "memo": "",
-      "method": "CARD",
       "transacted_at": "2026-02-03T12:30:00.000Z",
-      "created_at": "2026-02-03T12:30:00.000Z"
+      "created_at": "2026-02-03T12:30:00.000Z",
+      "payment": "CREDIT_CARD"
     },
     {
-      "id": 3,
+      "id": "3",
       "user_id": 1,
       "type": "EXPENSE",
       "amount": 4500,
       "category_id": 2,
       "detail": "아메리카노",
       "memo": "",
-      "method": "CARD",
       "transacted_at": "2026-02-05T08:45:00.000Z",
-      "created_at": "2026-02-05T08:45:00.000Z"
+      "created_at": "2026-02-05T08:45:00.000Z",
+      "payment": "CREDIT_CARD"
     },
     {
-      "id": 4,
+      "id": "4",
       "user_id": 1,
       "type": "EXPENSE",
       "amount": 13900,
       "category_id": 6,
       "detail": "넷플릭스",
       "memo": "",
-      "method": "CARD",
       "transacted_at": "2026-02-10T00:00:00.000Z",
-      "created_at": "2026-02-10T00:00:00.000Z"
+      "created_at": "2026-02-10T00:00:00.000Z",
+      "payment": "CREDIT_CARD"
     },
     {
-      "id": 5,
+      "id": "5",
       "user_id": 1,
       "type": "EXPENSE",
       "amount": 52000,
       "category_id": 5,
       "detail": "마트 장보기",
       "memo": "",
-      "method": "CARD",
       "transacted_at": "2026-02-15T16:00:00.000Z",
-      "created_at": "2026-02-15T16:00:00.000Z"
+      "created_at": "2026-02-15T16:00:00.000Z",
+      "payment": "CREDIT_CARD"
     },
     {
-      "id": 6,
+      "id": "6",
       "user_id": 1,
       "type": "EXPENSE",
       "amount": 3000,
       "category_id": 3,
       "detail": "지하철",
       "memo": "",
-      "method": "CARD",
       "transacted_at": "2026-02-18T07:30:00.000Z",
-      "created_at": "2026-02-18T07:30:00.000Z"
+      "created_at": "2026-02-18T07:30:00.000Z",
+      "payment": "CREDIT_CARD"
     },
     {
-      "id": 7,
+      "id": "7",
       "user_id": 1,
       "type": "EXPENSE",
       "amount": 120000,
       "category_id": 4,
       "detail": "겨울 옷 정리",
       "memo": "세일 구매",
-      "method": "CARD",
       "transacted_at": "2026-02-22T14:00:00.000Z",
-      "created_at": "2026-02-22T14:00:00.000Z"
+      "created_at": "2026-02-22T14:00:00.000Z",
+      "payment": "CREDIT_CARD"
     },
     {
-      "id": 8,
+      "id": "8",
       "user_id": 1,
       "type": "INCOME",
       "amount": 3000000,
       "category_id": 11,
       "detail": "3월 급여",
       "memo": "",
-      "method": "TRANSFER",
       "transacted_at": "2026-03-01T09:00:00.000Z",
-      "created_at": "2026-03-01T09:00:00.000Z"
+      "created_at": "2026-03-01T09:00:00.000Z",
+      "payment": null
     },
     {
-      "id": 9,
+      "id": "9",
       "user_id": 1,
       "type": "INCOME",
       "amount": 300000,
       "category_id": 12,
       "detail": "프리랜서 수입",
       "memo": "",
-      "method": "TRANSFER",
       "transacted_at": "2026-03-05T10:00:00.000Z",
-      "created_at": "2026-03-05T10:00:00.000Z"
+      "created_at": "2026-03-05T10:00:00.000Z",
+      "payment": null
     },
     {
-      "id": 10,
+      "id": "10",
       "user_id": 1,
       "type": "EXPENSE",
       "amount": 11000,
       "category_id": 1,
       "detail": "저녁 식사",
       "memo": "",
-      "method": "CARD",
       "transacted_at": "2026-03-07T19:00:00.000Z",
-      "created_at": "2026-03-07T19:00:00.000Z"
+      "created_at": "2026-03-07T19:00:00.000Z",
+      "payment": "CREDIT_CARD"
     },
     {
-      "id": 11,
+      "id": "11",
       "user_id": 1,
       "type": "EXPENSE",
       "amount": 5500,
       "category_id": 2,
       "detail": "카페라떼",
       "memo": "",
-      "method": "CARD",
       "transacted_at": "2026-03-10T09:00:00.000Z",
-      "created_at": "2026-03-10T09:00:00.000Z"
+      "created_at": "2026-03-10T09:00:00.000Z",
+      "payment": "CREDIT_CARD"
     },
     {
-      "id": 12,
+      "id": "12",
       "user_id": 1,
       "type": "EXPENSE",
       "amount": 13900,
       "category_id": 6,
       "detail": "넷플릭스",
       "memo": "",
-      "method": "CARD",
       "transacted_at": "2026-03-10T00:00:00.000Z",
-      "created_at": "2026-03-10T00:00:00.000Z"
+      "created_at": "2026-03-10T00:00:00.000Z",
+      "payment": "CREDIT_CARD"
     },
     {
-      "id": 13,
+      "id": "13",
       "user_id": 1,
       "type": "EXPENSE",
       "amount": 25000,
       "category_id": 7,
       "detail": "병원비",
       "memo": "",
-      "method": "CARD",
       "transacted_at": "2026-03-14T11:00:00.000Z",
-      "created_at": "2026-03-14T11:00:00.000Z"
+      "created_at": "2026-03-14T11:00:00.000Z",
+      "payment": "CREDIT_CARD"
     },
     {
-      "id": 14,
+      "id": "14",
       "user_id": 1,
       "type": "EXPENSE",
       "amount": 48000,
       "category_id": 5,
       "detail": "마트 장보기",
       "memo": "",
-      "method": "CASH",
       "transacted_at": "2026-03-20T15:00:00.000Z",
-      "created_at": "2026-03-20T15:00:00.000Z"
+      "created_at": "2026-03-20T15:00:00.000Z",
+      "payment": "CASH"
     },
     {
-      "id": 15,
+      "id": "15",
       "user_id": 1,
       "type": "EXPENSE",
       "amount": 40000,
       "category_id": 9,
       "detail": "영화 & 볼링",
       "memo": "친구들이랑",
-      "method": "CARD",
       "transacted_at": "2026-03-28T18:00:00.000Z",
-      "created_at": "2026-03-28T18:00:00.000Z"
+      "created_at": "2026-03-28T18:00:00.000Z",
+      "payment": "CREDIT_CARD"
     },
     {
-      "id": 16,
+      "id": "16",
       "user_id": 1,
       "type": "INCOME",
       "amount": 3000000,
       "category_id": 11,
       "detail": "4월 급여",
       "memo": "",
-      "method": "TRANSFER",
       "transacted_at": "2026-04-01T09:00:00.000Z",
-      "created_at": "2026-04-01T09:00:00.000Z"
+      "created_at": "2026-04-01T09:00:00.000Z",
+      "payment": null
     },
     {
-      "id": 17,
+      "id": "17",
       "user_id": 1,
       "type": "EXPENSE",
       "amount": 12000,
       "category_id": 1,
       "detail": "점심 식사",
       "memo": "팀 점심",
-      "method": "CARD",
       "transacted_at": "2026-04-02T12:30:00.000Z",
-      "created_at": "2026-04-02T12:30:00.000Z"
+      "created_at": "2026-04-02T12:30:00.000Z",
+      "payment": "CREDIT_CARD"
     },
     {
-      "id": 18,
+      "id": "18",
       "user_id": 1,
       "type": "EXPENSE",
       "amount": 4500,
       "category_id": 2,
       "detail": "아메리카노",
       "memo": "",
-      "method": "CARD",
       "transacted_at": "2026-04-03T08:45:00.000Z",
-      "created_at": "2026-04-03T08:45:00.000Z"
+      "created_at": "2026-04-03T08:45:00.000Z",
+      "payment": "CREDIT_CARD"
     },
     {
-      "id": 19,
+      "id": "19",
       "user_id": 1,
       "type": "EXPENSE",
       "amount": 1500,
       "category_id": 3,
       "detail": "버스",
       "memo": "",
-      "method": "CARD",
       "transacted_at": "2026-04-04T07:30:00.000Z",
-      "created_at": "2026-04-04T07:30:00.000Z"
+      "created_at": "2026-04-04T07:30:00.000Z",
+      "payment": "CREDIT_CARD"
     },
     {
-      "id": 20,
+      "id": "20",
       "user_id": 1,
       "type": "EXPENSE",
       "amount": 13900,
       "category_id": 6,
       "detail": "넷플릭스",
       "memo": "",
-      "method": "CARD",
       "transacted_at": "2026-04-05T00:00:00.000Z",
-      "created_at": "2026-04-05T00:00:00.000Z"
+      "created_at": "2026-04-05T00:00:00.000Z",
+      "payment": "CREDIT_CARD"
     },
     {
-      "id": 21,
+      "id": "21",
       "user_id": 1,
       "type": "EXPENSE",
       "amount": 45000,
       "category_id": 5,
       "detail": "마트 장보기",
       "memo": "",
-      "method": "CARD",
       "transacted_at": "2026-04-06T16:00:00.000Z",
-      "created_at": "2026-04-06T16:00:00.000Z"
+      "created_at": "2026-04-06T16:00:00.000Z",
+      "payment": "CREDIT_CARD"
     },
     {
-      "id": 22,
+      "id": "22",
       "user_id": 1,
       "type": "INCOME",
       "amount": 200000,
       "category_id": 12,
       "detail": "프리랜서 수입",
       "memo": "",
-      "method": "TRANSFER",
       "transacted_at": "2026-04-08T10:00:00.000Z",
-      "created_at": "2026-04-08T10:00:00.000Z"
+      "created_at": "2026-04-08T10:00:00.000Z",
+      "payment": null
     },
     {
-      "id": 23,
+      "id": "23",
       "user_id": 1,
       "type": "EXPENSE",
       "amount": 89000,
       "category_id": 4,
       "detail": "봄 옷 구매",
       "memo": "",
-      "method": "CARD",
       "transacted_at": "2026-04-09T14:00:00.000Z",
-      "created_at": "2026-04-09T14:00:00.000Z"
+      "created_at": "2026-04-09T14:00:00.000Z",
+      "payment": "CREDIT_CARD"
     },
     {
-      "id": 24,
+      "id": "24",
       "user_id": 1,
       "type": "EXPENSE",
       "amount": 15000,
       "category_id": 7,
       "detail": "약국",
       "memo": "",
-      "method": "CASH",
       "transacted_at": "2026-04-10T11:00:00.000Z",
-      "created_at": "2026-04-10T11:00:00.000Z"
+      "created_at": "2026-04-10T11:00:00.000Z",
+      "payment": "CASH"
     },
     {
-      "id": 25,
+      "id": "25",
       "user_id": 1,
       "type": "EXPENSE",
       "amount": 32000,
       "category_id": 9,
       "detail": "영화 관람",
       "memo": "친구랑",
-      "method": "CARD",
       "transacted_at": "2026-04-11T19:00:00.000Z",
-      "created_at": "2026-04-11T19:00:00.000Z"
+      "created_at": "2026-04-11T19:00:00.000Z",
+      "payment": "CREDIT_CARD"
     },
     {
       "type": "EXPENSE",
+      "transacted_at": "2026-04-12T15:00:00.000Z",
       "amount": 1500,
-      "category_id": 3,
+      "category_id": "2",
       "detail": "버스",
-      "transacted_at": "2026-04-12T15:44:36.534Z",
-      "user_id": 1,
-      "id": 26
+      "memo": "",
+      "user_id": "1",
+      "id": "RvSsKzGQBDQ",
+      "displayTime": "00:44",
+      "created_at": "2026-04-12T19:19:41.167Z",
+      "payment": "EASY_PAY"
     },
     {
       "type": "EXPENSE",
       "transacted_at": "2026-04-12T00:00:00.000Z",
       "amount": 50000,
-      "category_id": 8,
+      "category_id": "8",
       "detail": "교육",
       "memo": "",
-      "method": "CARD",
       "created_at": "2026-04-12T15:45:15.557Z",
-      "user_id": 1,
-      "id": 27
+      "user_id": "1",
+      "id": "oZLDgG7UL-A",
+      "payment": "CREDIT_CARD"
     },
     {
       "type": "EXPENSE",
+      "transacted_at": "2026-04-12T00:00:00.000Z",
       "amount": 15000,
       "category_id": 7,
       "detail": "약국",
-      "transacted_at": "2026-04-12T15:45:25.665Z",
-      "user_id": 1,
-      "id": 28
+      "memo": "",
+      "user_id": "1",
+      "id": "lk2ttVNnWyE",
+      "displayTime": "00:45",
+      "created_at": "2026-04-12T19:19:08.211Z",
+      "payment": "CHECK_CARD"
     },
     {
       "type": "EXPENSE",
+      "transacted_at": "2026-04-12T00:00:00.000Z",
+      "amount": 3000,
+      "category_id": 3,
+      "detail": "버스",
+      "memo": "",
+      "created_at": "2026-04-12T18:13:07.960Z",
+      "user_id": "1",
+      "id": "qSKHVC8",
+      "displayTime": "02:29",
+      "payment": "CREDIT_CARD"
+    },
+    {
+      "type": "EXPENSE",
+      "transacted_at": "2026-04-12T00:00:00.000Z",
       "amount": 1500,
       "category_id": 3,
       "detail": "버스",
-      "transacted_at": "2026-04-12T17:29:02.259Z",
-      "user_id": 1,
-      "id": 29
+      "memo": "",
+      "user_id": "1",
+      "id": "8adBnYt",
+      "displayTime": "02:57",
+      "created_at": "2026-04-12T19:19:01.344Z",
+      "payment": "CREDIT_CARD"
+    },
+    {
+      "type": "INCOME",
+      "transacted_at": "2026-04-12T15:00:00.000Z",
+      "amount": 3000,
+      "category_id": "3",
+      "detail": "교통",
+      "memo": "",
+      "created_at": "2026-04-12T18:13:21.276Z",
+      "user_id": "1",
+      "id": "m2_ychF",
+      "displayTime": "09:00",
+      "payment": null
+    },
+    {
+      "type": "EXPENSE",
+      "transacted_at": "2026-04-12T15:00:00.000Z",
+      "amount": 3000,
+      "category_id": "6",
+      "detail": "구독",
+      "memo": "",
+      "created_at": "2026-04-12T19:22:22.978Z",
+      "user_id": "1",
+      "id": "uDGFmDL",
+      "payment": "CREDIT_CARD"
     }
   ],
   "$schema": "./node_modules/json-server/schema.json"

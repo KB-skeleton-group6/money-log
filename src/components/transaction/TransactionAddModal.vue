@@ -1,27 +1,22 @@
 <script setup>
-import { ref, computed } from "vue";
+import { computed } from "vue";
+import { storeToRefs } from "pinia";
 import { useAddTransactionStore } from "@/stores/transactions/useAddTransactionStore";
 import { useCategoryStore } from "@/stores/categories/useCategoryStore";
-import { Payments } from "../../constant/paymentMethods";
+import { usePaymentMethodStore } from "@/stores/payments/usePaymentMethodStore";
 import { DatePicker } from "v-calendar";
 import "v-calendar/style.css";
 
 const addTransactionStore = useAddTransactionStore();
 const categoryStore = useCategoryStore();
+const paymentMethodStore = usePaymentMethodStore();
+const { paymentMethods } = storeToRefs(paymentMethodStore);
 const formData = addTransactionStore.formData;
 
 const categorizedList = computed(() => {
   return {
     INCOME: categoryStore.categories.filter((cat) => cat.type === "INCOME"),
     EXPENSE: categoryStore.categories.filter((cat) => cat.type === "EXPENSE"),
-  };
-});
-
-const paymentMethods = computed(() => {
-  const allList = Object.values(Payments);
-
-  return {
-    ALL: allList,
   };
 });
 
@@ -43,6 +38,9 @@ const handleSubmit = () => {
   }
   if (!formData.detail) {
     formData.detail = categoryStore.getCategoryById(formData.category_id)?.name;
+  }
+  if (formData.type !== 'EXPENSE') {
+    formData.payment = null;
   }
   addTransactionStore.submitTransaction();
 };
@@ -173,15 +171,15 @@ const handleSubmit = () => {
               </div>
             </div>
 
-            <div class="form-group">
+            <div class="form-group" v-if="formData.type === 'EXPENSE'">
               <label class="form-label">결제 수단</label>
               <div class="pills-container">
                 <div
-                  v-for="method in paymentMethods.ALL"
+                  v-for="method in paymentMethods"
                   :key="method.id"
                   class="pill-item"
-                  :class="{ selected: method.value == formData.method }"
-                  @click="formData.method = method.value"
+                  :class="{ selected: method.code === formData.payment }"
+                  @click="formData.payment = method.code"
                 >
                   {{ method.name }}
                 </div>

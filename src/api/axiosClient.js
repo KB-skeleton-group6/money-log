@@ -144,6 +144,14 @@ async function getCategories() {
   return res.data;
 }
 
+async function getPayments() {
+  const res = await axios.get(`${urlPrefix}/payments`);
+
+  checkRequestFailed(res.status, ErrorCode.FETCH_FAILED);
+
+  return res.data;
+}
+
 async function getBudgets(userId) {
   const res = await axios.get(`${urlPrefix}/budgets`, {
     params: { user_id: userId },
@@ -192,10 +200,14 @@ const categoryApi = {
   getCategories,
 };
 
+const paymentApi = {
+  getPayments,
+};
+
 const budgetApi = {
   getBudgets,
   createBudget,
   updateBudget,
 };
 
-export default { memberApi, transactionApi, categoryApi, budgetApi };
+export default { memberApi, transactionApi, categoryApi, paymentApi, budgetApi };
