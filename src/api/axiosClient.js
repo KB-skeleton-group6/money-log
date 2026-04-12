@@ -178,6 +178,30 @@ async function updateBudget(id, budget) {
   return res.data;
 }
 
+async function getTransactionTemplatesByUserId(userId) {
+  const res = await axios.get(`${urlPrefix}/transaction_templates`, {
+    params: { user_id: userId },
+  });
+
+  checkRequestFailed(res.status, ErrorCode.FETCH_FAILED);
+
+  return res.data;
+}
+
+async function createTransactionTemplate(template) {
+  const res = await axios.post(`${urlPrefix}/transaction_templates`, template);
+
+  checkRequestFailed(res.status, ErrorCode.SAVE_FAILED);
+
+  return res.data;
+}
+
+async function deleteTransactionTemplate(templateId) {
+  const res = await axios.delete(`${urlPrefix}/transaction_templates/${templateId}`);
+
+  checkRequestFailed(res.status, ErrorCode.FETCH_FAILED);
+}
+
 const memberApi = {
   getMembers,
   getMember,
@@ -210,4 +234,10 @@ const budgetApi = {
   updateBudget,
 };
 
-export default { memberApi, transactionApi, categoryApi, paymentApi, budgetApi };
+const transactionTemplateApi = {
+  getTransactionTemplatesByUserId,
+  createTransactionTemplate,
+  deleteTransactionTemplate,
+};
+
+export default { memberApi, transactionApi, categoryApi, paymentApi, budgetApi, transactionTemplateApi };

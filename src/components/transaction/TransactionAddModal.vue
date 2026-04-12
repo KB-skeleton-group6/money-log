@@ -1,17 +1,28 @@
 <script setup>
-import { computed } from "vue";
+import { ref, computed } from "vue";
 import { storeToRefs } from "pinia";
+import dayjs from "dayjs";
 import { useAddTransactionStore } from "@/stores/transactions/useAddTransactionStore";
 import { useCategoryStore } from "@/stores/categories/useCategoryStore";
+import { useTransactionTemplateStore } from "@/stores/transactions/useTransactionTemplateStore";
 import { usePaymentMethodStore } from "@/stores/payments/usePaymentMethodStore";
 import { DatePicker } from "v-calendar";
 import "v-calendar/style.css";
 
 const addTransactionStore = useAddTransactionStore();
 const categoryStore = useCategoryStore();
+const templateStore = useTransactionTemplateStore();
 const paymentMethodStore = usePaymentMethodStore();
 const { paymentMethods } = storeToRefs(paymentMethodStore);
 const formData = addTransactionStore.formData;
+
+const bookmarkOn = ref(false);
+const timeExpanded = ref(false);
+
+const handleSetNow = () => {
+  formData.transacted_at = dayjs().format("YYYY-MM-DD");
+  formData.transacted_time = dayjs().format("HH:mm");
+};
 
 const categorizedList = computed(() => {
   return {
@@ -28,7 +39,7 @@ const filterNumber = (event) => {
 
 const memoLength = computed(() => formData.memo.length);
 
-const handleSubmit = () => {
+const handleSubmit = async () => {
   if (!formData.category_id) {
     const defaultCode = formData.type === 'INCOME' ? 'ETC_INCOME' : 'ETC_EXPENSE';
     formData.category_id = categoryStore.categories.find((c) => c.code === defaultCode)?.id;
@@ -42,7 +53,17 @@ const handleSubmit = () => {
   if (formData.type !== 'EXPENSE') {
     formData.payment = null;
   }
-  addTransactionStore.submitTransaction();
+
+  // 북마크가 켜져 있으면 제출 전 스냅샷 캡처 (폼은 제출 후 초기화되므로)
+  const shouldSaveTemplate = bookmarkOn.value && !addTransactionStore.isEditMode;
+  const templateSnapshot = shouldSaveTemplate ? { ...formData } : null;
+
+  const isSuccess = await addTransactionStore.submitTransaction();
+
+  if (isSuccess && shouldSaveTemplate) {
+    await templateStore.addTemplate(templateSnapshot);
+    bookmarkOn.value = false;
+  }
 };
 </script>
 
@@ -62,13 +83,24 @@ const handleSubmit = () => {
           }"
         >
           <div class="modal-header">
-            <!-- <h2 class="modal-title">거래 추가</h2> -->
             <h2 class="modal-title">
               {{ addTransactionStore.isEditMode ? "거래 수정" : "거래 추가" }}
             </h2>
-            <button class="close-btn" @click="addTransactionStore.closeModal">
-              <i class="fa-solid fa-xmark"></i>
-            </button>
+            <div class="header-actions">
+              <button
+                v-if="!addTransactionStore.isEditMode"
+                type="button"
+                class="bookmark-btn"
+                :class="{ active: bookmarkOn }"
+                @click="bookmarkOn = !bookmarkOn"
+                :title="bookmarkOn ? '즐겨찾기 저장 켜짐 (추가 시 템플릿 저장)' : '즐겨찾기 저장 꺼짐'"
+              >
+                <i :class="bookmarkOn ? 'fa-solid fa-bookmark' : 'fa-regular fa-bookmark'"></i>
+              </button>
+              <button class="close-btn" @click="addTransactionStore.closeModal">
+                <i class="fa-solid fa-xmark"></i>
+              </button>
+            </div>
           </div>
 
           <form class="form-container" @submit.prevent="handleSubmit">
@@ -92,25 +124,51 @@ const handleSubmit = () => {
               </div>
             </div>
             <div class="form-group">
-              <label class="form-label">날짜</label>
-              <DatePicker
-                v-model="formData.transacted_at"
-                mode="date"
-                :masks="{ title: 'YYYY년 MMM', modelValue: 'YYYY-MM-DD' }"
-                @dayclick="(day, event) => event.target.blur()"
-              >
-                <template #default="{ inputValue, inputEvents }">
-                  <div class="input-box clickable" v-on="inputEvents">
-                    <i class="fa-solid fa-calendar input-icon"></i>
-                    <input
-                      class="input-control no-border bold"
-                      :value="inputValue"
-                      readonly
-                      placeholder="날짜 선택"
-                    />
-                  </div>
-                </template>
-              </DatePicker>
+              <div class="label-row">
+                <label class="form-label">날짜 / 시간</label>
+                <button type="button" class="now-btn" @click="handleSetNow">
+                  <i class="fa-solid fa-clock-rotate-left"></i> 지금
+                </button>
+              </div>
+              <div class="date-time-row">
+                <DatePicker
+                  :key="formData.transacted_at"
+                  v-model="formData.transacted_at"
+                  mode="date"
+                  :masks="{ title: 'YYYY년 MMM', modelValue: 'YYYY-MM-DD', input: 'YYYY/MM/DD' }"
+                  @dayclick="(day, event) => event.target.blur()"
+                >
+                  <template #default="{ inputValue, inputEvents }">
+                    <div class="input-box clickable" v-on="inputEvents">
+                      <i class="fa-solid fa-calendar input-icon"></i>
+                      <input
+                        class="input-control no-border bold text-center"
+                        :value="inputValue"
+                        readonly
+                        placeholder="날짜 선택"
+                      />
+                    </div>
+                  </template>
+                </DatePicker>
+                <button
+                  type="button"
+                  class="time-toggle-btn"
+                  :class="{ active: timeExpanded }"
+                  @click="timeExpanded = !timeExpanded"
+                >
+                  <i class="fa-regular fa-clock"></i>
+                  <span class="time-toggle-text">{{ formData.transacted_time }}</span>
+                  <i class="fa-solid fa-chevron-down toggle-chevron time-toggle-chevron" :class="{ rotated: timeExpanded }"></i>
+                </button>
+              </div>
+              <div v-if="timeExpanded" class="input-box time-input-box">
+                <i class="fa-regular fa-clock input-icon"></i>
+                <input
+                  type="time"
+                  class="input-control bold"
+                  v-model="formData.transacted_time"
+                />
+              </div>
             </div>
 
             <div class="form-group">
@@ -296,6 +354,28 @@ const handleSubmit = () => {
   font-size: 1.5rem;
   font-weight: bold;
   margin: 0;
+}
+.header-actions {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+.bookmark-btn {
+  background: none;
+  border: none;
+  font-size: 1.2rem;
+  cursor: pointer;
+  color: var(--color-text-muted);
+  padding: 4px 6px;
+  border-radius: 6px;
+  transition: color 0.2s, background-color 0.2s;
+}
+.bookmark-btn:hover {
+  background-color: var(--color-bg-light);
+  color: var(--color-primary);
+}
+.bookmark-btn.active {
+  color: var(--color-primary);
 }
 .close-btn {
   background: none;
@@ -496,6 +576,78 @@ const handleSubmit = () => {
   color: var(--color-bg-white);
 }
 
+.now-btn {
+  all: unset;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: var(--color-primary);
+  cursor: pointer;
+  padding: 3px 8px;
+  border-radius: 20px;
+  border: 1px solid var(--color-primary);
+  transition: 0.2s;
+}
+.now-btn:hover {
+  background-color: var(--color-primary-bg);
+}
+
+.date-time-row {
+  display: flex;
+  gap: 8px;
+  align-items: stretch;
+}
+.date-time-row > :first-child {
+  flex: 1;
+}
+
+.time-toggle-btn {
+  all: unset;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 0 12px;
+  border: 1px solid var(--color-border);
+  border-radius: 10px;
+  background-color: var(--color-bg-white);
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: var(--color-text-muted);
+  cursor: pointer;
+  white-space: nowrap;
+  transition: 0.2s;
+  flex-shrink: 0;
+}
+.time-toggle-btn:hover {
+  border-color: var(--color-primary);
+  color: var(--color-primary);
+}
+.time-toggle-btn.active {
+  border-color: var(--color-primary);
+  color: var(--color-primary);
+  background-color: var(--color-primary-bg);
+}
+.toggle-chevron {
+  font-size: 0.75rem;
+  transition: transform 0.2s;
+}
+.toggle-chevron.rotated {
+  transform: rotate(180deg);
+}
+
+.time-input-box {
+  margin-top: 8px;
+}
+.time-input-box input[type="time"] {
+  cursor: pointer;
+}
+.time-input-box input[type="time"]::-webkit-calendar-picker-indicator {
+  opacity: 0.5;
+  cursor: pointer;
+}
+
 .add-btn {
   all: unset;
   display: flex;
@@ -533,6 +685,16 @@ const handleSubmit = () => {
   }
   .category-item span {
     font-size: 0.75rem;
+  }
+  .time-toggle-text,
+  .time-toggle-chevron {
+    display: none;
+  }
+  .time-toggle-btn {
+    flex-shrink: 0;
+    width: 48px;
+    justify-content: center;
+    padding: 0;
   }
 }
 </style>

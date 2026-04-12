@@ -555,19 +555,6 @@
       "payment": "CREDIT_CARD"
     },
     {
-      "type": "INCOME",
-      "transacted_at": "2026-04-12T15:00:00.000Z",
-      "amount": 3000,
-      "category_id": "3",
-      "detail": "교통",
-      "memo": "",
-      "created_at": "2026-04-12T18:13:21.276Z",
-      "user_id": "1",
-      "id": "m2_ychF",
-      "displayTime": "09:00",
-      "payment": null
-    },
-    {
       "type": "EXPENSE",
       "transacted_at": "2026-04-12T15:00:00.000Z",
       "amount": 3000,
@@ -578,6 +565,67 @@
       "user_id": "1",
       "id": "uDGFmDL",
       "payment": "CREDIT_CARD"
+    },
+    {
+      "type": "EXPENSE",
+      "transacted_at": "2026-04-12T00:00:00.000Z",
+      "amount": 6000,
+      "category_id": "5",
+      "detail": "간식",
+      "memo": "",
+      "payment": "CREDIT_CARD",
+      "created_at": "2026-04-12T20:10:29.651Z",
+      "user_id": "1",
+      "id": "CLjitN3"
+    },
+    {
+      "type": "EXPENSE",
+      "transacted_at": "2026-04-13T02:54:00.000Z",
+      "amount": 500000,
+      "category_id": "7",
+      "detail": "건강보험",
+      "memo": "",
+      "payment": "BANK_TRANSFER",
+      "created_at": "2026-04-12T20:54:28.475Z",
+      "user_id": "1",
+      "id": "Jagjx8A",
+      "displayTime": "00:00"
+    },
+    {
+      "type": "EXPENSE",
+      "transacted_at": "2026-04-12T15:00:00.000Z",
+      "amount": 20000,
+      "category_id": "8",
+      "detail": "책",
+      "memo": "",
+      "payment": "CREDIT_CARD",
+      "created_at": "2026-04-12T20:13:23.891Z",
+      "user_id": "1",
+      "id": "RmMYOh6"
+    },
+    {
+      "type": "EXPENSE",
+      "amount": 20000,
+      "category_id": "8",
+      "detail": "책",
+      "memo": "",
+      "payment": "CREDIT_CARD",
+      "transacted_at": "2026-04-12T20:13:33.238Z",
+      "user_id": "1",
+      "id": "VkvCAtK"
+    }
+  ],
+  "transaction_templates": [
+    {
+      "type": "EXPENSE",
+      "amount": 20000,
+      "category_id": "8",
+      "detail": "책",
+      "memo": "",
+      "payment": "CREDIT_CARD",
+      "user_id": "1",
+      "created_at": "2026-04-12T20:13:23.911Z",
+      "id": 1
     }
   ],
   "$schema": "./node_modules/json-server/schema.json"

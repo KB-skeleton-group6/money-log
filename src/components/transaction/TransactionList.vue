@@ -1,5 +1,6 @@
 <script setup>
 import { ref, computed } from "vue";
+import dayjs from "dayjs";
 import { useTransactionStore } from "@/stores/transactions/useTransactionStore";
 import DeleteConfirmModal from "@/components/transaction/DeleteConfirmModal.vue";
 import TransactionItem from "@/components/transaction/TransactionItem.vue";
@@ -34,7 +35,7 @@ const groupedTransactions = computed(() => {
     (a, b) => new Date(b.date) - new Date(a.date),
   );
   sortedGroups.forEach((group) => {
-    group.items.sort((a, b) => a.detail.localeCompare(b.detail));
+    group.items.sort((a, b) => dayjs(b.transacted_at).diff(dayjs(a.transacted_at)));
   });
 
   return sortedGroups;
