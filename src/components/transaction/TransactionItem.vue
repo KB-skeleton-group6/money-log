@@ -1,10 +1,9 @@
 <script setup>
 import { ref } from "vue";
-import { storeToRefs } from "pinia";
 import { useCategoryStore } from "@/stores/categories/useCategoryStore";
 import { useAddTransactionStore } from "@/stores/transactions/useAddTransactionStore";
+import { usePaymentMethodStore } from "@/stores/payments/usePaymentMethodStore";
 import { formatAmountShort } from "@/utils/formatter";
-import { Payments } from "@/constant/paymentMethods";
 
 const props = defineProps({
   item: { type: Object, required: true },
@@ -13,6 +12,7 @@ const props = defineProps({
 const emit = defineEmits(["request-delete"]);
 
 const { getCategoryById } = useCategoryStore();
+const { getPaymentMethodByCode } = usePaymentMethodStore();
 const getCat = (id) => getCategoryById(id);
 
 const { openEditModal } = useAddTransactionStore();
@@ -34,8 +34,7 @@ const formatExpandDate = (dateStr, time) => {
   return `${d.getMonth() + 1}월 ${d.getDate()}일 ${time}`;
 };
 
-const getPayment = (method) =>
-  Object.values(Payments).find((p) => p.value === method);
+const getPayment = (method) => getPaymentMethodByCode(method);
 </script>
 
 <template>
@@ -137,14 +136,14 @@ const getPayment = (method) =>
               {{ formatAmount(item.amount, item.type) }}
             </span>
           </div>
-          <div class="expand-row" v-if="item.method">
+          <div class="expand-row" v-if="item.payment">
             <span class="expand-label">결제수단</span>
             <span class="expand-value">
               <i
-                :class="getPayment(item.method)?.icon"
-                :style="{ color: getPayment(item.method)?.color }"
+                :class="getPayment(item.payment)?.icon"
+                :style="{ color: getPayment(item.payment)?.color }"
               ></i>
-              {{ getPayment(item.method)?.name ?? item.method }}
+              {{ getPayment(item.payment)?.name ?? item.payment }}
             </span>
           </div>
           <div class="expand-row" v-if="item.memo">

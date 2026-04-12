@@ -16,7 +16,7 @@ export const useAddTransactionStore = defineStore("addTransaction", () => {
     category_id: "",
     detail: "",
     memo: "",
-    method: "CARD",
+    payment: "CREDIT_CARD",
   };
 
   const formData = reactive({ ...initialFormState });
