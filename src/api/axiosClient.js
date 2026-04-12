@@ -1,12 +1,12 @@
-import axios from 'axios';
+import axios from "axios";
 import {
   FetchFailedError,
   NetworkOfflineError,
   SaveFailedError,
-} from './networkError';
-import { ErrorCode } from '@/constant/errorCode';
+} from "./networkError";
+import { ErrorCode } from "@/constant/errorCode";
 
-const urlPrefix = '/api';
+const urlPrefix = "/api";
 
 const isRequestSuccessful = (statusCode) => {
   return statusCode >= 200 && statusCode < 300;
@@ -102,7 +102,11 @@ async function getTransaction(transactionId) {
 }
 
 async function getTransactionsByUserId(userId) {
-  const res = await axios.get(`${urlPrefix}/transactions?user_id:eq=${userId}`);
+  const res = await axios.get(`${urlPrefix}/transactions`, {
+    params: { user_id: userId },
+  });
+
+  checkRequestFailed(res.status, ErrorCode.FETCH_FAILED);
 
   return res.data;
 }
@@ -140,6 +144,32 @@ async function getCategories() {
   return res.data;
 }
 
+async function getBudgets(userId) {
+  const res = await axios.get(`${urlPrefix}/budgets`, {
+    params: { user_id: userId },
+  });
+
+  checkRequestFailed(res.status, ErrorCode.FETCH_FAILED);
+
+  return res.data;
+}
+
+async function createBudget(budget) {
+  const res = await axios.post(`${urlPrefix}/budgets`, budget);
+
+  checkRequestFailed(res.status, ErrorCode.SAVE_FAILED);
+
+  return res.data;
+}
+
+async function updateBudget(id, budget) {
+  const res = await axios.put(`${urlPrefix}/budgets/${id}`, budget);
+
+  checkRequestFailed(res.status, ErrorCode.SAVE_FAILED);
+
+  return res.data;
+}
+
 const memberApi = {
   getMembers,
   getMember,
@@ -162,4 +192,10 @@ const categoryApi = {
   getCategories,
 };
 
-export default { memberApi, transactionApi, categoryApi };
+const budgetApi = {
+  getBudgets,
+  createBudget,
+  updateBudget,
+};
+
+export default { memberApi, transactionApi, categoryApi, budgetApi };

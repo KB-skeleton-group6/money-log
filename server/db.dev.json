@@ -9,21 +9,158 @@
     }
   ],
   "categories": [
-    { "id": 1, "code": "FOOD", "name": "식비", "type": "EXPENSE" },
-    { "id": 2, "code": "CAFE", "name": "카페", "type": "EXPENSE" },
-    { "id": 3, "code": "TRANSPORT", "name": "교통", "type": "EXPENSE" },
-    { "id": 4, "code": "SHOPPING", "name": "쇼핑", "type": "EXPENSE" },
-    { "id": 5, "code": "GROCERIES", "name": "식료품", "type": "EXPENSE" },
-    { "id": 6, "code": "SUBSCRIPTION", "name": "구독", "type": "EXPENSE" },
-    { "id": 7, "code": "HEALTH", "name": "건강", "type": "EXPENSE" },
-    { "id": 8, "code": "EDUCATION", "name": "교육", "type": "EXPENSE" },
-    { "id": 9, "code": "LEISURE", "name": "여가", "type": "EXPENSE" },
-    { "id": 10, "code": "ETC_EXPENSE", "name": "기타", "type": "EXPENSE" },
-    { "id": 11, "code": "SALARY", "name": "급여", "type": "INCOME" },
-    { "id": 12, "code": "SIDE_JOB", "name": "부업", "type": "INCOME" },
-    { "id": 13, "code": "INVESTMENT", "name": "투자", "type": "INCOME" },
-    { "id": 14, "code": "ALLOWANCE", "name": "용돈", "type": "INCOME" },
-    { "id": 15, "code": "ETC_INCOME", "name": "기타", "type": "INCOME" }
+    {
+      "id": 1,
+      "code": "FOOD",
+      "name": "식비",
+      "type": "EXPENSE"
+    },
+    {
+      "id": 2,
+      "code": "CAFE",
+      "name": "카페",
+      "type": "EXPENSE"
+    },
+    {
+      "id": 3,
+      "code": "TRANSPORT",
+      "name": "교통",
+      "type": "EXPENSE"
+    },
+    {
+      "id": 4,
+      "code": "SHOPPING",
+      "name": "쇼핑",
+      "type": "EXPENSE"
+    },
+    {
+      "id": 5,
+      "code": "GROCERIES",
+      "name": "식료품",
+      "type": "EXPENSE"
+    },
+    {
+      "id": 6,
+      "code": "SUBSCRIPTION",
+      "name": "구독",
+      "type": "EXPENSE"
+    },
+    {
+      "id": 7,
+      "code": "HEALTH",
+      "name": "건강",
+      "type": "EXPENSE"
+    },
+    {
+      "id": 8,
+      "code": "EDUCATION",
+      "name": "교육",
+      "type": "EXPENSE"
+    },
+    {
+      "id": 9,
+      "code": "LEISURE",
+      "name": "여가",
+      "type": "EXPENSE"
+    },
+    {
+      "id": 10,
+      "code": "ETC_EXPENSE",
+      "name": "기타",
+      "type": "EXPENSE"
+    },
+    {
+      "id": 11,
+      "code": "SALARY",
+      "name": "급여",
+      "type": "INCOME"
+    },
+    {
+      "id": 12,
+      "code": "SIDE_JOB",
+      "name": "부업",
+      "type": "INCOME"
+    },
+    {
+      "id": 13,
+      "code": "INVESTMENT",
+      "name": "투자",
+      "type": "INCOME"
+    },
+    {
+      "id": 14,
+      "code": "ALLOWANCE",
+      "name": "용돈",
+      "type": "INCOME"
+    },
+    {
+      "id": 15,
+      "code": "ETC_INCOME",
+      "name": "기타",
+      "type": "INCOME"
+    }
+  ],
+  "budgets": [
+    {
+      "user_id": 1,
+      "category_id": 1,
+      "amount": 1000000,
+      "id": 1
+    },
+    {
+      "user_id": 1,
+      "category_id": 2,
+      "amount": 0,
+      "id": 2
+    },
+    {
+      "user_id": 1,
+      "category_id": 3,
+      "amount": 50000,
+      "id": 3
+    },
+    {
+      "user_id": 1,
+      "category_id": 4,
+      "amount": 0,
+      "id": 4
+    },
+    {
+      "user_id": 1,
+      "category_id": 5,
+      "amount": 0,
+      "id": 5
+    },
+    {
+      "user_id": 1,
+      "category_id": 6,
+      "amount": 0,
+      "id": 6
+    },
+    {
+      "user_id": 1,
+      "category_id": 7,
+      "amount": 0,
+      "id": 7
+    },
+    {
+      "user_id": 1,
+      "category_id": 8,
+      "amount": 0,
+      "id": 8
+    },
+    {
+      "user_id": 1,
+      "category_id": 9,
+      "amount": 0,
+      "id": 9
+    },
+    {
+      "user_id": 1,
+      "category_id": 10,
+      "amount": 0,
+      "id": 10
+    }
   ],
   "transactions": [
     {
@@ -325,6 +462,46 @@
       "method": "CARD",
       "transacted_at": "2026-04-11T19:00:00.000Z",
       "created_at": "2026-04-11T19:00:00.000Z"
+    },
+    {
+      "type": "EXPENSE",
+      "amount": 1500,
+      "category_id": 3,
+      "detail": "버스",
+      "transacted_at": "2026-04-12T15:44:36.534Z",
+      "user_id": 1,
+      "id": 26
+    },
+    {
+      "type": "EXPENSE",
+      "transacted_at": "2026-04-12T00:00:00.000Z",
+      "amount": 50000,
+      "category_id": 8,
+      "detail": "교육",
+      "memo": "",
+      "method": "CARD",
+      "created_at": "2026-04-12T15:45:15.557Z",
+      "user_id": 1,
+      "id": 27
+    },
+    {
+      "type": "EXPENSE",
+      "amount": 15000,
+      "category_id": 7,
+      "detail": "약국",
+      "transacted_at": "2026-04-12T15:45:25.665Z",
+      "user_id": 1,
+      "id": 28
+    },
+    {
+      "type": "EXPENSE",
+      "amount": 1500,
+      "category_id": 3,
+      "detail": "버스",
+      "transacted_at": "2026-04-12T17:29:02.259Z",
+      "user_id": 1,
+      "id": 29
     }
-  ]
+  ],
+  "$schema": "./node_modules/json-server/schema.json"
 }
