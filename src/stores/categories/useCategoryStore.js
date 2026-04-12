@@ -14,10 +14,10 @@ export const useCategoryStore = defineStore("category", () => {
     }
   }
 
-  const DEFAULT_CATEGORY = { name: '미분류', ...DEFAULT_CATEGORY_UI };
+  const DEFAULT_CATEGORY = { name: "미분류", ...DEFAULT_CATEGORY_UI };
 
   function getCategoryById(id) {
-    return categories.value.find((c) => c.id === id) ?? DEFAULT_CATEGORY;
+    return categories.value.find((c) => String(c.id) === String(id)) ?? DEFAULT_CATEGORY;
   }
 
   return { categories, fetchCategories, getCategoryById };

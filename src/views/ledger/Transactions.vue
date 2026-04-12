@@ -2,6 +2,7 @@
 import { ref, computed, onMounted, watch } from 'vue';
 import { storeToRefs } from 'pinia';
 import { useTransactionStore } from '@/stores/transactions/useTransactionStore';
+import { useCategoryStore } from '@/stores/categories/useCategoryStore';
 import TransactionList from '@/components/transaction/TransactionList.vue';
 import TransactionAddModal from '@/components/transaction/TransactionAddModal.vue';
 import { useAuthStore } from '@/stores/auth/useAuthStore';
@@ -11,7 +12,8 @@ const transactionStore = useTransactionStore();
 const authStore = useAuthStore();
 
 // 데이터(ref)는 storeToRefs로 감싸서 꺼내야 화면이 실시간으로 바뀜
-const { transactions, categories, loading } = storeToRefs(transactionStore);
+const { transactions, loading } = storeToRefs(transactionStore);
+const { categories } = storeToRefs(useCategoryStore());
 
 // 함수(액션)는 그냥 바로 꺼냅니다.
 const { fetchData, deleteTransaction, updateTransaction } = transactionStore;
@@ -263,7 +265,6 @@ const formatCurrency = (val) => new Intl.NumberFormat('ko-KR').format(val);
     <template v-else>
       <TransactionList
         :transactions="pagedTransactions"
-        :categories="categories"
         @delete="deleteTransaction"
         @edit="updateTransaction"
       />
