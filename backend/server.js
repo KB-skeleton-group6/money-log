@@ -21,6 +21,13 @@ server.use((req, res, next) => {
   next();
 });
 
+// /api/xxx 경로로 들어오는 요청을 /xxx 로 변환하여 처리
+server.use(
+  jsonServer.rewriter({
+    '/api/*': '/$1',
+  }),
+);
+
 // 라우터 연결
 server.use(router);
 
