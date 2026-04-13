@@ -1,14 +1,17 @@
 <script setup>
-import { inject, ref, onMounted, onUnmounted } from "vue";
-import { useRouter } from "vue-router";
-import { useAuthStore } from "@/stores/auth/useAuthStore";
+import { inject, ref, onMounted, onUnmounted } from 'vue';
+import { useRouter } from 'vue-router';
+import { useAuthStore } from '@/stores/auth/useAuthStore';
 
 const router = useRouter();
 const authStore = useAuthStore();
 const { isLoggedIn } = authStore;
-const openAuthModal = inject("openAuthModal", null);
+const openAuthModal = inject('openAuthModal', null);
 
 const showScrollTop = ref(false);
+
+const activePreview = ref(0);
+const previewTabs = ['대시보드(홈)', '거래 내역', '통계', '마이페이지'];
 
 const handleScroll = () => {
   showScrollTop.value = window.scrollY > 300;
@@ -16,7 +19,7 @@ const handleScroll = () => {
 
 const handlePrimaryAction = () => {
   if (isLoggedIn) {
-    router.push("/ledger/dashboard");
+    router.push('/ledger/dashboard');
     return;
   }
 
@@ -24,17 +27,17 @@ const handlePrimaryAction = () => {
 };
 
 const scrollToIntro = () => {
-  const element = document.getElementById("intro");
+  const element = document.getElementById('intro');
   if (element) {
-    element.scrollIntoView({ behavior: "smooth" });
+    element.scrollIntoView({ behavior: 'smooth' });
   }
 };
 
 onMounted(() => {
-  window.addEventListener("scroll", handleScroll);
+  window.addEventListener('scroll', handleScroll);
 });
 onUnmounted(() => {
-  window.removeEventListener("scroll", handleScroll);
+  window.removeEventListener('scroll', handleScroll);
 });
 </script>
 
@@ -48,11 +51,7 @@ onUnmounted(() => {
           직관적인 통계로 소비 패턴을 분석하세요.<br />
           Money Log와 함께 현명한 금융 생활을 시작해 보세요.
         </p>
-        <button
-          v-if="!isLoggedIn"
-          class="cta-btn"
-          @click="handlePrimaryAction"
-        >
+        <button v-if="!isLoggedIn" class="cta-btn" @click="handlePrimaryAction">
           지금 바로 시작하기
         </button>
         <button
@@ -104,22 +103,48 @@ onUnmounted(() => {
       <div class="preview-header">
         <h2>- 실제 화면 -</h2>
         <p>군더더기 없는 깔끔한 디자인으로 자산 관리에만 집중하세요.</p>
+        <div class="preview-tabs">
+          <button
+            v-for="(tab, index) in previewTabs"
+            :key="index"
+            :class="['tab-btn', { active: activePreview === index }]"
+            @click="activePreview = index"
+          >
+            {{ tab }}
+          </button>
+        </div>
       </div>
       <div class="preview-content">
         <div class="mockup-window">
-          <div class="mockup-placeholder">
-            <i class="fa-solid fa-laptop-code"></i>
-            <p>대시보드 화면 캡처가 들어갈 자리입니다.</p>
-          </div>
+          <img
+            v-show="activePreview === 0"
+            src="@/assets/images/main-dashboard.png"
+            alt="대시보드 실제 화면"
+            class="preview-image"
+          />
+          <img
+            v-show="activePreview === 1"
+            src="@/assets/images/transaction-list.png"
+            alt="내역 관리 실제 화면"
+            class="preview-image"
+          />
+          <img
+            v-show="activePreview === 2"
+            src="@/assets/images/statistics-chart.png"
+            alt="통계 분석 실제 화면"
+            class="preview-image"
+          />
+          <img
+            v-show="activePreview === 3"
+            src="@/assets/images/my-page.png"
+            alt="마이페이지 실제 화면"
+            class="preview-image"
+          />
         </div>
       </div>
     </section>
 
-    <button
-      v-if="showScrollTop"
-      class="scroll-top-btn"
-      @click="scrollToIntro"
-    >
+    <button v-if="showScrollTop" class="scroll-top-btn" @click="scrollToIntro">
       <i class="fa-solid fa-arrow-up"></i>
     </button>
   </div>
@@ -313,6 +338,36 @@ onUnmounted(() => {
   font-size: 1.1rem;
   color: #747d8c;
 }
+.preview-tabs {
+  display: flex;
+  justify-content: center;
+  gap: 12px;
+  margin-top: 30px;
+  flex-wrap: wrap;
+}
+.tab-btn {
+  padding: 10px 24px;
+  border: 1px solid #dfe4ea;
+  background-color: white;
+  color: #747d8c;
+  border-radius: 30px;
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+}
+.tab-btn:hover {
+  background-color: #f1f2f6;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.05);
+}
+.tab-btn.active {
+  background-color: #20bf6b;
+  color: white;
+  border-color: #20bf6b;
+  transform: translateY(-2px);
+  box-shadow: 0 6px 16px rgba(32, 191, 107, 0.3);
+}
 .preview-content {
   max-width: 1000px;
   margin: 0 auto;
@@ -324,23 +379,10 @@ onUnmounted(() => {
   overflow: hidden;
   border: 1px solid #eee;
 }
-.mockup-placeholder {
-  height: 500px;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  background: linear-gradient(to bottom right, #f8f9fa, #e0f2fe);
-  color: #a4b0be;
-}
-.mockup-placeholder i {
-  font-size: 5rem;
-  margin-bottom: 20px;
-  color: #70a1ff;
-}
-.mockup-placeholder p {
-  font-size: 1.2rem;
-  font-weight: bold;
+.preview-image {
+  width: 100%;
+  height: auto;
+  display: block;
 }
 
 /* 최상단으로 이동 버튼 */
@@ -419,9 +461,6 @@ onUnmounted(() => {
   }
   .preview-header h2 {
     font-size: 2rem;
-  }
-  .mockup-placeholder {
-    height: 300px;
   }
   .scroll-top-btn {
     bottom: 20px;

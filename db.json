@@ -1,0 +1,7 @@
+{
+  "members": [],
+  "categories": [],
+  "payments": [],
+  "transactions": [],
+  "$schema": "./node_modules/json-server/schema.json"
+}
