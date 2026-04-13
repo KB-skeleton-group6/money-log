@@ -57,7 +57,9 @@ async function getMember(memberId) {
 }
 
 async function getMemberByEmail(email) {
-  const res = await axios.get(`${urlPrefix}/members?email:eq=${email}`);
+  const res = await axios.get(`${urlPrefix}/members`, {
+    params: { email },
+  });
 
   checkRequestFailed(res.status, ErrorCode.FETCH_FAILED);
 
