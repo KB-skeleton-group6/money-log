@@ -67,7 +67,7 @@ export const useAddTransactionStore = defineStore("addTransaction", () => {
       const payload = {
         ...formRest,
         amount: Number(formData.amount),
-        transacted_at: dayjs(`${formData.transacted_at} ${transacted_time}`).toISOString(),
+        transacted_at: dayjs(`${dayjs(formData.transacted_at).format("YYYY-MM-DD")} ${transacted_time}`).toISOString(),
         created_at: new Date().toISOString(),
       };
 
